@@ -30,6 +30,7 @@
   "license": "Apache-2.0",
   "imports": {
     "fs": "bare-fs",
+    "path": "bare-path",
     "child_process": "bare-subprocess"
   },
   "dependencies": {
@@ -39,9 +40,11 @@
     "bare-subprocess": "^4.0.3",
     "hypercore-id-encoding": "^1.3.0",
     "paparam": "^1.6.1",
+    "pear-link": "^2.0.6",
     "safety-catch": "^1.0.2",
     "sodium-native": "^4.3.1",
     "url-file-url": "^1.0.4",
-    "which-runtime": "^1.2.1"
+    "which-runtime": "^1.2.1",
+    "z32": "^1.1.0"
   }
 }
