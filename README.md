@@ -25,12 +25,6 @@ global.Pear = new API(ipc, state, { worker })
 
 This creates the usual `global.Pear` API with the interface-runtime-specific `UIAPI` stored on a symbolic reference so it can later be exported from interface module entrypoint. The `global.Pear.worker` API can also be customized by extending `pear-api/worker` and passing an instance of the extended worker to `API`.
 
-## Statics
-
-### `API.ui` `<Symbol>`
-
-Interface integration generally leads to the need for state setup in pre-init (e.g. preload). At the same time there can be a need to override parts of the API anyway, so during API initialization is the first place to hookup UI APIs. The `API.ui` symbol can be used for integration purposes to store ui state or API for later public exposure, e.g. `module.exports = Pear[Pear.constructor.ui]`.
-
 ## Integration Libraries
 
 The `pear-api` module also exposes libraries that provide platform core functionality.
