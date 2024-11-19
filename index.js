@@ -23,7 +23,6 @@ class API {
   #refs = 0
   config = null
   argv = program.argv
-  static ui = Symbol('ui')
   constructor (ipc, state, { worker = new Worker({ ref: () => this.#ref(), unref: () => this.#unref() }), teardown = onteardown } = {}) {
     this.#ipc = ipc
     this.#state = state
