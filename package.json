@@ -1,13 +1,31 @@
 {
   "name": "pear-api",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Pear API Base & Integration Module",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "files": ["cmd-def/", "constants.js", "crasher.js", "gunk.js", "index.js", "shell.js", "teardown.js", "tryboot.js", "worker.js"],
-  "keywords": ["pear", "pear runtime", "peer-to-peer", "p2p", "api", "integration", "extension"],
+  "files": [
+    "cmd-def/",
+    "constants.js",
+    "crasher.js",
+    "gunk.js",
+    "index.js",
+    "shell.js",
+    "teardown.js",
+    "tryboot.js",
+    "worker.js"
+  ],
+  "keywords": [
+    "pear",
+    "pear runtime",
+    "peer-to-peer",
+    "p2p",
+    "api",
+    "integration",
+    "extension"
+  ],
   "author": "Holepunch",
   "license": "Apache-2.0",
   "imports": {
