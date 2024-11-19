@@ -6,7 +6,7 @@ const sodium = require('sodium-native')
 const b4a = require('b4a')
 const shell = require('./shell')
 const { flags } = shell(global.Bare?.argv.slice(1) || global.process.argv.slice(2))
-const CHECKOUT = flags.checkout ?? Pear.config.checkout
+const CHECKOUT = flags.checkout ?? global.Pear?.config.checkout ?? require('./checkout')
 
 const BIN = 'by-arch/' + platform + '-' + arch + '/bin/'
 
