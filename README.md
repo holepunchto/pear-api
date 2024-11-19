@@ -43,6 +43,14 @@ Platform constants.
 
 Platform gunk - glue-state for native and protocol integration.
 
+### `pear-api/state`
+
+Base `State` class for cross-process state management.
+
+### `pear-api/errors`
+
+Platform error types. Includes `known` method for checking if error is recognized.
+
 ### `pear-api/crasher`
 
 Sets up crash handlers and outputs crash logs to a known location on-disk.
@@ -54,6 +62,10 @@ Attempt to boot the sidecar. Useful when establishing a `pear-ipc` connection fr
 ### `pear-api/worker`
 
 The class for the `Pear.worker` API. Extend this class, create a worker instance and pass it to as an option to `pear-api` `API` class to override methods as needed for a given interface-runtime.
+
+### `pear-api/parse-link`
+
+Parse `pear://` links per [`pear-link`](https://github.com/holepunchto/pear-link).
 
 ### `pear-api/teardown`
 
