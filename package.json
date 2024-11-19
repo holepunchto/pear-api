@@ -10,9 +10,12 @@
     "cmd-def/",
     "constants.js",
     "crasher.js",
+    "errors.js",
     "gunk.js",
     "index.js",
+    "parse-link.js",
     "shell.js",
+    "state.js",
     "teardown.js",
     "tryboot.js",
     "worker.js"
