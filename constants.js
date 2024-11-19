@@ -1,21 +1,25 @@
 'use strict'
 const hypercoreid = require('hypercore-id-encoding')
 const { platform, arch, isWindows, isLinux } = require('which-runtime')
-const { pathToFileURL, fileURLToPath } = require('url-file-url')
+const { fileURLToPath } = require('url-file-url')
 const sodium = require('sodium-native')
 const b4a = require('b4a')
-const CHECKOUT = require('./checkout')
-const { ERR_COULD_NOT_INFER_MODULE_PATH } = require('./errors')
+const shell = require('./shell')
+const { flags } = shell(global.Bare?.argv.slice(1) || global.process.argv.slice(2))
+const CHECKOUT = flags.checkout ?? Pear.config.checkout
 
 const BIN = 'by-arch/' + platform + '-' + arch + '/bin/'
 
-let url = module.url || electronModuleURL()
-if (url.protocol === 'pear:' && url.host === 'dev') {
-  url = global.Pear.config.applink
-  if (url.slice(-1) !== '/') url += '/'
+let mount = flags.mountpoint
+if (!mount) {
+  let url = require.main?.url
+  if (url && url.protocol === 'pear:' && url.host === 'dev') {
+    url = global.Pear.config.applink
+    if (url.slice(-1) !== '/') url += '/'
+  }
+  mount = flags.mountpoint ? new URL(flags.mountpoint) : new URL('.', url)
 }
 
-const mount = new URL('.', url)
 const LOCALDEV = CHECKOUT.length === null
 const swapURL = mount.pathname.endsWith('.bundle/') ? new URL('..', mount) : mount
 
@@ -24,12 +28,6 @@ const IPC_ID = 'pear'
 const PLATFORM_URL = LOCALDEV ? new URL('pear/', swapURL) : new URL('../../../', swapURL)
 const PLATFORM_DIR = toPath(PLATFORM_URL)
 const PLATFORM_LOCK = toPath(new URL('corestores/platform/primary-key', PLATFORM_URL))
-
-const DESKTOP_EXEC = isWindows
-  ? 'pear-runtime-app/Pear Runtime.exe'
-  : isLinux
-    ? 'pear-runtime-app/pear-runtime'
-    : 'Pear Runtime.app/Contents/MacOS/Pear Runtime'
 
 const RUNTIME_EXEC = isWindows
   ? 'pear-runtime.exe'
@@ -74,20 +72,10 @@ exports.SPINDOWN_TIMEOUT = 60_000
 
 exports.WAKEUP = toPath(new URL(BIN + WAKEUP_EXEC, swapURL))
 exports.RUNTIME = toPath(new URL(BIN + RUNTIME_EXEC, swapURL))
-exports.DESKTOP_RUNTIME = toPath(new URL(BIN + DESKTOP_EXEC, swapURL))
-
-exports.BARE_RESTART_EXIT_CODE = 75
 
 exports.SALT = b4a.from('d134aa8b0631f1193b5031b356d82dbea214389208fa4a0bcdf5c2e062d8ced2', 'hex')
 
 exports.KNOWN_NODES_LIMIT = 100
-
-function electronModuleURL () {
-  const u = pathToFileURL(process.execPath)
-  const i = u.href.lastIndexOf(BIN)
-  if (i === -1) throw ERR_COULD_NOT_INFER_MODULE_PATH('Could not infer the actual module path')
-  return new URL(u.href.slice(0, i) + 'constants.js')
-}
 
 function toPath (u) {
   return fileURLToPath(u).replace(/[/\\]$/, '') || '/'
