@@ -14,5 +14,5 @@ module.exports = [
   flag('--appling').hide(), // appling legacy
   flag('--dht-bootstrap <nodes>').hide(),
   flag('--checkout json').hide(),
-  flag('--mountpoint url').hide(),
+  flag('--mountpoint url').hide()
 ]

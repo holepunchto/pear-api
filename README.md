@@ -55,7 +55,7 @@ Attempt to boot the sidecar. Useful when establishing a `pear-ipc` connection fr
 
 ### `pear-api/worker`
 
-The class for the `Pear.worker` API. Extend this class, create a worker instance and pass it to as an option to `pear-api` `API` class to override methods as needed for a given interface-runtime.
+Internal class, pass this (or a subclass of it) to the `pear-api` `API` constructor for `Pear.run` to use.
 
 ### `pear-api/parse-link`
 
@@ -64,6 +64,10 @@ Parse `pear://` links per [`pear-link`](https://github.com/holepunchto/pear-link
 ### `pear-api/teardown`
 
 The `Pear.teardown` function.
+
+### `pear-api/transform`
+
+A minimal transformer for `__LOCALVAR__`-style templates.
 
 ### `pear-api/cmd-def/pear`
 

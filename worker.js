@@ -7,7 +7,7 @@ const Pipe = isBare
   ? require('bare-pipe')
   : class Pipe extends require('net').Socket { constructor (fd) { super({ fd }) } }
 const teardown = isBare ? require('./teardown') : (fn) => fn()
-const { RUNTIME } = require('./constants') 
+const { RUNTIME } = require('./constants')
 const rundef = require('./cmd-def/run')
 const noop = Function.prototype
 
@@ -23,7 +23,7 @@ class Worker {
 
   #args (link) {
     const parser = command('pear', command('run', ...rundef))
-    const argv = ['run', '--trusted', ...Bare.argv.slice(2)]
+    const argv = ['run', '--trusted', ...global.Bare.argv.slice(2)]
     const cmd = parser.parse(argv, { sync: true })
     const args = argv.map((arg) => arg === cmd.args.link ? link : arg)
     if (cmd.indices.rest > 0) args.splice(cmd.indices.rest)
@@ -70,7 +70,7 @@ class Worker {
     })
     this.#pipe = pipe
     pipe.once('close', () => {
-      teardown(() => Bare.exit(), Number.MAX_SAFE_INTEGER)
+      teardown(() => global.Bare.exit(), Number.MAX_SAFE_INTEGER)
     })
     return pipe
   }

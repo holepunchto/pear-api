@@ -14,9 +14,6 @@ class PearError extends Error {
   static ERR_UNSTAGED = ERR_UNSTAGED
   static ERR_DIR_NONEMPTY = ERR_DIR_NONEMPTY
   static ERR_OPERATION_FAILED = ERR_OPERATION_FAILED
-  static ERR_HTTP_GONE = ERR_HTTP_GONE
-  static ERR_HTTP_BAD_REQUEST = ERR_HTTP_BAD_REQUEST
-  static ERR_HTTP_NOT_FOUND = ERR_HTTP_NOT_FOUND
   static ERR_SECRET_NOT_FOUND = ERR_SECRET_NOT_FOUND
   static ERR_NOT_FOUND_OR_NOT_CONNECTED = ERR_NOT_FOUND_OR_NOT_CONNECTED
   static ERR_INVALID_MANIFEST = ERR_INVALID_MANIFEST
@@ -73,24 +70,6 @@ function ERR_INVALID_TEMPLATE (msg) {
 
 function ERR_PERMISSION_REQUIRED (msg, info = {}) {
   return new PearError(msg, 'ERR_PERMISSION_REQUIRED', ERR_PERMISSION_REQUIRED, info)
-}
-
-function ERR_HTTP_GONE () {
-  const err = new PearError('Gone', 'ERR_HTTP_GONE', ERR_HTTP_GONE)
-  err.status = 410
-  return err
-}
-
-function ERR_HTTP_BAD_REQUEST (msg = 'Bad Request') {
-  const err = new PearError(msg, 'ERR_HTTP_BAD_REQUEST', ERR_HTTP_BAD_REQUEST)
-  err.status = 400
-  return err
-}
-
-function ERR_HTTP_NOT_FOUND (msg) {
-  const err = new PearError(msg, 'ERR_HTTP_NOT_FOUND', ERR_HTTP_NOT_FOUND)
-  err.status = 404
-  return err
 }
 
 function ERR_SECRET_NOT_FOUND (msg) {
