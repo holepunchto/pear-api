@@ -4,7 +4,7 @@ const { platform, arch, isWindows, isLinux } = require('which-runtime')
 const { fileURLToPath } = require('url-file-url')
 const sodium = require('sodium-native')
 const b4a = require('b4a')
-const shell = require('./shell')
+const shell = require('./cmd-def')
 const { flags } = shell(global.Bare?.argv.slice(1) || global.process.argv.slice(2))
 const CHECKOUT = flags.checkout ?? global.Pear?.config.checkout ?? require('./checkout')
 

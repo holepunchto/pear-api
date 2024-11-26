@@ -31,17 +31,15 @@
   ],
   "author": "Holepunch",
   "license": "Apache-2.0",
-  "imports": {
-    "fs": "bare-fs",
-    "path": "bare-path",
-    "child_process": "bare-subprocess"
-  },
   "dependencies": {
     "b4a": "^1.6.7",
     "bare-path": "^3.0.0",
     "bare-signals": "^3.0.2",
     "bare-subprocess": "^4.0.3",
+    "child_process": "npm:bare-node-child-process",
+    "fs": "npm:bare-node-fs",
     "hypercore-id-encoding": "^1.3.0",
+    "path": "npm:bare-node-path",
     "paparam": "^1.6.1",
     "pear-link": "^2.0.6",
     "safety-catch": "^1.0.2",

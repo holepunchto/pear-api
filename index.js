@@ -1,6 +1,9 @@
 'use strict'
+const { RUNTIME } = require('./constants')
+const Worker = require('./worker')
 const onteardown = global.Bare ? require('./teardown') : noop
 const program = global.Bare || global.process
+const kIPC = Symbol('ipc')
 
 class Identity {
   #reftrack = null
@@ -21,20 +24,25 @@ class API {
   #unloading = null
   #teardowns = null
   #refs = 0
+  #worker = null
   config = null
   argv = program.argv
+  static RUNTIME = RUNTIME
+  static IPC = kIPC
   constructor (ipc, state, { worker = new Worker({ ref: () => this.#ref(), unref: () => this.#unref() }), teardown = onteardown } = {}) {
     this.#ipc = ipc
     this.#state = state
     this.#refs = 0
+    this.#worker = worker
+    this.#teardowns = new Promise((resolve) => { this.#unloading = resolve })
     this.key = this.#state.key ? (this.#state.key.type === 'Buffer' ? Buffer.from(this.#state.key.data) : this.#state.key) : null
     this.config = state.config
-    this.worker = worker
     this.identity = new Identity({ reftrack: (promise) => this.#reftrack(promise), ipc: this.#ipc })
-    this.#teardowns = new Promise((resolve) => { this.#unloading = resolve })
     teardown(() => this.#unload())
     this.#ipc.unref()
   }
+
+  get [kIPC] () { return this.#ipc }
 
   #ref () {
     this.#refs++
@@ -67,7 +75,7 @@ class API {
     if (timedout) {
       console.error(`Max teardown wait reached after ${MAX_TEARDOWN_WAIT} ms. Exiting...`)
       if (global.Bare) {
-        Bare.exit()
+        global.Bare.exit()
       } else {
         const electron = require('electron')
         electron.ipcRenderer.send('app-exit') // graceful electron shutdown
@@ -104,6 +112,10 @@ class API {
   }
 
   versions = () => this.#reftrack(this.#ipc.versions())
+
+  run = (link, args) => this.#worker.run(link, args)
+
+  get pipe () { return this.#worker.pipe() }
 
   restart = async (opts = {}) => {
     if (this.#state.ui === null) throw new Error('Pear.restart is not supported for terminal apps')

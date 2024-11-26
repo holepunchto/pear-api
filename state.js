@@ -81,10 +81,10 @@ module.exports = class State {
   }
 
   static configFrom (state) {
-    const { id, key, links, alias, env, ui, options, checkpoint, checkout, flags, dev, tier, stage, storage, name, main, dependencies, args, channel, release, applink, fragment, link, linkData, entrypoint, dir, dht } = state
+    const { id, startId, key, links, alias, env, ui, options, checkpoint, checkout, flags, dev, tier, stage, storage, name, main, dependencies, args, channel, release, applink, fragment, link, linkData, entrypoint, dir, dht } = state
     const pearDir = PLATFORM_DIR
     const mountDir = MOUNT
-    return { id, key, links, alias, env, ui, options, checkpoint, checkout, flags, dev, tier, stage, storage, name, main, dependencies, args, channel, release, applink, fragment, link, linkData, entrypoint, dir, dht, pearDir, mountDir }
+    return { id, startId, key, links, alias, env, ui, options, checkpoint, checkout, flags, dev, tier, stage, storage, name, main, dependencies, args, channel, release, applink, fragment, link, linkData, entrypoint, dir, dht, pearDir, mountDir }
   }
 
   static isKeetInvite (segment) {
