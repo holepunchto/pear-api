@@ -14,7 +14,7 @@ function logCrashAndExit (logPath, errorInfo, checkout, stackTrace, err) {
   // Electron does not play well with process.exit, so use app.exit instead
   const runContext = isBare ? global.Bare : (global.process.versions.electron ? require('electron').app : global.process)
   const timeStamp = (new Date()).toISOString()
-  const pid = isBare ? Bare.pid : global.process.pid
+  const pid = isBare ? global.Bare.pid : global.process.pid
   const uptime = (Date.now() - start) / 1000
   const driveInfo = `key=${checkout.key}\nlength=${checkout.length}\nfork=${checkout.fork}`
   const processInfo = `platform=${platform}\narch=${arch}\npid=${pid}\nuptime=${uptime}s`
