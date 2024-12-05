@@ -2,20 +2,21 @@
 const { isBare, platform, arch } = require('which-runtime')
 const fs = isBare ? require('bare-fs') : require('fs')
 const path = isBare ? require('bare-path') : require('path')
-const CHECKOUT = require('./constants')
+const checkout = require('../checkout')
+const os = isBare ? require('bare-os') : require('os')
 
 let hasLogged = false
 const start = Date.now()
-function logCrashAndExit (logPath, errorInfo, stackTrace, err) {
+function logCrashAndExit (logPath, errorInfo, checkout, stackTrace, err) {
   if (hasLogged) return // Safety: only logging 1 crash per run
   hasLogged = true
 
   // Electron does not play well with process.exit, so use app.exit instead
   const runContext = isBare ? global.Bare : (global.process.versions.electron ? require('electron').app : global.process)
   const timeStamp = (new Date()).toISOString()
-  const pid = isBare ? global.Bare.pid : global.process.pid
+  const pid = isBare ? Bare.pid : global.process.pid
   const uptime = (Date.now() - start) / 1000
-  const driveInfo = `key=${CHECKOUT.key}\nlength=${CHECKOUT.length}\nfork=${CHECKOUT.fork}`
+  const driveInfo = `key=${checkout.key}\nlength=${checkout.length}\nfork=${checkout.fork}`
   const processInfo = `platform=${platform}\narch=${arch}\npid=${pid}\nuptime=${uptime}s`
   const errInfo = err !== null && typeof err === 'object' ? JSON.stringify(err, 0, 4).slice(1, -2) : ''
   const errorMsg = `${timeStamp} ${errorInfo}\n${driveInfo}\n${processInfo}\nstack=${stackTrace + errInfo}\n\n`
@@ -25,7 +26,11 @@ function logCrashAndExit (logPath, errorInfo, stackTrace, err) {
 
   console.error(`Error logged at ${logPath}`)
 
-  runContext.exit(1)
+  if (isBare) {
+    os.kill(pid)
+  } else {
+    runContext.exit(1)
+  }
 }
 
 function setupCrashHandlers (processName, swap) {
@@ -35,12 +40,12 @@ function setupCrashHandlers (processName, swap) {
   runContext.on('unhandledRejection', (reason) => {
     const stack = reason?.stack || reason || ''
     const errorInfo = `${processName} exiting due to unhandled rejection`
-    logCrashAndExit(crashlogPath, errorInfo, stack, reason)
+    logCrashAndExit(crashlogPath, errorInfo, checkout, stack, reason)
   })
 
   runContext.on('uncaughtException', (err) => {
     const errorInfo = `${processName} exiting due to uncaught exception`
-    logCrashAndExit(crashlogPath, errorInfo, err.stack, err)
+    logCrashAndExit(crashlogPath, errorInfo, checkout, err.stack, err)
   })
 }
 
