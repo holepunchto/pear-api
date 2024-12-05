@@ -49,7 +49,6 @@ class Worker {
       this.#unref()
     })
     const pipe = sp.stdio[3]
-    pipe.pid = sp.pid
     const pipeEmit = pipe.emit
     pipe.emit = function (event, ...args) {
       if (event === 'error' && args[0]?.code === 'ENOTCONN') return false
