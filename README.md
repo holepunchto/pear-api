@@ -16,7 +16,7 @@ const Worker = require('pear-api/worker')
 class API extends require('pear-api') {
   constructor (ipc, state, { worker, teardown } = {}) {
     super(ipc, state, { worker, teardown })
-    this[this.constructor.ui] = new UIAPI()
+    this[this.constructor.UI] = new UIAPI()
   }
 }
 const worker = new Worker()

@@ -19,7 +19,7 @@ const validateAppName = (name) => {
 const readPkg = (pkgPath) => {
   let pkg = null
   try { pkg = fs.readFileSync(path.resolve(pkgPath)) } catch { /* ignore */ }
-  if (pkg) pkg = JSON.parse(pkg) // we want to know if this throws, so no catch
+  if (pkg) pkg = JSON.parse(pkg) // important to know if this throws, so no try/catch
   return pkg
 }
 
@@ -148,6 +148,7 @@ module.exports = class State {
     this.cmdArgs = cmdArgs
     this.pkgPath = pkgPath
     this.id = id
+    this.runtimeInfo = flags['runtime-info'] ? JSON.parse(flags['runtime-info']) : null // important to know if this throws, so no try/catch
     this.clearAppStorage = unsafeClearAppStorage
     this.chromeWebrtcInternals = chromeWebrtcInternals
     this.env = { ...env }
