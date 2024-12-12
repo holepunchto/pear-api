@@ -18,7 +18,7 @@ class Identity {
   clear = () => this.#reftrack(this.#ipc.clearIdentity())
 }
 
-class API {
+class API extends global.Pear.constructor {
   #ipc = null
   #state = null
   #unloading = null
@@ -30,6 +30,7 @@ class API {
   static RUNTIME = RUNTIME
   static IPC = kIPC
   constructor (ipc, state, { worker = new Worker({ ref: () => this.#ref(), unref: () => this.#unref() }), teardown = onteardown } = {}) {
+    super()
     this.#ipc = ipc
     this.#state = state
     this.#refs = 0
