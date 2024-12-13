@@ -69,17 +69,18 @@ The `Pear.teardown` function.
 
 A minimal transformer for `__LOCALVAR__`-style templates.
 
-### `pear-api/cmd-def/pear`
+### `pear-api/cmd`
+
+Parse out platform flags while ignoring the rest of the command. Useful for parsing platform flags regardless of whether the flags after `<cmd>` are valid. 
+
+### `pear-api/cmd/pear`
 
 Paparam definition array for the `pear` command. Useful for parsing platform flags passed to an interface-runtime.
 
-### `pear-api/cmd-def/run`
+### `pear-api/cmd/run`
 
 Paparam definition array for the `pear run` command. Useful for parsing run flags passed to an interface-runtime.
 
-### `pear-api/shell`
-
-Parse out platform flags while ignoring the rest of the command. Useful for parsing platform flags regardless of whether the flags after `<cmd>` are valid.
  
 # LICENSE
 

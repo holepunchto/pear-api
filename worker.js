@@ -8,7 +8,7 @@ const Pipe = isBare
   : class Pipe extends require('net').Socket { constructor (fd) { super({ fd }) } }
 const teardown = isBare ? require('./teardown') : (fn) => fn()
 const { RUNTIME } = require('./constants')
-const rundef = require('./cmd-def/run')
+const rundef = require('./cmd/run')
 const noop = Function.prototype
 
 class Worker {

@@ -1,10 +1,11 @@
 'use strict'
 const { spawn } = require('child_process')
-const { RUNTIME, PLATFORM_DIR } = require('./constants.js')
+const { RUNTIME, PLATFORM_DIR } = require('./constants')
+const pear = require('./cmd')
 
 module.exports = function tryboot () {
   const { argv } = global.Bare || global.process
-  const { flags = {} } = require('./shell')(argv.slice(1)) ?? {}
+  const { flags = {} } = pear(argv.slice(1)) ?? {}
   const args = ['--sidecar']
   const dhtBootstrap = argv.includes('--dht-bootstrap') ? argv[argv.indexOf('--dht-bootstrap') + 1] : null
   if (dhtBootstrap) {

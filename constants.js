@@ -4,8 +4,8 @@ const { platform, arch, isWindows, isLinux } = require('which-runtime')
 const { fileURLToPath } = require('url-file-url')
 const sodium = require('sodium-native')
 const b4a = require('b4a')
-const shell = require('./cmd-def')
-const { flags } = shell(global.Bare?.argv.slice(1) || global.process.argv.slice(2))
+const pear = require('./cmd')
+const { flags } = pear(global.Bare?.argv.slice(1) || global.process.argv.slice(2))
 const CHECKOUT = global.Pear.constructor.CHECKOUT
 
 const BIN = 'by-arch/' + platform + '-' + arch + '/bin/'
