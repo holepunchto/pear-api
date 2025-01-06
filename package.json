@@ -4,7 +4,8 @@
   "description": "Pear API Base & Integration Module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "standard",
+    "test": "brittle state.test.js"
   },
   "files": [
     "cmd/",
@@ -47,5 +48,9 @@
     "url-file-url": "^1.0.4",
     "which-runtime": "^1.2.1",
     "z32": "^1.1.0"
+  },
+  "devDependencies": {
+    "brittle": "^3.4.0",
+    "standard": "^17.1.0"
   }
 }
