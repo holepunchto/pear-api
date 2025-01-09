@@ -4,7 +4,7 @@
   "description": "Pear API Base & Integration Module",
   "main": "index.js",
   "scripts": {
-    "lint": "standard",
+    "lint": "standard --fix",
     "test": "brittle state.test.js"
   },
   "files": [
