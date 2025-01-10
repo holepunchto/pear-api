@@ -53,6 +53,7 @@
   },
   "devDependencies": {
     "brittle": "^3.7.0",
+    "pear-ipc": "^3.0.2",
     "standard": "^17.1.2"
   }
 }

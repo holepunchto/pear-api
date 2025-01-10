@@ -6,7 +6,7 @@ const sodium = require('sodium-native')
 const b4a = require('b4a')
 const pear = require('./cmd')
 const { flags } = pear(global.Bare?.argv.slice(1) || global.process.argv.slice(2))
-const CHECKOUT = global.Pear.constructor.CHECKOUT
+const CHECKOUT = global.Pear?.constructor?.CHECKOUT
 
 const BIN = 'by-arch/' + platform + '-' + arch + '/bin/'
 
@@ -20,7 +20,7 @@ if (!mount) {
   mount = flags.mountpoint ? new URL(flags.mountpoint) : new URL('.', url)
 }
 
-const LOCALDEV = CHECKOUT.length === null
+const LOCALDEV = CHECKOUT?.length === null
 const swapURL = mount.pathname.endsWith('.bundle/') ? new URL('..', mount) : mount
 
 const swapPath = toPath(swapURL)
