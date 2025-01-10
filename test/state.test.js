@@ -3,13 +3,12 @@ const test = require('brittle')
 const { command } = require('paparam')
 const IPC = require('pear-ipc')
 const API = require('..')
+const rundef = require('../cmd/run')
+const State = require('../state')
 
 const ipc = new IPC.Client()
 const state = {}
 global.Pear = new API(ipc, state)
-
-const rundef = require('../cmd/run')
-const State = require('../state')
 
 test('new State with runtime info', async (t) => {
   t.plan(2)
