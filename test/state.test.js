@@ -1,6 +1,6 @@
 'use strict'
 const test = require('brittle')
-const { command, flag } = require('paparam')
+const { command } = require('paparam')
 
 // mock global.Pear
 global.Pear = {
@@ -26,7 +26,7 @@ test('new State with runtime info', async (t) => {
   function runMain (cmd) {
     const state = new State({
       flags: cmd.flags,
-      args: cmd.args,
+      args: cmd.args
     })
     t.is(state.runtimeInfo.type, 'bridge')
     t.is(state.runtimeInfo.data, 'http://localhost:1234')
