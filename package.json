@@ -17,6 +17,7 @@
     "shell.js",
     "state.js",
     "teardown.js",
+    "transform",
     "tryboot.js",
     "worker.js"
   ],
