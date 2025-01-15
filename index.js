@@ -27,7 +27,7 @@ class API {
   #worker = null
   config = null
   argv = program.argv
-  static CHECKOUT = global.Pear?.constructor.checkout ?? null
+  static CHECKOUT = global.Pear?.constructor.CHECKOUT ?? null
   static RUNTIME = RUNTIME
   static IPC = kIPC
   constructor (ipc, state, { worker = new Worker({ ref: () => this.#ref(), unref: () => this.#unref() }), teardown = onteardown } = {}) {
