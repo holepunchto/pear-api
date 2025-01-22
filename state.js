@@ -7,7 +7,7 @@ const { pathToFileURL } = require('url-file-url')
 const hypercoreid = require('hypercore-id-encoding')
 const z32 = require('z32')
 const { discoveryKey, randomBytes } = require('hypercore-crypto')
-const { PLATFORM_DIR, MOUNT, RUNTIME } = require('pear-api/constants')
+const { PLATFORM_DIR, SWAP, RUNTIME } = require('pear-api/constants')
 const CWD = isBare ? os.cwd() : process.cwd()
 const ENV = isBare ? require('bare-env') : process.env
 const parseLink = require('./parse-link')
@@ -83,8 +83,8 @@ module.exports = class State {
   static configFrom (state) {
     const { id, startId, key, links, alias, env, ui, options, checkpoint, checkout, flags, dev, tier, stage, storage, name, main, dependencies, args, channel, release, applink, fragment, link, linkData, entrypoint, dir, dht } = state
     const pearDir = PLATFORM_DIR
-    const mountDir = MOUNT
-    return { id, startId, key, links, alias, env, ui, options, checkpoint, checkout, flags, dev, tier, stage, storage, name, main, dependencies, args, channel, release, applink, fragment, link, linkData, entrypoint, dir, dht, pearDir, mountDir }
+    const swapDir = SWAP
+    return { id, startId, key, links, alias, env, ui, options, checkpoint, checkout, flags, dev, tier, stage, storage, name, main, dependencies, args, channel, release, applink, fragment, link, linkData, entrypoint, dir, dht, pearDir, swapDir }
   }
 
   static isKeetInvite (segment) {
@@ -109,7 +109,7 @@ module.exports = class State {
     const { dht, link, id = null, args = null, env = ENV, dir = CWD, cwd = dir, cmdArgs, onupdate = () => {}, flags, run } = params
     const {
       startId, appling, channel, devtools, checkout, links,
-      dev = false, stage, updates, updatesDiff,
+      dev = false, stage, updates, updatesDiff, followSymlinks,
       unsafeClearAppStorage, chromeWebrtcInternals
     } = flags
     const { drive: { alias = null, key = null }, pathname: route, protocol, hash } = link ? parseLink(link) : { drive: {} }
@@ -148,7 +148,8 @@ module.exports = class State {
     this.cmdArgs = cmdArgs
     this.pkgPath = pkgPath
     this.id = id
-    this.runtimeInfo = flags['runtime-info'] ? JSON.parse(flags['runtime-info']) : null // important to know if this throws, so no try/catch
+    this.followSymlinks = followSymlinks
+    this.runtimeInfo = flags.runtimeInfo ? JSON.parse(flags.runtimeInfo) : null // important to know if this throws, so no try/catch
     this.clearAppStorage = unsafeClearAppStorage
     this.chromeWebrtcInternals = chromeWebrtcInternals
     this.env = { ...env }

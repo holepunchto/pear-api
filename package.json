@@ -8,7 +8,6 @@
   },
   "files": [
     "cmd/",
-    "_constants.js",
     "constants.js",
     "crasher.js",
     "errors.js",
@@ -18,7 +17,7 @@
     "shell.js",
     "state.js",
     "teardown.js",
-    "transform",
+    "transform.js",
     "tryboot.js",
     "worker.js"
   ],
