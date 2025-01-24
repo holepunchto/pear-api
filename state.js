@@ -43,7 +43,7 @@ module.exports = class State {
     state.options = pkg?.pear || null
     state.name = pkg?.pear?.name || pkg?.name || null
     state.links = pkg?.pear?.links || null
-    state.ui = pkg?.pear?.ui || null
+    state.gui = pkg?.pear?.gui || null
     if (overrides.links) {
       const links = overrides.links.split(',').reduce((links, kv) => {
         const [key, value] = kv.split('=')
