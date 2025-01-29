@@ -119,6 +119,10 @@ class API {
 
   get pipe () { return this.#worker.pipe() }
 
+  get = (params) => this.#reftrack(this.#ipc.get(params))
+
+  exists = (params) => this.#reftrack(this.#ipc.exists(params))
+
   restart = async (opts = {}) => {
     if (this.#state.ui === null) throw new Error('Pear.restart is not supported for terminal apps')
 
