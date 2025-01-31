@@ -106,14 +106,14 @@ module.exports = class State {
   }
 
   constructor (params = {}) {
-    const { dht, link, id = null, args = null, env = ENV, dir = CWD, cwd = dir, cmdArgs, onupdate = () => {}, flags, run } = params
+    const { dht, link, id = null, args = null, env = ENV, cwd = CWD, dir = cwd, cmdArgs, onupdate = () => {}, flags, run } = params
     const {
       startId, appling, channel, devtools, checkout, links,
       dev = false, stage, updates, updatesDiff, followSymlinks,
       unsafeClearAppStorage, chromeWebrtcInternals
     } = flags
     const { drive: { alias = null, key = null }, pathname: route, protocol, hash } = link ? parseLink(link) : { drive: {} }
-    const pathname = protocol === 'file:' ? isWindows ? route.slice(1).slice(dir.length) : route.slice(dir.length) : route
+    const pathname = protocol === 'file:' ? (isWindows ? route.slice(1).slice(dir.length) : route.slice(dir.length)) : route
     const segment = pathname?.startsWith('/') ? pathname.slice(1) : pathname
     const fragment = hash ? hash.slice(1) : (this.constructor.isKeetInvite(segment) ? segment : null)
     const entrypoint = this.constructor.isEntrypoint(pathname) ? pathname : null
@@ -149,7 +149,7 @@ module.exports = class State {
     this.pkgPath = pkgPath
     this.id = id
     this.followSymlinks = followSymlinks
-    this.runtimeInfo = flags.runtimeInfo ? JSON.parse(flags.runtimeInfo) : null // important to know if this throws, so no try/catch
+    this.rti = flags.rti ? JSON.parse(flags.rti) : null // important to know if this throws, so no try/catch
     this.clearAppStorage = unsafeClearAppStorage
     this.chromeWebrtcInternals = chromeWebrtcInternals
     this.env = { ...env }

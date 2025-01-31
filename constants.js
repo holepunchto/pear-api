@@ -4,8 +4,8 @@ const { platform, arch, isWindows, isLinux } = require('which-runtime')
 const { fileURLToPath } = require('url-file-url')
 const sodium = require('sodium-native')
 const b4a = require('b4a')
-const CHECKOUT = global.Pear?.constructor.CHECKOUT
-const MOUNT = global.Pear?.constructor.MOUNT
+const CHECKOUT = global.Pear?.constructor.RTI.checkout
+const MOUNT = global.Pear?.constructor.RTI.mount
 const BIN = 'by-arch/' + platform + '-' + arch + '/bin/'
 
 let mount = MOUNT ? new URL(MOUNT + '/') : null

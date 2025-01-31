@@ -20,7 +20,7 @@ module.exports = [
   flag('--detached', 'Wakeup existing app or run detached'),
   flag('--no-ask', 'Suppress permissions dialog'),
   flag('--follow-symlinks|-f', 'Follow in-project symlinks'),
-  flag('--runtime-info <info>').hide(),
+  flag('--rti <info>').hide(),
   flag('--start-id <id>').hide(),
   flag('--dht-bootstrap <nodes>').hide(),
   flag('--encryption-key <name>').hide(),
