@@ -27,6 +27,7 @@ class API {
   #worker = null
   config = null
   argv = program.argv
+  pid = program.pid
   static RTI = global.Pear?.constructor.RTI ?? null
   static RUNTIME = RUNTIME
   static IPC = kIPC
