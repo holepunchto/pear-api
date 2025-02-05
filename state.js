@@ -6,16 +6,12 @@ const path = isBare ? require('bare-path') : require('path')
 const { pathToFileURL } = require('url-file-url')
 const hypercoreid = require('hypercore-id-encoding')
 const z32 = require('z32')
-const { discoveryKey, randomBytes } = require('hypercore-crypto')
-const { PLATFORM_DIR, MOUNT, RUNTIME } = require('pear-api/constants')
+const crypto = require('hypercore-crypto')
+const { PLATFORM_DIR, SWAP, RUNTIME } = require('pear-api/constants')
 const CWD = isBare ? os.cwd() : process.cwd()
 const ENV = isBare ? require('bare-env') : process.env
 const parseLink = require('./parse-link')
 const { ERR_INVALID_APP_NAME, ERR_INVALID_APP_STORAGE } = require('./errors')
-const validateAppName = (name) => {
-  if (/^[@/a-z0-9-_]+$/.test(name)) return name
-  throw ERR_INVALID_APP_NAME('The package.json name / pear.name field must be lowercase and one word, and may contain letters, numbers, hyphens (-), underscores (_), forward slashes (/) and asperands (@).')
-}
 const readPkg = (pkgPath) => {
   let pkg = null
   try { pkg = fs.readFileSync(path.resolve(pkgPath)) } catch { /* ignore */ }
@@ -43,7 +39,7 @@ module.exports = class State {
     state.options = pkg?.pear || null
     state.name = pkg?.pear?.name || pkg?.name || null
     state.links = pkg?.pear?.links || null
-    state.ui = pkg?.pear?.ui || null
+    state.gui = pkg?.pear?.gui || null
     if (overrides.links) {
       const links = overrides.links.split(',').reduce((links, kv) => {
         const [key, value] = kv.split('=')
@@ -62,29 +58,21 @@ module.exports = class State {
     ]
     state.entrypoints = new Set(pkg?.pear?.stage?.entrypoints || [])
     if (pkg == null) return
-    try { this.storage(state) } catch (err) { state.error = err }
   }
 
-  static storage (state) {
-    if (!state.key && !state.name) { // uninited local case
-      this.injestPackage(state, readPkg(path.join(state.dir, 'package.json')))
-      return
-    }
-    const { previewFor } = state.options
-    const previewKey = typeof previewFor === 'string' ? hypercoreid.decode(previewFor) : null
-    const dkey = previewKey ? discoveryKey(previewKey).toString('hex') : (state.key ? discoveryKey(state.key).toString('hex') : null)
-    const storeby = state.store ? null : (state.key ? ['by-dkey', dkey] : ['by-name', validateAppName(state.name)])
-    state.storage = state.store ? (path.isAbsolute(state.store) ? state.store : path.resolve(state.cwd, state.store)) : path.join(PLATFORM_DIR, 'app-storage', ...storeby)
-    if (state.key === null && state.storage.startsWith(state.dir)) {
-      throw ERR_INVALID_APP_STORAGE('Application Storage may not be inside the project directory. --store "' + state.storage + '" is invalid')
-    }
+  static storageFromLink (link) {
+    const parsedLink = typeof link === 'string' ? parseLink(link) : link
+    const appStorage = path.join(PLATFORM_DIR, 'app-storage')
+    return parsedLink.protocol !== 'pear:'
+      ? path.join(appStorage, 'by-random', crypto.randomBytes(16).toString('hex'))
+      : path.join(appStorage, 'by-dkey', crypto.discoveryKey(hypercoreid.decode(parsedLink.drive.key)).toString('hex'))
   }
 
   static configFrom (state) {
-    const { id, startId, key, links, alias, env, ui, options, checkpoint, checkout, flags, dev, tier, stage, storage, name, main, dependencies, args, channel, release, applink, fragment, link, linkData, entrypoint, dir, dht } = state
+    const { id, startId, key, links, alias, env, gui, options, checkpoint, checkout, flags, dev, tier, stage, storage, name, main, dependencies, args, channel, release, applink, fragment, link, linkData, entrypoint, dir, dht } = state
     const pearDir = PLATFORM_DIR
-    const mountDir = MOUNT
-    return { id, startId, key, links, alias, env, ui, options, checkpoint, checkout, flags, dev, tier, stage, storage, name, main, dependencies, args, channel, release, applink, fragment, link, linkData, entrypoint, dir, dht, pearDir, mountDir }
+    const swapDir = SWAP
+    return { id, startId, key, links, alias, env, gui, options, checkpoint, checkout, flags, dev, tier, stage, storage, name, main, dependencies, args, channel, release, applink, fragment, link, linkData, entrypoint, dir, dht, pearDir, swapDir }
   }
 
   static isKeetInvite (segment) {
@@ -106,20 +94,20 @@ module.exports = class State {
   }
 
   constructor (params = {}) {
-    const { dht, link, id = null, args = null, env = ENV, dir = CWD, cwd = dir, cmdArgs, onupdate = () => {}, flags, run } = params
+    const { dht, link, id = null, args = null, env = ENV, cwd = CWD, dir = cwd, cmdArgs, onupdate = () => {}, flags, run, storage = null } = params
     const {
       startId, appling, channel, devtools, checkout, links,
-      dev = false, stage, updates, updatesDiff,
-      runtimeInfo, unsafeClearAppStorage, chromeWebrtcInternals
+      dev = false, stage, updates, updatesDiff, followSymlinks,
+      unsafeClearAppStorage, chromeWebrtcInternals
     } = flags
     const { drive: { alias = null, key = null }, pathname: route, protocol, hash } = link ? parseLink(link) : { drive: {} }
-    const pathname = protocol === 'file:' ? isWindows ? route.slice(1).slice(dir.length) : route.slice(dir.length) : route
+    const pathname = protocol === 'file:' ? (isWindows ? route.slice(1).slice(dir.length) : route.slice(dir.length)) : route
     const segment = pathname?.startsWith('/') ? pathname.slice(1) : pathname
     const fragment = hash ? hash.slice(1) : (this.constructor.isKeetInvite(segment) ? segment : null)
     const entrypoint = this.constructor.isEntrypoint(pathname) ? pathname : null
     const pkgPath = path.join(dir, 'package.json')
     const pkg = key === null ? readPkg(pkgPath) : null
-    const store = flags.tmpStore ? path.join(os.tmpdir(), randomBytes(16).toString('hex')) : flags.store
+    const store = flags.tmpStore ? path.join(os.tmpdir(), crypto.randomBytes(16).toString('hex')) : flags.store
     this.#onupdate = onupdate
     this.startId = startId || null
     this.dht = dht
@@ -131,6 +119,7 @@ module.exports = class State {
     this.dir = dir
     this.cwd = cwd
     this.run = run ?? flags.run
+    this.storage = storage
     this.flags = flags
     this.dev = dev
     this.devtools = this.dev || devtools
@@ -148,7 +137,8 @@ module.exports = class State {
     this.cmdArgs = cmdArgs
     this.pkgPath = pkgPath
     this.id = id
-    this.runtimeInfo = runtimeInfo ? JSON.parse(runtimeInfo) : null // important to know if this throws, so no try/catch
+    this.followSymlinks = followSymlinks
+    this.rti = flags.rti ? JSON.parse(flags.rti) : null // important to know if this throws, so no try/catch
     this.clearAppStorage = unsafeClearAppStorage
     this.chromeWebrtcInternals = chromeWebrtcInternals
     this.env = { ...env }
@@ -156,5 +146,9 @@ module.exports = class State {
       this.env.NODE_ENV = this.env.NODE_ENV || 'production'
     }
     this.constructor.injestPackage(this, pkg, { links })
+    const invalidStorage = this.key === null && this.storage !== null && this.storage.startsWith(this.dir) && this.storage.includes('/pear/pear/') === false
+    if (invalidStorage) throw ERR_INVALID_APP_STORAGE('Application Storage may not be inside the project directory. --store "' + this.storage + '" is invalid')
+    const invalidName = /^[@/a-z0-9-_]+$/.test(this.name) === false
+    if (invalidName) throw ERR_INVALID_APP_NAME('The package.json name / pear.name field must be lowercase and one word, and may contain letters, numbers, hyphens (-), underscores (_), forward slashes (/) and asperands (@).')
   }
 }

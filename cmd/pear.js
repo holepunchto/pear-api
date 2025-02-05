@@ -12,7 +12,9 @@ module.exports = [
   flag('--run').hide(), // appling legacy
   flag('--sandbox').hide(), // appling legacy
   flag('--appling').hide(), // appling legacy
+  flag('--rti <info>').hide(),
+  flag('--key <key>', 'Advanced. Switch release lines').hide(),
+  flag('--mem', 'Memory mode: RAM corestore').hide(),
   flag('--dht-bootstrap <nodes>').hide(),
-  flag('--checkout json').hide(),
-  flag('--mountpoint url').hide()
+  flag('--start-id <id>').hide()
 ]

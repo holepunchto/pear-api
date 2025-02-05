@@ -19,11 +19,12 @@ module.exports = [
   flag('--checkout <n|release|staged>', 'Run a checkout from version length'),
   flag('--detached', 'Wakeup existing app or run detached'),
   flag('--no-ask', 'Suppress permissions dialog'),
-  flag('--runtime-info <info>', 'Info for app runtime').hide(),
-  flag('--dht-bootstrap <nodes>', 'DHT boostrap').hide(),
-  flag('--encryption-key <name>', 'Application encryption key').hide(),
+  flag('--follow-symlinks|-f', 'Follow in-project symlinks'),
+  flag('--rti <info>').hide(),
+  flag('--start-id <id>').hide(),
+  flag('--dht-bootstrap <nodes>').hide(),
+  flag('--encryption-key <name>').hide(),
   flag('--trusted').hide(),
   flag('--detach').hide(),
-  flag('--start-id <id>').hide(),
   flag('--sandbox').hide() // electron passthrough
 ]

@@ -27,7 +27,7 @@ class API {
   #worker = null
   config = null
   argv = program.argv
-  static CHECKOUT = global.Pear?.constructor.checkout ?? null
+  static RTI = global.Pear?.constructor.RTI ?? null
   static RUNTIME = RUNTIME
   static IPC = kIPC
   constructor (ipc, state, { worker = new Worker({ ref: () => this.#ref(), unref: () => this.#unref() }), teardown = onteardown } = {}) {
@@ -117,6 +117,12 @@ class API {
   run = (link, args) => this.#worker.run(link, args)
 
   get pipe () { return this.#worker.pipe() }
+
+  get = (key, opts = {}) => this.#reftrack(this.#ipc.get({ key, ...opts }))
+
+  exists = (key) => this.#reftrack(this.#ipc.exists({ key }))
+
+  compare = (keyA, keyB) => this.#reftrack(this.#ipc.exists({ keyA, keyB }))
 
   restart = async (opts = {}) => {
     if (this.#state.ui === null) throw new Error('Pear.restart is not supported for terminal apps')

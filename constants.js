@@ -4,28 +4,25 @@ const { platform, arch, isWindows, isLinux } = require('which-runtime')
 const { fileURLToPath } = require('url-file-url')
 const sodium = require('sodium-native')
 const b4a = require('b4a')
-const pear = require('./cmd')
-const { flags } = pear(global.Bare?.argv.slice(1) || global.process.argv.slice(2))
-const CHECKOUT = global.Pear?.constructor?.CHECKOUT
-
+const CHECKOUT = global.Pear?.constructor.RTI.checkout
+const MOUNT = global.Pear?.constructor.RTI.mount
 const BIN = 'by-arch/' + platform + '-' + arch + '/bin/'
 
-let mount = flags.mountpoint
+let mount = MOUNT ? new URL(MOUNT + '/', 'file:') : null
 if (!mount) {
   let url = require.main?.url
-  if (url && url.protocol === 'pear:' && url.host === 'dev') {
-    url = global.Pear.config.applink
-    if (url.slice(-1) !== '/') url += '/'
-  }
-  mount = flags.mountpoint ? new URL(flags.mountpoint) : new URL('.', url)
+  if (url?.href.endsWith('/boot.bundle')) url.href += '/'
+  else url = new URL('.', url)
+  if (url && url.protocol === 'pear:' && url.host === 'dev') url = new URL(global.Pear.config.swapDir + '/', 'file:')
+  mount = url
 }
 
 const LOCALDEV = CHECKOUT?.length === null
 const swapURL = mount.pathname.endsWith('.bundle/') ? new URL('..', mount) : mount
-
 const swapPath = toPath(swapURL)
 const IPC_ID = 'pear'
 const PLATFORM_URL = LOCALDEV ? new URL('pear/', swapURL) : new URL('../../../', swapURL)
+
 const PLATFORM_DIR = toPath(PLATFORM_URL)
 const PLATFORM_LOCK = toPath(new URL('corestores/platform/primary-key', PLATFORM_URL))
 
