@@ -8,7 +8,7 @@ const CHECKOUT = global.Pear?.constructor.RTI.checkout
 const MOUNT = global.Pear?.constructor.RTI.mount
 const BIN = 'by-arch/' + platform + '-' + arch + '/bin/'
 
-let mount = MOUNT ? new URL(MOUNT + '/') : null
+let mount = MOUNT ? new URL(MOUNT + '/', 'file:') : null
 if (!mount) {
   let url = require.main?.url
   if (url?.href.endsWith('/boot.bundle')) url.href += '/'
