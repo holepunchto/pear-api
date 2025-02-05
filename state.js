@@ -6,7 +6,7 @@ const path = isBare ? require('bare-path') : require('path')
 const { pathToFileURL } = require('url-file-url')
 const hypercoreid = require('hypercore-id-encoding')
 const z32 = require('z32')
-const { discoveryKey, randomBytes } = require('hypercore-crypto')
+const crypto = require('hypercore-crypto')
 const { PLATFORM_DIR, SWAP, RUNTIME } = require('pear-api/constants')
 const CWD = isBare ? os.cwd() : process.cwd()
 const ENV = isBare ? require('bare-env') : process.env
@@ -65,6 +65,14 @@ module.exports = class State {
     try { this.storage(state) } catch (err) { state.error = err }
   }
 
+  static storageFromLink (link) {
+    const parsedLink = typeof link === 'string' ? parseLink(link) : link
+    const appStorage = path.join(PLATFORM_DIR, 'app-storage')
+    return parsedLink.protocol !== 'pear:'
+      ? path.join(appStorage, 'by-random', crypto.randomBytes(16).toString('hex'))
+      : path.join(appStorage, 'by-dkey', crypto.discoveryKey(hypercoreid.decode(parsedLink.drive.key)).toString('hex'))
+  }
+
   static storage (state) {
     if (!state.key && !state.name) { // uninited local case
       this.injestPackage(state, readPkg(path.join(state.dir, 'package.json')))
@@ -72,7 +80,7 @@ module.exports = class State {
     }
     const { previewFor } = state.options
     const previewKey = typeof previewFor === 'string' ? hypercoreid.decode(previewFor) : null
-    const dkey = previewKey ? discoveryKey(previewKey).toString('hex') : (state.key ? discoveryKey(state.key).toString('hex') : null)
+    const dkey = previewKey ? crypto.discoveryKey(previewKey).toString('hex') : (state.key ? crypto.discoveryKey(state.key).toString('hex') : null)
     const storeby = state.store ? null : (state.key ? ['by-dkey', dkey] : ['by-name', validateAppName(state.name)])
     state.storage = state.store ? (path.isAbsolute(state.store) ? state.store : path.resolve(state.cwd, state.store)) : path.join(PLATFORM_DIR, 'app-storage', ...storeby)
     if (state.key === null && state.storage.startsWith(state.dir)) {
@@ -119,7 +127,7 @@ module.exports = class State {
     const entrypoint = this.constructor.isEntrypoint(pathname) ? pathname : null
     const pkgPath = path.join(dir, 'package.json')
     const pkg = key === null ? readPkg(pkgPath) : null
-    const store = flags.tmpStore ? path.join(os.tmpdir(), randomBytes(16).toString('hex')) : flags.store
+    const store = flags.tmpStore ? path.join(os.tmpdir(), crypto.randomBytes(16).toString('hex')) : flags.store
     this.#onupdate = onupdate
     this.startId = startId || null
     this.dht = dht
