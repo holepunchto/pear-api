@@ -12,10 +12,6 @@ const CWD = isBare ? os.cwd() : process.cwd()
 const ENV = isBare ? require('bare-env') : process.env
 const parseLink = require('./parse-link')
 const { ERR_INVALID_APP_NAME, ERR_INVALID_APP_STORAGE } = require('./errors')
-const validateAppName = (name) => {
-  if (/^[@/a-z0-9-_]+$/.test(name)) return name
-  throw ERR_INVALID_APP_NAME('The package.json name / pear.name field must be lowercase and one word, and may contain letters, numbers, hyphens (-), underscores (_), forward slashes (/) and asperands (@).')
-}
 const readPkg = (pkgPath) => {
   let pkg = null
   try { pkg = fs.readFileSync(path.resolve(pkgPath)) } catch { /* ignore */ }
@@ -62,7 +58,6 @@ module.exports = class State {
     ]
     state.entrypoints = new Set(pkg?.pear?.stage?.entrypoints || [])
     if (pkg == null) return
-    try { this.storage(state) } catch (err) { state.error = err }
   }
 
   static storageFromLink (link) {
@@ -71,21 +66,6 @@ module.exports = class State {
     return parsedLink.protocol !== 'pear:'
       ? path.join(appStorage, 'by-random', crypto.randomBytes(16).toString('hex'))
       : path.join(appStorage, 'by-dkey', crypto.discoveryKey(hypercoreid.decode(parsedLink.drive.key)).toString('hex'))
-  }
-
-  static storage (state) {
-    if (!state.key && !state.name) { // uninited local case
-      this.injestPackage(state, readPkg(path.join(state.dir, 'package.json')))
-      return
-    }
-    const { previewFor } = state.options
-    const previewKey = typeof previewFor === 'string' ? hypercoreid.decode(previewFor) : null
-    const dkey = previewKey ? crypto.discoveryKey(previewKey).toString('hex') : (state.key ? crypto.discoveryKey(state.key).toString('hex') : null)
-    const storeby = state.store ? null : (state.key ? ['by-dkey', dkey] : ['by-name', validateAppName(state.name)])
-    state.storage = state.store ? (path.isAbsolute(state.store) ? state.store : path.resolve(state.cwd, state.store)) : path.join(PLATFORM_DIR, 'app-storage', ...storeby)
-    if (state.key === null && state.storage.startsWith(state.dir)) {
-      throw ERR_INVALID_APP_STORAGE('Application Storage may not be inside the project directory. --store "' + state.storage + '" is invalid')
-    }
   }
 
   static configFrom (state) {
@@ -114,7 +94,7 @@ module.exports = class State {
   }
 
   constructor (params = {}) {
-    const { dht, link, id = null, args = null, env = ENV, cwd = CWD, dir = cwd, cmdArgs, onupdate = () => {}, flags, run } = params
+    const { dht, link, id = null, args = null, env = ENV, cwd = CWD, dir = cwd, cmdArgs, onupdate = () => {}, flags, run, storage = null } = params
     const {
       startId, appling, channel, devtools, checkout, links,
       dev = false, stage, updates, updatesDiff, followSymlinks,
@@ -139,6 +119,7 @@ module.exports = class State {
     this.dir = dir
     this.cwd = cwd
     this.run = run ?? flags.run
+    this.storage = storage
     this.flags = flags
     this.dev = dev
     this.devtools = this.dev || devtools
@@ -165,5 +146,9 @@ module.exports = class State {
       this.env.NODE_ENV = this.env.NODE_ENV || 'production'
     }
     this.constructor.injestPackage(this, pkg, { links })
+    const invalidStorage = this.key === null && this.storage !== null && this.storage.startsWith(this.dir) && this.storage.includes('/pear/pear/') === false
+    if (invalidStorage) throw ERR_INVALID_APP_STORAGE('Application Storage may not be inside the project directory. --store "' + this.storage + '" is invalid')
+    const invalidName = /^[@/a-z0-9-_]+$/.test(this.name) === false
+    if (invalidName) throw ERR_INVALID_APP_NAME('The package.json name / pear.name field must be lowercase and one word, and may contain letters, numbers, hyphens (-), underscores (_), forward slashes (/) and asperands (@).')
   }
 }
