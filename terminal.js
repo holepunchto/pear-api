@@ -19,7 +19,7 @@ const isTTY = tty.isTTY(0)
 const pt = (arg) => arg
 const es = () => ''
 const ansi = isWindows
-  ? { bold: pt, dim: pt, italic: pt, underline: pt, inverse: pt, red: pt, green: pt, yellow: pt, gray: pt, upHome: es, link: pt }
+  ? { bold: pt, dim: pt, italic: pt, underline: pt, inverse: pt, red: pt, green: pt, yellow: pt, gray: pt, upHome: es, link: pt, hideCursor: es, showCursor: es }
   : {
       bold: (s) => `\x1B[1m${s}\x1B[22m`,
       dim: (s) => `\x1B[2m${s}\x1B[22m`,
@@ -198,7 +198,10 @@ const outputter = (cmd, taggers = {}) => async (json, stream, info = {}, ipc) =>
   let error = null
   if (Array.isArray(stream)) stream = asyncIterate(stream)
   stdio.out.write(ansi.hideCursor())
-  const dereg = teardown(() => { stdio.out.write(ansi.showCursor()) })
+  const dereg = teardown(() => {
+    if (!isWindows && isTTY) stdio.out.write('\x1B[1K\x1B[G') // clear ^C
+    stdio.out.write(ansi.showCursor())
+  })
   try {
     for await (const { tag, data = {} } of stream) {
       if (json) {
