@@ -10,10 +10,6 @@ const byteSize = require('tiny-byte-size')
 const { isWindows } = require('which-runtime')
 const { CHECKOUT } = require('pear-api/constants')
 const teardown = require('./teardown')
-const ADD = 1
-const REMOVE = -1
-const CHANGE = 0
-
 const isTTY = tty.isTTY(0)
 
 const pt = (arg) => arg
@@ -188,11 +184,6 @@ function byteDiff ({ type, sizes, message }) {
   print(indicator(type, 'diff') + ' ' + message + ' (' + sizes + ')')
 }
 
-function diff ({ prefix = '', suffix = '', add, remove, change, success }) {
-  statusFrag = ''
-  status(prefix + indicator(ADD, 'diff') + add + ' ' + indicator(REMOVE, 'diff') + remove + ' ' + indicator(CHANGE, 'diff') + change + suffix, success)
-}
-
 function indicator (value, type = 'success') {
   if (value === undefined) return ''
   if (value === true) value = 1
@@ -231,7 +222,6 @@ const outputter = (cmd, taggers = {}) => async (json, stream, info = {}, ipc) =>
       const { output, message, success = data.success } = result
       if (output === 'print') print(message, success)
       if (output === 'status') status(message, success)
-      if (tag === 'diff') diff(data)
       if (tag === 'byte-diff') byteDiff(data)
     }
   } finally {
