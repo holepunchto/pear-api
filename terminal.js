@@ -43,6 +43,8 @@ ansi.warning = isWindows ? '!' : '⚠️'
 ansi.pear = isWindows ? '*' : '🍐'
 ansi.dot = isWindows ? '•' : 'o'
 ansi.key = isWindows ? '>' : '🔑'
+ansi.down = isWindows ? '↓' : '⬇'
+ansi.up = isWindows ? '↑' : '⬆'
 
 const stdio = new class Stdio {
   drained = Writable.drained
@@ -166,22 +168,28 @@ class Interact {
   }
 }
 
+let statusFrag = ''
+
 function status (msg, success) {
   msg = msg || ''
   const done = typeof success === 'boolean'
   if (msg) stdio.out.write(`\x1B[2K\r${indicator(success)}${msg}\n${done ? '' : ansi.upHome()}`)
+  statusFrag = msg.slice(0, 3)
 }
 
 function print (message, success) {
+  statusFrag = ''
   console.log(`${typeof success !== 'undefined' ? indicator(success) : ''}${message}`)
 }
 
 function byteDiff ({ type, sizes, message }) {
+  statusFrag = ''
   sizes = sizes.map((size) => (size > 0 ? '+' : '') + byteSize(size)).join(', ')
   print(indicator(type, 'diff') + ' ' + message + ' (' + sizes + ')')
 }
 
 function diff ({ prefix = '', suffix = '', add, remove, change, success }) {
+  statusFrag = ''
   status(prefix + indicator(ADD, 'diff') + add + ' ' + indicator(REMOVE, 'diff') + remove + ' ' + indicator(CHANGE, 'diff') + change + suffix, success)
 }
 
@@ -199,7 +207,7 @@ const outputter = (cmd, taggers = {}) => async (json, stream, info = {}, ipc) =>
   if (Array.isArray(stream)) stream = asyncIterate(stream)
   stdio.out.write(ansi.hideCursor())
   const dereg = teardown(() => {
-    if (!isWindows && isTTY) stdio.out.write('\x1B[1K\x1B[G') // clear ^C
+    if (!isWindows && isTTY) stdio.out.write('\x1B[1K\x1B[G' + statusFrag) // clear ^C
     stdio.out.write(ansi.showCursor())
   })
   try {
