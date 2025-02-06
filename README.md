@@ -69,6 +69,10 @@ The `Pear.teardown` function.
 
 A minimal transformer for `__LOCALVAR__`-style templates.
 
+### `pear-api/terminal`
+
+Terminal interface.
+
 ### `pear-api/cmd`
 
 Parse out platform flags while ignoring the rest of the command. Useful for parsing platform flags regardless of whether the flags after `<cmd>` are valid. 

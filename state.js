@@ -57,7 +57,6 @@ module.exports = class State {
       ...(pkg?.bundledDependencies || [])
     ]
     state.entrypoints = new Set(pkg?.pear?.stage?.entrypoints || [])
-    if (pkg == null) return
   }
 
   static storageFromLink (link) {

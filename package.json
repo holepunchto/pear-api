@@ -1,6 +1,6 @@
 {
   "name": "pear-api",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Pear API Base & Integration Module",
   "main": "index.js",
   "scripts": {
@@ -19,6 +19,7 @@
     "shell.js",
     "state.js",
     "teardown.js",
+    "terminal.js",
     "transform.js",
     "tryboot.js",
     "worker.js"
