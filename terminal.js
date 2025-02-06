@@ -169,7 +169,7 @@ class Interact {
 function status (msg, success) {
   msg = msg || ''
   const done = typeof success === 'boolean'
-  if (msg) stdio.out.write(`${indicator(success)}${msg}\n${done ? '' : ansi.upHome()}`)
+  if (msg) stdio.out.write(`\x1B[2K\r${indicator(success)}${msg}\n${done ? '' : ansi.upHome()}`)
 }
 
 function print (message, success) {
