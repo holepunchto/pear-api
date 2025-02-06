@@ -9,6 +9,7 @@ const hypercoreid = require('hypercore-id-encoding')
 const byteSize = require('tiny-byte-size')
 const { isWindows } = require('which-runtime')
 const { CHECKOUT } = require('pear-api/constants')
+const teardown = require('./teardown')
 const ADD = 1
 const REMOVE = -1
 const CHANGE = 0
@@ -31,8 +32,8 @@ const ansi = isWindows
       gray: (s) => `\x1B[90m${s}\x1B[39m`,
       upHome: (n = 1) => `\x1B[${n}F`,
       link: (url, text = url) => `\x1B]8;;${url}\x07${text}\x1B]8;;\x07`,
-      hideCursor: () => `\x1B[?25l`,
-      showCursor: () => `\x1B[?25h`,
+      hideCursor: () => '\x1B[?25l',
+      showCursor: () => '\x1B[?25h'
     }
 
 ansi.sep = isWindows ? '-' : ansi.dim(ansi.green('∞'))
@@ -196,8 +197,9 @@ function indicator (value, type = 'success') {
 const outputter = (cmd, taggers = {}) => async (json, stream, info = {}, ipc) => {
   let error = null
   if (Array.isArray(stream)) stream = asyncIterate(stream)
+  stdio.out.write(ansi.hideCursor())
+  const dereg = teardown(() => { stdio.out.write(ansi.showCursor()) })
   try {
-    stdio.out.write(ansi.hideCursor())
     for await (const { tag, data = {} } of stream) {
       if (json) {
         print(JSON.stringify({ cmd, tag, data }))
@@ -223,6 +225,7 @@ const outputter = (cmd, taggers = {}) => async (json, stream, info = {}, ipc) =>
     }
   } finally {
     stdio.out.write(ansi.showCursor())
+    dereg()
     if (error) throw error // eslint-disable-line no-unsafe-finally
   }
 }
