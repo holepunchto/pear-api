@@ -30,7 +30,9 @@ const ansi = isWindows
       yellow: (s) => `\x1B[33m${s}\x1B[39m`,
       gray: (s) => `\x1B[90m${s}\x1B[39m`,
       upHome: (n = 1) => `\x1B[${n}F`,
-      link: (url, text = url) => `\x1B]8;;${url}\x07${text}\x1B]8;;\x07`
+      link: (url, text = url) => `\x1B]8;;${url}\x07${text}\x1B]8;;\x07`,
+      hideCursor: () => `\x1B[?25l`,
+      showCursor: () => `\x1B[?25h`,
     }
 
 ansi.sep = isWindows ? '-' : ansi.dim(ansi.green('∞'))
@@ -183,6 +185,7 @@ function diff ({ prefix = '', suffix = '', add, remove, change, success }) {
 }
 
 function indicator (value, type = 'success') {
+  if (value === undefined) return ''
   if (value === true) value = 1
   else if (value === false) value = -1
   else if (value == null) value = 0
@@ -194,6 +197,7 @@ const outputter = (cmd, taggers = {}) => async (json, stream, info = {}, ipc) =>
   let error = null
   if (Array.isArray(stream)) stream = asyncIterate(stream)
   try {
+    stdio.out.write(ansi.hideCursor())
     for await (const { tag, data = {} } of stream) {
       if (json) {
         print(JSON.stringify({ cmd, tag, data }))
@@ -218,6 +222,7 @@ const outputter = (cmd, taggers = {}) => async (json, stream, info = {}, ipc) =>
       if (tag === 'byte-diff') byteDiff(data)
     }
   } finally {
+    stdio.out.write(ansi.showCursor())
     if (error) throw error // eslint-disable-line no-unsafe-finally
   }
 }
