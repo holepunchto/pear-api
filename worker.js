@@ -8,6 +8,7 @@ const Pipe = isBare
   : class Pipe extends require('net').Socket { constructor (fd) { super({ fd }) } }
 const teardown = isBare ? require('./teardown') : (fn) => fn()
 const { RUNTIME } = require('./constants')
+const cmdPear = require('./cmd')
 const rundef = require('./cmd/run')
 const noop = Function.prototype
 
@@ -23,7 +24,9 @@ class Worker {
 
   #args (link) {
     const parser = command('pear', command('run', ...rundef))
-    const argv = ['run', '--trusted', ...global.Bare.argv.slice(2)]
+    const sliced = global.Bare.argv.slice(1)
+    const cmdIdx = cmdPear(sliced).indices.args.cmd
+    const argv = ['run', ...sliced.slice(cmdIdx + 1)]
     const cmd = parser.parse(argv, { sync: true })
     const args = argv.map((arg) => arg === cmd.args.link ? link : arg)
     if (cmd.indices.rest > 0) args.splice(cmd.indices.rest)
@@ -34,6 +37,7 @@ class Worker {
       if (linksIndex > cmd.indices.flags.startId) linksIndex -= linksElements
     }
     if (linksIndex > 0) args.splice(linksIndex, linksElements)
+    if (!cmd.flags.trusted) args.splice(1, 0, '--trusted')
     return args
   }
 
