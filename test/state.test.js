@@ -15,7 +15,7 @@ test('new State with runtime info', async (t) => {
 
   const run = command('run', ...rundef, runMain)
   run.parse([
-    '--runtime-info', '{ "type": "bridge", "data": "http://localhost:1234" }',
+    '--rti', '{ "type": "bridge", "data": "http://localhost:1234" }',
     'pear://link'
   ])
 
@@ -24,7 +24,7 @@ test('new State with runtime info', async (t) => {
       flags: cmd.flags,
       args: cmd.args
     })
-    t.is(state.runtimeInfo.type, 'bridge')
-    t.is(state.runtimeInfo.data, 'http://localhost:1234')
+    t.is(state.rti.type, 'bridge')
+    t.is(state.rti.data, 'http://localhost:1234')
   }
 })
