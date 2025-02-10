@@ -1,0 +1,6 @@
+{
+  "name": "worker",
+  "main": "index.js",
+  "type": "module",
+  "pear": {}
+}
