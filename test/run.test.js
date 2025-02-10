@@ -25,7 +25,7 @@ test('run pipe', async function ({ is, plan, teardown }) {
   }
   const state = {}
   const Worker = require('../worker')
-  Worker.RUNTIME = '/Users/MDinh/n/bin/bare'
+  Worker.RUNTIME = Bare.argv[0]
   const worker = new Worker({ ref: () => undefined, unref: () => undefined })
   global.Pear = new API(ipc, state, { worker, teardown })
 
