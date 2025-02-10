@@ -10,21 +10,14 @@ const dirname = __dirname
 test('run pipe', async function ({ is, plan, teardown }) {
   teardown(() => { global.Pear = undefined })
 
-  const ipc = {
-    ref: () => undefined,
-    unref: () => undefined
-  }
-  const state = {}
   const Worker = require('../worker')
   Worker.RUNTIME = Bare.argv[0]
   const worker = new Worker({ ref: () => undefined, unref: () => undefined })
-  const API = require('..')
-  global.Pear = new API(ipc, state, { worker, teardown })
 
   plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'run')
-  const pipe = Pear.run(dir)
+  const pipe = worker.run(dir)
 
   pipe.on('error', (err) => {
     if (err.code === 'ENOTCONN') return

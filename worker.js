@@ -38,7 +38,8 @@ class Worker {
   }
 
   run (link, args = []) {
-    args = [...this.#args(link), ...args]
+    // args = [...this.#args(link), ...args]
+    args = [link, ...args]
     const sp = spawn(this.constructor.RUNTIME, args, {
       stdio: ['inherit', 'inherit', 'inherit', 'overlapped'],
       windowsHide: true
