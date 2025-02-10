@@ -6,8 +6,8 @@
   "scripts": {
     "lint": "standard",
     "lint:fix": "standard --fix",
-    "test:gen": "brittle -r test/index.mjs test/*.test.js",
-    "test": "bare test"
+    "test:gen": "brittle -r test/all.mjs test/*.test.js",
+    "test": "bare test/all.mjs"
   },
   "files": [
     "cmd/",
