@@ -3,14 +3,12 @@
 const { test } = require('brittle')
 const path = require('path')
 
-const constants = require('../constants')
-
 const dirname = __dirname
 
 const setPearMinimal = () => {
   class APIMinimal {
     static RTI = { checkout: { key: dirname, length: null, fork: null } }
-    static get CONSTANTS () { return constants }
+    static get CONSTANTS () { return require('../constants') }
     config = {}
   }
   global.Pear = new APIMinimal()
