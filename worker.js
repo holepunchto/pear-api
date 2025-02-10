@@ -2,13 +2,13 @@
 const fs = require('fs')
 const { spawn } = require('child_process')
 const { isWindows, isBare } = require('which-runtime')
-// const { command } = require('paparam')
+const { command } = require('paparam')
 const Pipe = isBare
   ? require('bare-pipe')
   : class Pipe extends require('net').Socket { constructor (fd) { super({ fd }) } }
 const teardown = isBare ? require('./teardown') : (fn) => fn()
 const { RUNTIME } = require('./constants')
-// const rundef = require('./cmd/run')
+const rundef = require('./cmd/run')
 const noop = Function.prototype
 
 class Worker {
