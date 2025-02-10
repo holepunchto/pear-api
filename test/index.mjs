@@ -7,7 +7,7 @@ async function runTests () {
 
   test.pause()
 
-  await import('./worker.test.js')
+  await import('./run.test.js')
 
   test.resume()
 }

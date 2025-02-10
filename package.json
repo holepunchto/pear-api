@@ -6,9 +6,8 @@
   "scripts": {
     "lint": "standard",
     "lint:fix": "standard --fix",
-    "test:gen": "brittle -r test/index.js test/*.test.js",
-    "pretest": "cd test && npm i",
-    "test": "pear run test"
+    "test:gen": "brittle -r test/index.mjs test/*.test.js",
+    "test": "bare test"
   },
   "files": [
     "cmd/",
