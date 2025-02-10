@@ -2,18 +2,10 @@
 
 const { test } = require('brittle')
 const path = require('path')
+const Helper = require('./helper')
+Helper.rig()
 
 const dirname = __dirname
-
-const rig = () => {
-  class TestAPI {
-    static RTI = { checkout: { key: dirname, length: null, fork: null } }
-    static get CONSTANTS () { return require('../constants') }
-    config = {}
-  }
-  global.Pear = new TestAPI()
-}
-rig()
 
 test('run pipe', async function ({ is, plan, teardown }) {
   teardown(() => { global.Pear = undefined })
@@ -31,7 +23,7 @@ test('run pipe', async function ({ is, plan, teardown }) {
 
   plan(1)
 
-  const dir = path.join(dirname, 'fixtures', 'worker')
+  const dir = path.join(dirname, 'fixtures', 'run')
   const pipe = Pear.run(dir)
 
   pipe.on('error', (err) => {

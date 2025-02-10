@@ -1,16 +1,7 @@
 'use strict'
 
-const dirname = __dirname
-
-const rig = () => {
-  class TestAPI {
-    static RTI = { checkout: { key: dirname, length: null, fork: null } }
-    static get CONSTANTS () { return require('../../../constants') }
-    config = {}
-  }
-  global.Pear = new TestAPI()
-}
-rig()
+const Helper = require('../../helper')
+Helper.rig()
 
 const ipc = {
   ref: () => undefined,
