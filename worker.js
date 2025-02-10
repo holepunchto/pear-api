@@ -2,13 +2,13 @@
 const fs = require('fs')
 const { spawn } = require('child_process')
 const { isWindows, isBare } = require('which-runtime')
-const { command } = require('paparam')
+// const { command } = require('paparam')
 const Pipe = isBare
   ? require('bare-pipe')
   : class Pipe extends require('net').Socket { constructor (fd) { super({ fd }) } }
 const teardown = isBare ? require('./teardown') : (fn) => fn()
 const { RUNTIME } = require('./constants')
-const rundef = require('./cmd/run')
+// const rundef = require('./cmd/run')
 const noop = Function.prototype
 
 class Worker {
@@ -21,24 +21,24 @@ class Worker {
     this.#unref = unref
   }
 
-  #args (link) {
-    const parser = command('pear', command('run', ...rundef))
-    const argv = ['run', '--trusted', ...global.Bare.argv.slice(2)]
-    const cmd = parser.parse(argv, { sync: true })
-    const args = argv.map((arg) => arg === cmd.args.link ? link : arg)
-    if (cmd.indices.rest > 0) args.splice(cmd.indices.rest)
-    let linksIndex = cmd.indices.flags.links
-    const linksElements = linksIndex > 0 ? (cmd.flags.links === args[linksIndex]) ? 2 : 1 : 0
-    if (cmd.indices.flags.startId > 0) {
-      args.splice(cmd.indices.flags.startId, 1)
-      if (linksIndex > cmd.indices.flags.startId) linksIndex -= linksElements
-    }
-    if (linksIndex > 0) args.splice(linksIndex, linksElements)
-    return args
-  }
+  // #args (link) {
+  //   const parser = command('pear', command('run', ...rundef))
+  //   const argv = ['run', '--trusted', ...global.Bare.argv.slice(2)]
+  //   const cmd = parser.parse(argv, { sync: true })
+  //   const args = argv.map((arg) => arg === cmd.args.link ? link : arg)
+  //   if (cmd.indices.rest > 0) args.splice(cmd.indices.rest)
+  //   let linksIndex = cmd.indices.flags.links
+  //   const linksElements = linksIndex > 0 ? (cmd.flags.links === args[linksIndex]) ? 2 : 1 : 0
+  //   if (cmd.indices.flags.startId > 0) {
+  //     args.splice(cmd.indices.flags.startId, 1)
+  //     if (linksIndex > cmd.indices.flags.startId) linksIndex -= linksElements
+  //   }
+  //   if (linksIndex > 0) args.splice(linksIndex, linksElements)
+  //   return args
+  // }
 
   run (link, args = []) {
-    args = [...this.#args(link), ...args]
+    args = [link, ...args]
     const sp = spawn(this.constructor.RUNTIME, args, {
       stdio: ['inherit', 'inherit', 'inherit', 'overlapped'],
       windowsHide: true

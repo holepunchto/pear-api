@@ -38,7 +38,8 @@
   "license": "Apache-2.0",
   "standard": {
     "globals": [
-      "Pear"
+      "Pear",
+      "Bare"
     ]
   },
   "dependencies": {

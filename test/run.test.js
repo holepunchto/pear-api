@@ -18,7 +18,6 @@ rig()
 test('run pipe', async function ({ is, plan, teardown }) {
   teardown(() => { global.Pear = undefined })
 
-  const API = require('..')
   const ipc = {
     ref: () => undefined,
     unref: () => undefined
@@ -27,6 +26,7 @@ test('run pipe', async function ({ is, plan, teardown }) {
   const Worker = require('../worker')
   Worker.RUNTIME = Bare.argv[0]
   const worker = new Worker({ ref: () => undefined, unref: () => undefined })
+  const API = require('..')
   global.Pear = new API(ipc, state, { worker, teardown })
 
   plan(1)
