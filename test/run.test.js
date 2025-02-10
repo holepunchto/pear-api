@@ -13,10 +13,10 @@ const rig = () => {
   }
   global.Pear = new TestAPI()
 }
+rig()
 
 test('run pipe', async function ({ is, plan, teardown }) {
-  teardown(() => { rig() })
-  rig()
+  teardown(() => { global.Pear = undefined })
 
   const API = require('..')
   const ipc = {
@@ -24,12 +24,14 @@ test('run pipe', async function ({ is, plan, teardown }) {
     unref: () => undefined
   }
   const state = {}
-  global.Pear = new API(ipc, state, { teardown })
+  const Worker = require('../worker')
+  Worker.RUNTIME = '/Users/MDinh/n/bin/bare'
+  const worker = new Worker({ ref: () => undefined, unref: () => undefined })
+  global.Pear = new API(ipc, state, { worker, teardown })
 
   plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'worker')
-  // TODO: rig to have this.constructor.RUNTIME
   const pipe = Pear.run(dir)
 
   pipe.on('error', (err) => {
