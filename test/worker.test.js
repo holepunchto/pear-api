@@ -2,7 +2,7 @@
 /* global Pear */
 
 import test from 'brittle'
-import path from 'bare-path'
+import path from 'path'
 
 const testDir = Pear.config.dir
 

@@ -3,6 +3,9 @@
   "main": "index.js",
   "type": "module",
   "pear": {},
+  "imports": {
+    "path": "bare-path"
+  },
   "dependencies": {
     "bare-path": "^3.0.0",
     "brittle": "^3.10.0"
