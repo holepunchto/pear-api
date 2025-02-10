@@ -29,6 +29,7 @@ test('run pipe', async function ({ is, plan, teardown }) {
   plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'worker')
+  // TODO: rig to have this.constructor.RUNTIME
   const pipe = Pear.run(dir)
 
   pipe.on('error', (err) => {
