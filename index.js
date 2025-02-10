@@ -46,6 +46,21 @@ class API {
 
   get [kIPC] () { return this.#ipc }
 
+  get worker () {
+    console.error('[ DEPRECATED ] Pear.worker is deprecated and will be removed')
+    return new class DeprecatedWorker {
+      pipe = () => {
+        console.error('[ DEPRECATED ] Pear.worker.pipe() is now Pear.pipe')
+        return this.pipe()
+      }
+
+      run = (...args) => {
+        console.error('[ DEPRECATED ] Pear.worker.run() is now Pear.run()')
+        return this.run(...args)
+      }
+    }()
+  }
+
   #ref () {
     this.#refs++
     if (this.#refs === 1) {
