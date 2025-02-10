@@ -1,5 +1,5 @@
 {
-  "name": "worker",
+  "name": "test",
   "main": "index.js",
   "type": "module",
   "pear": {},
