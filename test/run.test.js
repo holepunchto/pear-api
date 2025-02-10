@@ -5,18 +5,18 @@ const path = require('path')
 
 const dirname = __dirname
 
-const setPearMinimal = () => {
-  class APIMinimal {
+const rig = () => {
+  class TestAPI {
     static RTI = { checkout: { key: dirname, length: null, fork: null } }
     static get CONSTANTS () { return require('../constants') }
     config = {}
   }
-  global.Pear = new APIMinimal()
+  global.Pear = new TestAPI()
 }
 
 test('run pipe', async function ({ is, plan, teardown }) {
-  teardown(() => { setPearMinimal() })
-  setPearMinimal()
+  teardown(() => { rig() })
+  rig()
 
   const API = require('..')
   const ipc = {
