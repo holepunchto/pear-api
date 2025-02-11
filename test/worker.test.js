@@ -2,26 +2,19 @@
 
 const { test } = require('brittle')
 const path = require('path')
-const { command } = require('paparam')
 const Helper = require('./helper')
-const rundef = require('../cmd/run')
 Helper.rig()
 
 const dirname = __dirname
 
 test('run pipe', async function ({ is, plan, teardown }) {
   teardown(() => { global.Pear = undefined })
-
-  const Worker = require('../worker')
-  Worker.RUNTIME = Bare.argv[0]
-  Worker.RUNTIME_PARSER = command('bare', ...rundef)
-  const worker = new Worker({ ref: () => undefined, unref: () => undefined })
+  const worker = Helper.rigWorker()
 
   plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'run')
-  worker.constructor.RUNTIME_ARGS = [dir]
-  const pipe = worker.run(dir)
+  const pipe = Helper.run(worker, dir)
 
   pipe.on('error', (err) => {
     if (err.code === 'ENOTCONN') return
