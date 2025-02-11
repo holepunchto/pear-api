@@ -25,7 +25,7 @@ class Worker {
 
   #args (link) {
     const parser = this.constructor.RUNTIME_PARSER
-    const argv = [...this.constructor.RUNTIME_ARGS, ...global.Bare.argv.slice(2), 'aaa']
+    const argv = [...this.constructor.RUNTIME_ARGS, ...global.Bare.argv.slice(2)]
     const cmd = parser.parse(argv, { sync: true })
     const args = argv.map((arg) => arg === cmd.args.link ? link : arg)
     if (cmd.indices.rest > 0) args.splice(cmd.indices.rest)
