@@ -2,7 +2,9 @@
 
 const { test } = require('brittle')
 const path = require('path')
+const { command } = require('paparam')
 const Helper = require('./helper')
+const rundef = require('../cmd/run')
 Helper.rig()
 
 const dirname = __dirname
@@ -17,6 +19,8 @@ test('run pipe', async function ({ is, plan, teardown }) {
   const state = {}
   const Worker = require('../worker')
   Worker.RUNTIME = Bare.argv[0]
+  Worker.RUNTIME_PARSER = command('bare', ...rundef)
+  Worker.RUNTIME_ARGS = []
   const worker = new Worker({ ref: () => undefined, unref: () => undefined })
   const API = require('..')
   global.Pear = new API(ipc, state, { worker, teardown })
@@ -24,6 +28,7 @@ test('run pipe', async function ({ is, plan, teardown }) {
   plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'run')
+
   const pipe = Pear.run(dir)
 
   pipe.on('error', (err) => {

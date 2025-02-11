@@ -2,7 +2,9 @@
 
 const { test } = require('brittle')
 const path = require('path')
+const { command } = require('paparam')
 const Helper = require('./helper')
+const rundef = require('../cmd/run')
 Helper.rig()
 
 const dirname = __dirname
@@ -12,6 +14,8 @@ test('run pipe', async function ({ is, plan, teardown }) {
 
   const Worker = require('../worker')
   Worker.RUNTIME = Bare.argv[0]
+  Worker.RUNTIME_PARSER = command('bare', ...rundef)
+  Worker.RUNTIME_ARGS = []
   const worker = new Worker({ ref: () => undefined, unref: () => undefined })
 
   plan(1)
