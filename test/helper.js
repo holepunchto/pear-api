@@ -30,12 +30,6 @@ class Helper {
     const API = require('..')
     global.Pear = new API(ipc, state, { worker, teardown })
   }
-
-  static run (worker, dir, args) {
-    worker.constructor.RUNTIME_ARGS = [dir]
-    const pipe = worker.run(dir, args)
-    return pipe
-  }
 }
 
 module.exports = Helper

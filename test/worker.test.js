@@ -14,7 +14,8 @@ test('run pipe', async function ({ is, plan, teardown }) {
   plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'run')
-  const pipe = Helper.run(worker, dir)
+  worker.constructor.RUNTIME_ARGS = [dir]
+  const pipe = worker.run(dir)
 
   pipe.on('error', (err) => {
     if (err.code === 'ENOTCONN') return
