@@ -1,0 +1,40 @@
+name: CI
+on:
+  schedule:
+    - cron:  '0 10 * * *'
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  ci:
+    strategy:
+      matrix:
+        include:
+        - os: ubuntu-latest
+          platform: linux
+          arch: x64
+        - os: macos-latest
+          platform: darwin
+          arch: x64
+        - os: windows-latest
+          platform: win32
+          arch: x64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 5
+    steps:
+      - name: Setup repo
+        uses: holepunchto/actions/.github/steps/setup-repo@v1
+
+      - name: Install Bare
+        run: npm i -g bare-runtime
+
+      - name: Install deps
+        run: npm i
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
