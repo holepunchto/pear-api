@@ -2,7 +2,6 @@
 
 const Helper = require('../../helper')
 Helper.rig()
-Helper.rigAPI()
 
 const pipe = Pear.pipe
 

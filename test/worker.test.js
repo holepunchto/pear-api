@@ -2,16 +2,15 @@
 
 const { test } = require('brittle')
 const path = require('path')
+
 const Helper = require('./helper')
-Helper.rig()
 
 const dirname = __dirname
 
 test('run pipe', async function ({ is, plan, teardown }) {
-  teardown(() => { global.Pear = undefined })
-  const worker = Helper.rigWorker()
-
   plan(1)
+
+  const { worker } = Helper.rig({ teardown })
 
   const dir = path.join(dirname, 'fixtures', 'run')
   worker.constructor.RUNTIME_ARGS = [dir]

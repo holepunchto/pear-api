@@ -1,34 +1,26 @@
 const { command } = require('paparam')
+
 const rundef = require('../cmd/run')
 
 const dirname = __dirname
 
 class Helper {
-  static rig () {
-    class TestAPI {
-      static RTI = { checkout: { key: dirname, length: null, fork: null } }
-      static get CONSTANTS () { return require('../constants') }
-      config = {}
-    }
-    global.Pear = new TestAPI()
-  }
-
-  static rigWorker () {
+  static rig ({ teardown } = {}) {
     const Worker = require('../worker')
     Worker.RUNTIME = Bare.argv[0]
     Worker.RUNTIME_PARSER = command('bare', ...rundef)
     const worker = new Worker({ ref: () => undefined, unref: () => undefined })
-    return worker
-  }
 
-  static rigAPI ({ worker, teardown } = {}) {
     const ipc = {
       ref: () => undefined,
       unref: () => undefined
     }
     const state = {}
     const API = require('..')
+    API.RTI = { checkout: { key: dirname, length: null, fork: null } }
+
     global.Pear = new API(ipc, state, { worker, teardown })
+    return { worker }
   }
 }
 
