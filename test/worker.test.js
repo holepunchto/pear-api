@@ -15,12 +15,12 @@ test('run pipe', async function ({ is, plan, teardown }) {
   const Worker = require('../worker')
   Worker.RUNTIME = Bare.argv[0]
   Worker.RUNTIME_PARSER = command('bare', ...rundef)
-  Worker.RUNTIME_ARGS = []
   const worker = new Worker({ ref: () => undefined, unref: () => undefined })
 
   plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'run')
+  worker.constructor.RUNTIME_ARGS = [dir]
   const pipe = worker.run(dir)
 
   pipe.on('error', (err) => {
