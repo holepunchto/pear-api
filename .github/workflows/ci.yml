@@ -32,8 +32,8 @@ jobs:
       - name: Install deps
         run: npm i
 
-      - name: Lint
-        run: npm run lint
-
       - name: Test
         run: npm test
+
+      - name: Lint
+        run: npm run lint
