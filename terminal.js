@@ -209,7 +209,7 @@ const outputter = (cmd, taggers = {}) => (json, stream, info = {}, ipc) => {
         print(JSON.stringify({ cmd, tag, data }))
         return
       }
-      const transform = typeof taggers[tag] === 'function' ? taggers[tag](data, info, ipc) : Promise.resolve(taggers[tag] || false)
+      const transform = Promise.resolve(typeof taggers[tag] === 'function' ? taggers[tag](data, info, ipc) : taggers[tag] || false)
       transform.then((result) => {
         if (result === undefined) return
         if (typeof result === 'string') result = { output: 'print', message: result }
