@@ -2,6 +2,9 @@
 
 const dirname = __dirname
 
+const Worker = require('../../../worker')
+const worker = new Worker({ ref: () => undefined, unref: () => undefined })
+
 const ipc = {
   ref: () => undefined,
   unref: () => undefined
@@ -9,9 +12,9 @@ const ipc = {
 const state = {}
 const API = require('../../..')
 API.RTI = { checkout: { key: dirname, length: null, fork: null } }
-global.Pear = new API(ipc, state)
+global.Pear = new API(ipc, state, { worker })
 
-const pipe = Pear.pipe
+const pipe = worker.pipe()
 
 let i = 0
 let interval = null
