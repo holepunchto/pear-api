@@ -216,7 +216,7 @@ const outputter = (cmd, taggers = {}) => (json, stream, info = {}, ipc) => {
         if (result === false) {
           if (tag === 'final') result = { output: 'print', message: data.success ? 'Success\n' : 'Failure\n' }
         }
-        const { output, message, success = data.success } = result
+        const { output, message, success = data?.success } = result
         if (output === 'print') print(message, success)
         if (output === 'status') status(message, success)
         if (tag === 'byte-diff') byteDiff(data)
