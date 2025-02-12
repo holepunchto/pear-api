@@ -3,12 +3,12 @@
 const Pipe = require('bare-pipe')
 const readline = require('bare-readline')
 const tty = require('bare-tty')
-const { Writable } = require('streamx')
+const { Writable, Readable } = require('streamx')
 const { once } = require('bare-events')
 const hypercoreid = require('hypercore-id-encoding')
 const byteSize = require('tiny-byte-size')
 const { isWindows } = require('which-runtime')
-const { CHECKOUT } = require('pear-api/constants')
+const { CHECKOUT } = require('./constants')
 const teardown = require('./teardown')
 const isTTY = tty.isTTY(0)
 
@@ -193,45 +193,40 @@ function indicator (value, type = 'success') {
   return value < 0 ? ansi.cross + ' ' : (value > 0 ? ansi.tick + ' ' : ansi.gray('- '))
 }
 
-const outputter = (cmd, taggers = {}) => async (json, stream, info = {}, ipc) => {
-  let error = null
-  if (Array.isArray(stream)) stream = asyncIterate(stream)
+const outputter = (cmd, taggers = {}) => (json, stream, info = {}, ipc) => {
+  if (Array.isArray(stream)) stream = Readable.from(stream)
   stdio.out.write(ansi.hideCursor())
   const dereg = teardown(() => {
     if (!isWindows && isTTY) stdio.out.write('\x1B[1K\x1B[G' + statusFrag) // clear ^C
     stdio.out.write(ansi.showCursor())
   })
-  try {
-    for await (const { tag, data = {} } of stream) {
+
+  return Promise((resolve, reject) => {
+    stream.once('error', reject)
+    stream.on('end', resolve)
+    stream.on('data', ({ tag, data }) => {
       if (json) {
         print(JSON.stringify({ cmd, tag, data }))
-        continue
+        return
       }
-      let result = null
-      try {
-        result = typeof taggers[tag] === 'function' ? await taggers[tag](data, info, ipc) : (taggers[tag] || false)
-      } catch (err) {
-        error = err
-        break
-      }
-      if (result === undefined) continue
-      if (typeof result === 'string') result = { output: 'print', message: result }
-      if (result === false) {
-        if (tag === 'final') result = { output: 'print', message: data.success ? 'Success\n' : 'Failure\n' }
-      }
-      const { output, message, success = data.success } = result
-      if (output === 'print') print(message, success)
-      if (output === 'status') status(message, success)
-      if (tag === 'byte-diff') byteDiff(data)
-    }
-  } finally {
+      const transform = typeof taggers[tag] === 'function' ? taggers[tag](data, info, ipc) : Promise.resolve(taggers[tag] || false)
+      transform.then((result) => {
+        if (result === undefined) return
+        if (typeof result === 'string') result = { output: 'print', message: result }
+        if (result === false) {
+          if (tag === 'final') result = { output: 'print', message: data.success ? 'Success\n' : 'Failure\n' }
+        }
+        const { output, message, success = data.success } = result
+        if (output === 'print') print(message, success)
+        if (output === 'status') status(message, success)
+        if (tag === 'byte-diff') byteDiff(data)
+      }, reject)
+    })
+  }).finally(() => {
     stdio.out.write(ansi.showCursor())
     dereg()
-    if (error) throw error // eslint-disable-line no-unsafe-finally
-  }
+  })
 }
-
-function asyncIterate (array) { return (async function * () { yield * array }()) }
 
 const banner = `${ansi.bold('Pear')} ~ ${ansi.dim('Welcome to the Internet of Peers')}`
 const version = `${CHECKOUT.fork || 0}.${CHECKOUT.length || 'dev'}.${CHECKOUT.key}`
