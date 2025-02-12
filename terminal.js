@@ -201,7 +201,7 @@ const outputter = (cmd, taggers = {}) => (json, stream, info = {}, ipc) => {
     stdio.out.write(ansi.showCursor())
   })
 
-  return Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     stream.once('error', reject)
     stream.on('end', resolve)
     stream.on('data', ({ tag, data }) => {
