@@ -11,8 +11,11 @@ const dirname = __dirname
 test('run pipe', async function ({ is, plan, teardown }) {
   plan(1)
 
+  const dir = path.join(dirname, 'fixtures', 'run')
+
   const Worker = require('../worker')
   Worker.RUNTIME = Bare.argv[0]
+  Worker.RUNTIME_ARGV = [dir]
   const worker = new Worker({ ref: () => undefined, unref: () => undefined })
 
   const ipc = {
@@ -24,8 +27,6 @@ test('run pipe', async function ({ is, plan, teardown }) {
   API.RTI = { checkout: { key: dirname, length: null, fork: null } }
   global.Pear = new API(ipc, state, { worker, teardown })
 
-  const dir = path.join(dirname, 'fixtures', 'run')
-  worker.constructor.RUNTIME_ARGV = [dir]
   const pipe = Pear.run(dir)
 
   pipe.on('error', (err) => {
