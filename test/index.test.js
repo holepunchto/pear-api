@@ -10,7 +10,7 @@ Helper.rig()
 
 const dirname = __dirname
 
-test('pear run pear pipe', async function ({ is, plan, teardown }) {
+test('pear run pear pipe', async function ({ is, plan }) {
   plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'run')
@@ -39,7 +39,7 @@ test('pear run pear pipe', async function ({ is, plan, teardown }) {
   pipe.write('exit')
 })
 
-test('pear run worker pipe', async function ({ is, plan, teardown }) {
+test('pear run worker pipe', async function ({ is, plan }) {
   plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'worker')
@@ -68,7 +68,7 @@ test('pear run worker pipe', async function ({ is, plan, teardown }) {
   pipe.write('exit')
 })
 
-test('worker should receive args from the parent', async function ({ is, plan, teardown }) {
+test('worker should receive args from the parent', async function ({ is, plan }) {
   plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'print-args')
@@ -84,7 +84,7 @@ test('worker should receive args from the parent', async function ({ is, plan, t
   await Helper.untilClose(pipe)
 })
 
-test('worker should run directly in a terminal app', async function ({ is, plan, comment, teardown }) {
+test('worker should run directly in a terminal app', async function ({ is, plan, comment }) {
   plan(1)
 
   const runDir = path.join(dirname, 'fixtures', 'worker-runner')
