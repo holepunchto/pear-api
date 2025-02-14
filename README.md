@@ -33,14 +33,6 @@ The `pear-api` module also exposes libraries that provide platform core function
 
 Platform constants.
 
-### `pear-api/gunk`
-
-Platform gunk - glue-state for native and protocol integration.
-
-### `pear-api/state`
-
-Base `State` class for cross-process state management.
-
 ### `pear-api/errors`
 
 Platform error types. Includes `known` method for checking if error is recognized.
@@ -48,6 +40,49 @@ Platform error types. Includes `known` method for checking if error is recognize
 ### `pear-api/crasher`
 
 Sets up crash handlers and outputs crash logs to a known location on-disk.
+
+### `pear-api/logger`
+
+Logger class with only `error`, `info`, `trace` log methods, supports log labels and default options honour `pear --log*` and/or `pear run --log*` flags.
+
+#### Options
+
+* `level` `<String>` -  Level to log at. 0,1,2,3 (OFF,ERR,INF,TRC). Default: `pear run --log-level` else `pear --log-level`.
+* `labels` `<String>` -  Labels to log out. Default: `pear run --log-labels` else `pear --log-labels`
+* `fields` `<String>` -  Fields to show/hide. `<field>` shows, `h:<field>` hides. Default: `pear run --log-fields` else `pear --log-fields` else `h:time,h:data,level,label,delta`
+* `stacks` `<Boolean>` -  Print stack traces with all logs. Default  `pear run --log-stacks` else `pear --log-stacks` else `false`
+* `pretty` `<Boolean>` -  Enables label field if more than 2 labels, disables level field default. Default `false`.
+
+#### Properties
+
+ * `OFF` - true if logging is off
+ * `ERR` - true if logging is at error level
+ * `INF` - true if logging is at info level
+ * `TRC` - true if logging is at trace level
+ * `LEVEL` - level: 0, 1,2,3
+
+#### Methods
+
+* `error(label, ...args)` - Log `args` at error level with `label`
+* `info(label, ...args)` - Log `args` at info level with `label`
+* `trace(label, ...args)` - Log `args` at trace level with `label`
+
+#### Statics
+
+* `settings` `<Object>` - initial settings per flags
+  * `level: run?.flags.logLevel ?? pear?.flags.logLevel`
+  * `labels: run?.flags.logLabels ?? pear?.flags.logLabels`
+  * `fields: run?.flags.logFields ?? pear?.flags.logFields ?? ''`
+  * `stacks: run?.flags.logStacks ?? pear?.flags.logStacks ?? false`
+  * `log: run?.flags.log ?? pear?.flags.log`
+
+### `pear-api/state`
+
+Base `State` class for cross-process state management.
+
+### `pear-api/gunk`
+
+Platform gunk - glue-state for native and protocol integration.
 
 ### `pear-api/tryboot`
 

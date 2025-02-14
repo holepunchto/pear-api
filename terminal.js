@@ -193,20 +193,23 @@ function indicator (value, type = 'success') {
   return value < 0 ? ansi.cross + ' ' : (value > 0 ? ansi.tick + ' ' : ansi.gray('- '))
 }
 
-const outputter = (cmd, taggers = {}) => (json, stream, info = {}, ipc) => {
+const outputter = (cmd, taggers = {}) => (opts, stream, info = {}, ipc) => {
   if (Array.isArray(stream)) stream = Readable.from(stream)
   stdio.out.write(ansi.hideCursor())
   const dereg = teardown(() => {
     if (!isWindows && isTTY) stdio.out.write('\x1B[1K\x1B[G' + statusFrag) // clear ^C
     stdio.out.write(ansi.showCursor())
   })
-
+  if (typeof opts === 'boolean') opts = { json: opts }
+  const { json = false, log } = opts
   return new Promise((resolve, reject) => {
     stream.once('error', reject)
     stream.on('end', resolve)
     stream.on('data', ({ tag, data }) => {
       if (json) {
-        print(JSON.stringify({ cmd, tag, data }))
+        const str = JSON.stringify({ cmd, tag, data })
+        if (log) log(str)
+        else print(str)
         return
       }
       const transform = Promise.resolve(typeof taggers[tag] === 'function' ? taggers[tag](data, info, ipc) : taggers[tag] || false)
@@ -215,8 +218,14 @@ const outputter = (cmd, taggers = {}) => (json, stream, info = {}, ipc) => {
         if (typeof result === 'string') result = { output: 'print', message: result }
         if (result === false) {
           if (tag === 'final') result = { output: 'print', message: data.success ? 'Success\n' : 'Failure\n' }
+          else result = {}
         }
-        const { output, message, success = data?.success } = result
+        result.success = result.success ?? data?.success
+        if (log) {
+          log(result)
+          return
+        }
+        const { output, message, success } = result
         if (output === 'print') print(message, success)
         if (output === 'status') status(message, success)
         if (tag === 'byte-diff') byteDiff(data)
