@@ -1,7 +1,6 @@
-'use strict'
-
 import Worker from '../../../worker'
 import Helper from '../../helper'
+
 Helper.rig({ state: { config: { args: Bare.argv.slice(4) } } })
 
 const pipeIn = Pear.pipe

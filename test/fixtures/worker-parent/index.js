@@ -1,5 +1,3 @@
-'use strict'
-
 import Worker from '../../../worker'
 import Helper from '../../helper'
 

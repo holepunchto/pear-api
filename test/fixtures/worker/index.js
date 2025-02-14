@@ -1,6 +1,5 @@
-'use strict'
+import Worker from '../../../worker'
 
-const Worker = require('../../../worker')
 const worker = new Worker({ ref: () => undefined, unref: () => undefined })
 
 const pipe = worker.pipe()
