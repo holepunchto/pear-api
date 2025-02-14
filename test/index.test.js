@@ -102,36 +102,8 @@ test('worker should run directly in a terminal app', async function ({ is, plan,
   await Helper.untilClose(pipe)
 })
 
-// test('worker should run as a link in a terminal app', async function ({ is, plan, comment, teardown }) {
-//   plan(1)
-
-//   const helper = new Helper()
-//   teardown(() => helper.close(), { order: Infinity })
-//   await helper.ready()
-
-//   const testId = Math.floor(Math.random() * 100000)
-//   comment('Staging worker-runner...')
-//   const staging1 = helper.stage({ channel: `test-${testId}`, name: `test-${testId}`, key: null, dir: workerRunner, cmdArgs: [], dryRun: false, ignore: [] })
-//   teardown(() => Helper.teardownStream(staging1))
-//   const until1 = await Helper.pick(staging1, [{ tag: 'staging' }, { tag: 'final' }])
-//   const { link: runnerLink } = await until1.staging
-//   await until1.final
-
-//   comment('Staging worker...')
-//   const staging2 = helper.stage({ channel: `test-worker-${testId}`, name: `test-worker-${testId}`, key: null, dir: helloWorld, cmdArgs: [], dryRun: false, ignore: [] })
-//   teardown(() => Helper.teardownStream(staging2))
-//   const until2 = await Helper.pick(staging2, [{ tag: 'staging' }, { tag: 'final' }])
-//   const { link: workerLink } = await until2.staging
-//   await until2.final
-
-//   comment('Running worker using worker-runner...')
-//   const { pipe } = await Helper.run({ link: runnerLink, args: [workerLink] })
-//   const response = await Helper.untilResult(pipe)
-
-//   is(response, 'hello world', 'worker should send expected response')
-
-//   await Helper.untilClose(pipe)
-// })
+// TODO:
+// test('worker should run as a link in a terminal app')
 
 // test('worker exit when child calls pipe.end()', async function () {
 //   const pipe = await Pear.run(workerParent, [workerEndFromChild])
