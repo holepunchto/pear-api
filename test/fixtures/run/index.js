@@ -1,7 +1,7 @@
 'use strict'
 
 const Helper = require('../../helper')
-Helper.rig()
+Helper.rig({ state: { config: { args: Bare.argv.slice(4) } } })
 
 const pipe = Pear.pipe
 

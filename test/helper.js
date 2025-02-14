@@ -1,16 +1,21 @@
-const dirname = __dirname
+'use strict'
 
+const Worker = require('../worker')
+const API = require('..')
+
+Worker.RUNTIME = Bare.argv[0]
+
+const dirname = __dirname
 const STOP_CHAR = '\n'
 
 class Helper {
-  static rig ({ state = {}, worker, teardown } = {}) {
+  static rig ({ state = {} } = {}) {
     const ipc = {
       ref: () => undefined,
       unref: () => undefined
     }
-    const API = require('..')
     API.RTI = { checkout: { key: dirname, length: null, fork: null } }
-    global.Pear = new API(ipc, state, { worker, teardown })
+    global.Pear = new API(ipc, state)
   }
 
   static async untilResult (pipe, opts = {}) {
