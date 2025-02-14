@@ -1,3 +1,4 @@
+import '../../helper'
 import Worker from '../../../worker'
 
 const worker = new Worker({ ref: () => undefined, unref: () => undefined })

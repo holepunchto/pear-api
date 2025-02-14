@@ -7,7 +7,7 @@ const Helper = require('./helper')
 
 const dirname = __dirname
 
-test('pear run pear pipe', async function ({ is, plan }) {
+test('run pipe', async function ({ is, plan }) {
   plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'run')
