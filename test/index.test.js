@@ -102,8 +102,8 @@ test('worker should run directly in a terminal app', async function ({ is, plan,
   await Helper.untilClose(pipe)
 })
 
+// TODO: how to stage to generate a link?
 test.skip('worker should run as a link in a terminal app', () => {
-  // TODO:
 })
 
 test('worker exit when child calls pipe.end()', async function () {
@@ -139,6 +139,7 @@ test('worker exit when parent calls pipe.end()', async function () {
   await Helper.untilWorkerExit(pid)
 })
 
+// TODO: why failed?
 test.skip('worker exit when parent calls pipe.destroy()', async function () {
   const workerDestroyFromParent = path.join(dirname, 'fixtures', 'worker-destroy-from-parent')
   const workerChildErrorHandler = path.join(dirname, 'fixtures', 'worker-child-error-handler')
