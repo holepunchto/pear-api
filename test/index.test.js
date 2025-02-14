@@ -139,8 +139,7 @@ test('worker exit when parent calls pipe.end()', async function () {
   await Helper.untilWorkerExit(pid)
 })
 
-// TODO: why failed?
-test.skip('worker exit when parent calls pipe.destroy()', async function () {
+test('worker exit when parent calls pipe.destroy()', async function () {
   const workerDestroyFromParent = path.join(dirname, 'fixtures', 'worker-destroy-from-parent')
   const workerChildErrorHandler = path.join(dirname, 'fixtures', 'worker-child-error-handler')
 
