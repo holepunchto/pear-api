@@ -65,6 +65,24 @@ class Helper {
     pipe.end()
     return res
   }
+
+  static async isRunning (pid) {
+    try {
+      // 0 is a signal that doesn't kill the process, just checks if it's running
+      return process.kill(pid, 0)
+    } catch (err) {
+      return err.code === 'EPERM'
+    }
+  }
+
+  static async untilWorkerExit (pid, timeout = 5000) {
+    if (!pid) throw new Error('Invalid pid')
+    const start = Date.now()
+    while (await this.isRunning(pid)) {
+      if (Date.now() - start > timeout) throw new Error('timed out')
+      await new Promise((resolve) => setTimeout(resolve, 100))
+    }
+  }
 }
 
 module.exports = Helper

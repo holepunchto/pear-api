@@ -102,29 +102,50 @@ test('worker should run directly in a terminal app', async function ({ is, plan,
   await Helper.untilClose(pipe)
 })
 
-// TODO:
-// test('worker should run as a link in a terminal app')
+test.skip('worker should run as a link in a terminal app', () => {
+  // TODO:
+})
 
-// test('worker exit when child calls pipe.end()', async function () {
-//   const pipe = await Pear.run(workerParent, [workerEndFromChild])
-//   const pid = await Helper.untilResult(pipe)
-//   await Helper.untilWorkerExit(pid)
-// })
+test('worker exit when child calls pipe.end()', async function () {
+  const workerParent = path.join(dirname, 'fixtures', 'worker-parent')
+  const workerEndFromChild = path.join(dirname, 'fixtures', 'worker-end-from-child')
 
-// test('worker exit when child calls pipe.destroy()', async function () {
-//   const pipe = await Pear.run(workerParentErrorHandler, [workerDestroyFromChild])
-//   const pid = await Helper.untilResult(pipe)
-//   await Helper.untilWorkerExit(pid)
-// })
+  Worker.RUNTIME_ARGV = [workerParent]
 
-// test('worker exit when parent calls pipe.end()', async function () {
-//   const pipe = await Pear.run(workerEndFromParent, [workerChild])
-//   const pid = await Helper.untilResult(pipe)
-//   await Helper.untilWorkerExit(pid)
-// })
+  const pipe = await Pear.run(workerParent, [workerEndFromChild])
+  const pid = await Helper.untilResult(pipe)
+  await Helper.untilWorkerExit(pid)
+})
 
-// test('worker exit when parent calls pipe.destroy()', async function () {
-//   const pipe = await Pear.run(workerDestroyFromParent, [workerChildErrorHandler])
-//   const pid = await Helper.untilResult(pipe)
-//   await Helper.untilWorkerExit(pid)
-// })
+test('worker exit when child calls pipe.destroy()', async function () {
+  const workerParentErrorHandler = path.join(dirname, 'fixtures', 'worker-parent-error-handler')
+  const workerDestroyFromChild = path.join(dirname, 'fixtures', 'worker-destroy-from-child')
+
+  Worker.RUNTIME_ARGV = [workerParentErrorHandler]
+
+  const pipe = await Pear.run(workerParentErrorHandler, [workerDestroyFromChild])
+  const pid = await Helper.untilResult(pipe)
+  await Helper.untilWorkerExit(pid)
+})
+
+test('worker exit when parent calls pipe.end()', async function () {
+  const workerEndFromParent = path.join(dirname, 'fixtures', 'worker-end-from-parent')
+  const workerChild = path.join(dirname, 'fixtures', 'worker-child')
+
+  Worker.RUNTIME_ARGV = [workerEndFromParent]
+
+  const pipe = await Pear.run(workerEndFromParent, [workerChild])
+  const pid = await Helper.untilResult(pipe)
+  await Helper.untilWorkerExit(pid)
+})
+
+test.skip('worker exit when parent calls pipe.destroy()', async function () {
+  const workerDestroyFromParent = path.join(dirname, 'fixtures', 'worker-destroy-from-parent')
+  const workerChildErrorHandler = path.join(dirname, 'fixtures', 'worker-child-error-handler')
+
+  Worker.RUNTIME_ARGV = [workerDestroyFromParent]
+
+  const pipe = await Pear.run(workerDestroyFromParent, [workerChildErrorHandler])
+  const pid = await Helper.untilResult(pipe)
+  await Helper.untilWorkerExit(pid)
+})
