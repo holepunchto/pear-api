@@ -2,6 +2,7 @@
 
 const { test } = require('brittle')
 const path = require('path')
+const Helper = require('./helper')
 
 const dirname = __dirname
 
@@ -15,14 +16,7 @@ test('pear run pear pipe', async function ({ is, plan, teardown }) {
   Worker.RUNTIME_ARGV = [dir]
   const worker = new Worker({ ref: () => undefined, unref: () => undefined })
 
-  const ipc = {
-    ref: () => undefined,
-    unref: () => undefined
-  }
-  const state = {}
-  const API = require('..')
-  API.RTI = { checkout: { key: dirname, length: null, fork: null } }
-  global.Pear = new API(ipc, state, { worker, teardown })
+  Helper.rig({ worker, teardown })
 
   const pipe = Pear.run(dir)
 
@@ -57,14 +51,7 @@ test('pear run worker pipe', async function ({ is, plan, teardown }) {
   Worker.RUNTIME_ARGV = [dir]
   const worker = new Worker({ ref: () => undefined, unref: () => undefined })
 
-  const ipc = {
-    ref: () => undefined,
-    unref: () => undefined
-  }
-  const state = {}
-  const API = require('..')
-  API.RTI = { checkout: { key: dirname, length: null, fork: null } }
-  global.Pear = new API(ipc, state, { worker, teardown })
+  Helper.rig({ worker, teardown })
 
   const pipe = Pear.run(dir)
 
@@ -87,4 +74,26 @@ test('pear run worker pipe', async function ({ is, plan, teardown }) {
   is(workerResponse, '0123', 'worker pipe can send and receive data')
 
   pipe.write('exit')
+})
+
+test('worker should receive args from the parent', async function ({ is, plan, teardown }) {
+  plan(1)
+
+  const dir = path.join(dirname, 'fixtures', 'print-args')
+
+  const Worker = require('../worker')
+  Worker.RUNTIME = Bare.argv[0]
+  Worker.RUNTIME_ARGV = [dir]
+  const worker = new Worker({ ref: () => undefined, unref: () => undefined })
+
+  Helper.rig({ worker, teardown })
+
+  const args = ['hello', 'world']
+  const pipe = Pear.run(dir, args)
+
+  const result = await Helper.untilResult(pipe)
+
+  is(result, JSON.stringify(args), 'worker should receive args from the parent')
+
+  await Helper.untilClose(pipe)
 })
