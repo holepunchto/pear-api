@@ -4,15 +4,14 @@ const { isBare } = require('which-runtime')
 const hrtime = isBare ? require('bare-hrtime') : process.hrtime
 
 const pear = global.Pear?.config.cmdArgs ? cmd(global.Pear.config.cmdArgs) : cmd(global.Bare.argv.slice(1))
-const run = global.Pear?.config
 
 class Logger {
   static settings = {
-    log: run?.flags?.log ?? pear?.flags.log,
-    level: run?.flags?.logLevel ?? pear?.flags.logLevel,
-    labels: run?.flags?.logLabels ?? pear?.flags.logLabels,
-    fields: run?.flags?.logFields ?? pear?.flags.logFields ?? '',
-    stacks: run?.flags?.logStacks ?? pear?.flags.logStacks ?? false
+    log: pear?.flags.log,
+    level: pear?.flags.logLevel,
+    labels: pear?.flags.logLabels,
+    fields: pear?.flags.logFields ?? '',
+    stacks: pear?.flags.logStacks ?? false
   }
 
   constructor ({ labels, fields, stacks, level, pretty } = {}) {
@@ -46,7 +45,7 @@ class Logger {
     const datetime = (this._show.date || this._show.time) ? new Date().toISOString().split('T') : []
     const date = this._show.date ? datetime[0] : ''
     const time = this._show.time ? datetime[1].slice(0, -1) : ''
-    label = this._show.label ? '[ ' + label.slice(0, 14) + ' ]' : ''
+    label = this._show.label ? '[ ' + label.slice(0, 21) + ' ]' : ''
     level = this._show.level ? level : ''
     const prefix = [level, date, time, label].filter(Boolean)
     return [...prefix, ...args, this._show.delta ? '[+' + (Math.round(delta * Math.pow(10, 4)) / Math.pow(10, 4)) + 'ms]' : '']

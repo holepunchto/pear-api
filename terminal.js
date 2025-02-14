@@ -221,11 +221,11 @@ const outputter = (cmd, taggers = {}) => (opts, stream, info = {}, ipc) => {
           else result = {}
         }
         result.success = result.success ?? data?.success
+        const { output, message, success = data?.success } = result
         if (log) {
-          log(result)
+          log(message, { output, ...(typeof success === 'boolean' ? { success } : {}) })
           return
         }
-        const { output, message, success } = result
         if (output === 'print') print(message, success)
         if (output === 'status') status(message, success)
         if (tag === 'byte-diff') byteDiff(data)

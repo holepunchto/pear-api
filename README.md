@@ -47,10 +47,10 @@ Logger class with only `error`, `info`, `trace` log methods, supports log labels
 
 #### Options
 
-* `level` `<String>` -  Level to log at. 0,1,2,3 (OFF,ERR,INF,TRC). Default: `pear run --log-level` else `pear --log-level`.
-* `labels` `<String>` -  Labels to log out. Default: `pear run --log-labels` else `pear --log-labels`
-* `fields` `<String>` -  Fields to show/hide. `<field>` shows, `h:<field>` hides. Default: `pear run --log-fields` else `pear --log-fields` else `h:time,h:data,level,label,delta`
-* `stacks` `<Boolean>` -  Print stack traces with all logs. Default  `pear run --log-stacks` else `pear --log-stacks` else `false`
+* `level` `<String>` -  Level to log at. 0,1,2,3 (OFF,ERR,INF,TRC). Default: `pear --log-level`.
+* `labels` `<String>` -  Labels to log out. Default: `pear --log-labels`
+* `fields` `<String>` -  Fields to show/hide. `<field>` shows, `h:<field>` hides. Default: `pear --log-fields` else `h:time,h:data,level,label,delta`
+* `stacks` `<Boolean>` -  Print stack traces with all logs. Default  `pear --log-stacks` else `false`
 * `pretty` `<Boolean>` -  Enables label field if more than 2 labels, disables level field default. Default `false`.
 
 #### Properties
@@ -69,12 +69,12 @@ Logger class with only `error`, `info`, `trace` log methods, supports log labels
 
 #### Statics
 
-* `settings` `<Object>` - initial settings per flags
-  * `level: run?.flags.logLevel ?? pear?.flags.logLevel`
-  * `labels: run?.flags.logLabels ?? pear?.flags.logLabels`
-  * `fields: run?.flags.logFields ?? pear?.flags.logFields ?? ''`
-  * `stacks: run?.flags.logStacks ?? pear?.flags.logStacks ?? false`
-  * `log: run?.flags.log ?? pear?.flags.log`
+* `settings` `<Object>` - default settings per flags
+  * `level`: `pear --log-level`
+  * `labels`: `pear --log-labels`
+  * `fields`: `pear --log-fields`
+  * `stacks`: `pear --log-stacks`
+  * `log`: `pear --log`
 
 ### `pear-api/state`
 
