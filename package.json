@@ -13,6 +13,7 @@
     "errors.js",
     "gunk.js",
     "index.js",
+    "logger.js",
     "parse-link.js",
     "shell.js",
     "state.js",
