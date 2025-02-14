@@ -17,7 +17,7 @@ if (!mount) {
   mount = url
 }
 
-const LOCALDEV = CHECKOUT?.length === null
+const LOCALDEV = CHECKOUT.length === null
 const swapURL = mount.pathname.endsWith('.bundle/') ? new URL('..', mount) : mount
 const swapPath = toPath(swapURL)
 const IPC_ID = 'pear'

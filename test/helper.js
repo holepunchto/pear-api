@@ -10,6 +10,13 @@ const STOP_CHAR = '\n'
 
 class Helper {
   static rig ({ state = {} } = {}) {
+    class TestAPI {
+      static RTI = { checkout: { key: dirname, length: null, fork: null } }
+      static get CONSTANTS () { return require('../constants') }
+      config = {}
+    }
+    global.Pear = new TestAPI()
+
     const ipc = {
       ref: () => undefined,
       unref: () => undefined
