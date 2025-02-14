@@ -14,10 +14,7 @@ const STOP_CHAR = '\n'
 
 class Helper {
   static rig ({ state = {}, runtimeArgv } = {}) {
-    const ipc = {
-      ref: () => undefined,
-      unref: () => undefined
-    }
+    const ipc = { ref: () => undefined, unref: () => undefined }
     API.RTI = { checkout: { key: dirname, length: null, fork: null } }
     Worker.RUNTIME = Bare.argv[0]
     Worker.RUNTIME_ARGV = runtimeArgv
