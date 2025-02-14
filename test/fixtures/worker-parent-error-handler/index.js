@@ -1,4 +1,3 @@
-import Worker from '../../../worker'
 import Helper from '../../helper'
 
 Helper.rig({ state: { config: { args: Bare.argv.slice(4) } } })
@@ -7,7 +6,7 @@ const pipeIn = Pear.pipe
 pipeIn.write(`${Bare.pid}\n`)
 
 const [workerPath] = Pear.config.args
-Worker.RUNTIME_ARGV = [workerPath]
+Helper.rig({ state: { config: { args: Bare.argv.slice(4) } }, runtimeArgv: [workerPath] })
 
 const pipe = Pear.run(workerPath)
 pipe.on('error', (err) => {

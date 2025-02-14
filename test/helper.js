@@ -1,27 +1,38 @@
 'use strict'
 
-const Worker = require('../worker')
-const API = require('..')
+//
+// rig minimal API
+//
+const dirname = __dirname
 
+class TestAPI {
+  static RTI = { checkout: { key: dirname, length: null, fork: null } }
+  static get CONSTANTS () { return require('../constants') }
+  config = {}
+}
+
+global.Pear = new TestAPI()
+
+//
+// rig full API
+//
+
+const ipc = {
+  ref: () => undefined,
+  unref: () => undefined
+}
+
+const API = require('..')
+API.RTI = { checkout: { key: dirname, length: null, fork: null } }
+
+const Worker = require('../worker')
 Worker.RUNTIME = Bare.argv[0]
 
-const dirname = __dirname
 const STOP_CHAR = '\n'
 
 class Helper {
-  static rig ({ state = {} } = {}) {
-    class TestAPI {
-      static RTI = { checkout: { key: dirname, length: null, fork: null } }
-      static get CONSTANTS () { return require('../constants') }
-      config = {}
-    }
-    global.Pear = new TestAPI()
-
-    const ipc = {
-      ref: () => undefined,
-      unref: () => undefined
-    }
-    API.RTI = { checkout: { key: dirname, length: null, fork: null } }
+  static rig ({ state = {}, runtimeArgv } = {}) {
+    Worker.RUNTIME_ARGV = runtimeArgv
     global.Pear = new API(ipc, state)
   }
 
