@@ -3,16 +3,16 @@ const cmd = require('./cmd')
 const { isBare } = require('which-runtime')
 const hrtime = isBare ? require('bare-hrtime') : process.hrtime
 
-const pear = global.Pear ? cmd(global.Pear.config.cmdArgs) : cmd(global.Bare.argv.slice(1))
+const pear = global.Pear?.config.cmdArgs ? cmd(global.Pear.config.cmdArgs) : cmd(global.Bare.argv.slice(1))
 const run = global.Pear?.config
 
 class Logger {
   static settings = {
-    log: run?.flags.log ?? pear?.flags.log,
-    level: run?.flags.logLevel ?? pear?.flags.logLevel,
-    labels: run?.flags.logLabels ?? pear?.flags.logLabels,
-    fields: run?.flags.logFields ?? pear?.flags.logFields ?? '',
-    stacks: run?.flags.logStacks ?? pear?.flags.logStacks ?? false
+    log: run?.flags?.log ?? pear?.flags.log,
+    level: run?.flags?.logLevel ?? pear?.flags.logLevel,
+    labels: run?.flags?.logLabels ?? pear?.flags.logLabels,
+    fields: run?.flags?.logFields ?? pear?.flags.logFields ?? '',
+    stacks: run?.flags?.logStacks ?? pear?.flags.logStacks ?? false
   }
 
   constructor ({ labels, fields, stacks, level, pretty } = {}) {
