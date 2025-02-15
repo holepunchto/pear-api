@@ -1,7 +1,12 @@
-import '../../helper'
-import Worker from '../../../worker'
+const dirname = __dirname
 
-const worker = new Worker({ ref: () => undefined, unref: () => undefined })
+class RigAPI {
+  static RTI = { checkout: { key: dirname, length: null, fork: null } }
+}
+global.Pear = new RigAPI()
+
+const Worker = require('../../../worker')
+const worker = new Worker()
 
 const pipe = worker.pipe()
 

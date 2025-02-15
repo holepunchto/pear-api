@@ -5,7 +5,7 @@ const path = require('path')
 
 const dirname = __dirname
 
-test.skip('worker pipe', async function ({ is, plan, teardown }) {
+test('worker pipe', async function ({ is, plan, teardown }) {
   teardown(() => { global.Pear = null })
 
   plan(1)
@@ -22,17 +22,7 @@ test.skip('worker pipe', async function ({ is, plan, teardown }) {
     static RUNTIME = Bare.argv[0]
     static RUNTIME_ARGV = [dir]
   }
-
-  const API = require('..')
-  class TestAPI extends API {
-    static RTI = RigAPI.RTI
-  }
-
-  const noop = () => undefined
-  const ipc = { ref: noop, unref: noop }
-  const state = {}
-  const worker = new TestWorker(ipc)
-  global.Pear = new TestAPI(ipc, state, { worker })
+  const worker = new TestWorker()
 
   const pipe = worker.run(dir)
 

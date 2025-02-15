@@ -1,4 +1,3 @@
 {
-  "name": "worker",
-  "type": "module"
+  "name": "worker"
 }
