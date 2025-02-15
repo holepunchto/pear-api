@@ -1,12 +1,13 @@
 import Helper from '../../helper'
 
-Helper.rig({ state: { config: { args: Bare.argv.slice(4) } } })
+const td = Helper.rig({ state: { config: { args: Bare.argv.slice(4) } } })
+const [workerPath] = Pear.config.args
+td()
+
+Helper.rig({ state: { config: { args: Bare.argv.slice(4) } }, runtimeArgv: [workerPath] })
 
 const pipeIn = Pear.pipe
 pipeIn.write(`${Bare.pid}\n`)
-
-const [workerPath] = Pear.config.args
-Helper.rig({ state: { config: { args: Bare.argv.slice(4) } }, runtimeArgv: [workerPath] })
 
 const pipe = Pear.run(workerPath)
 const pid = await new Promise((resolve) => {

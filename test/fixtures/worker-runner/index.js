@@ -1,11 +1,12 @@
 import Helper from '../../helper'
 
-Helper.rig({ state: { config: { args: Bare.argv.slice(4) } } })
-
-const pipe = Pear.pipe
+const td = Helper.rig({ state: { config: { args: Bare.argv.slice(4) } } })
 const [workerPath] = Pear.config.args
+td()
 
 Helper.rig({ state: { config: { args: Bare.argv.slice(4) } }, runtimeArgv: [workerPath] })
+
+const pipe = Pear.pipe
 
 const workerPipe = Pear.run(workerPath)
 workerPipe.on('data', (data) => {

@@ -4,18 +4,23 @@ const { test } = require('brittle')
 const path = require('path')
 
 const Helper = require('./helper')
-const Worker = require('../worker')
 
 const dirname = __dirname
 
-test('run pipe', async function ({ is, plan }) {
+test('worker pipe', async function ({ is, plan, teardown }) {
   plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'worker')
 
-  Helper.rig({ runtimeArgv: [dir] })
+  const td = Helper.rig({ runtimeArgv: [dir] })
+  teardown(td)
 
-  const worker = new Worker({ ref: () => undefined, unref: () => undefined })
+  const Worker = require('../worker')
+  class TestWorker extends Worker {
+    static RUNTIME = Bare.argv[0]
+    static RUNTIME_ARGV = [dir]
+  }
+  const worker = new TestWorker()
 
   const pipe = worker.run(dir)
 

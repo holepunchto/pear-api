@@ -1,24 +1,39 @@
 'use strict'
 
 const dirname = __dirname
-
-class TestAPI {
-  static RTI = { checkout: { key: dirname, length: null, fork: null } }
-}
-global.Pear = new TestAPI()
-
-const API = require('..')
-const Worker = require('../worker')
+global.Pear = null
 
 const STOP_CHAR = '\n'
 
 class Helper {
   static rig ({ state = {}, runtimeArgv } = {}) {
-    const ipc = { ref: () => undefined, unref: () => undefined }
-    API.RTI = { checkout: { key: dirname, length: null, fork: null } }
-    Worker.RUNTIME = Bare.argv[0]
-    Worker.RUNTIME_ARGV = runtimeArgv
-    global.Pear = new API(ipc, state)
+    if (global.Pear !== null) throw Error(`Prior Pear global not cleaned up: ${global.Pear}`)
+
+    class RigAPI {
+      static RTI = { checkout: { key: dirname, length: null, fork: null } }
+    }
+    global.Pear = new RigAPI()
+
+    const Worker = require('../worker')
+    class TestWorker extends Worker {
+      static RUNTIME = Bare.argv[0]
+      static RUNTIME_ARGV = runtimeArgv
+    }
+
+    const API = require('..')
+    class TestAPI extends API {
+      static RTI = RigAPI.RTI
+    }
+
+    const noop = () => undefined
+    const ipc = { ref: noop, unref: noop }
+    const worker = new TestWorker(ipc)
+    global.Pear = new TestAPI(ipc, state, { worker })
+
+    return () => {
+      global.Pear = null
+      // TODO: clear require.cache
+    }
   }
 
   static async untilResult (pipe, opts = {}) {
