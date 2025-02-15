@@ -59,7 +59,7 @@ test('run should receive args from the parent', async function ({ is, plan, tear
 test('run should run directly in a terminal app', async function ({ is, plan, comment, teardown }) {
   plan(1)
 
-  const runDir = path.join(dirname, 'fixtures', 'worker-runner')
+  const runDir = path.join(dirname, 'fixtures', 'run-runner')
   const helloWorldDir = path.join(dirname, 'fixtures', 'hello-world')
 
   const td = Helper.rig({ runtimeArgv: [runDir] })
@@ -80,8 +80,8 @@ test.skip('worker should run as a link in a terminal app', () => {
 })
 
 test('run exit when child calls pipe.end()', async function ({ teardown }) {
-  const workerParent = path.join(dirname, 'fixtures', 'worker-parent')
-  const workerEndFromChild = path.join(dirname, 'fixtures', 'worker-end-from-child')
+  const workerParent = path.join(dirname, 'fixtures', 'run-parent')
+  const workerEndFromChild = path.join(dirname, 'fixtures', 'run-end-from-child')
 
   const td = Helper.rig({ runtimeArgv: [workerParent] })
   teardown(td)
@@ -92,8 +92,8 @@ test('run exit when child calls pipe.end()', async function ({ teardown }) {
 })
 
 test('run exit when child calls pipe.destroy()', async function ({ teardown }) {
-  const workerParentErrorHandler = path.join(dirname, 'fixtures', 'worker-parent-error-handler')
-  const workerDestroyFromChild = path.join(dirname, 'fixtures', 'worker-destroy-from-child')
+  const workerParentErrorHandler = path.join(dirname, 'fixtures', 'run-parent-error-handler')
+  const workerDestroyFromChild = path.join(dirname, 'fixtures', 'run-destroy-from-child')
 
   const td = Helper.rig({ runtimeArgv: [workerParentErrorHandler] })
   teardown(td)
@@ -104,8 +104,8 @@ test('run exit when child calls pipe.destroy()', async function ({ teardown }) {
 })
 
 test('run exit when parent calls pipe.end()', async function ({ teardown }) {
-  const workerEndFromParent = path.join(dirname, 'fixtures', 'worker-end-from-parent')
-  const workerChild = path.join(dirname, 'fixtures', 'worker-child')
+  const workerEndFromParent = path.join(dirname, 'fixtures', 'run-end-from-parent')
+  const workerChild = path.join(dirname, 'fixtures', 'run-child')
 
   const td = Helper.rig({ runtimeArgv: [workerEndFromParent] })
   teardown(td)
@@ -116,8 +116,8 @@ test('run exit when parent calls pipe.end()', async function ({ teardown }) {
 })
 
 test('run exit when parent calls pipe.destroy()', async function ({ teardown }) {
-  const workerDestroyFromParent = path.join(dirname, 'fixtures', 'worker-destroy-from-parent')
-  const workerChildErrorHandler = path.join(dirname, 'fixtures', 'worker-child-error-handler')
+  const workerDestroyFromParent = path.join(dirname, 'fixtures', 'run-destroy-from-parent')
+  const workerChildErrorHandler = path.join(dirname, 'fixtures', 'run-child-error-handler')
 
   const td = Helper.rig({ runtimeArgv: [workerDestroyFromParent] })
   teardown(td)
