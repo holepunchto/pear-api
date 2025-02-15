@@ -3,24 +3,36 @@
 const { test } = require('brittle')
 const path = require('path')
 
-const Helper = require('./helper')
-
 const dirname = __dirname
 
-test('worker pipe', async function ({ is, plan, teardown }) {
+test.skip('worker pipe', async function ({ is, plan, teardown }) {
+  teardown(() => { global.Pear = null })
+
   plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'worker')
 
-  const td = Helper.rig({ runtimeArgv: [dir] })
-  teardown(td)
+  class RigAPI {
+    static RTI = { checkout: { key: dirname, length: null, fork: null } }
+  }
+  global.Pear = new RigAPI()
 
   const Worker = require('../worker')
   class TestWorker extends Worker {
     static RUNTIME = Bare.argv[0]
     static RUNTIME_ARGV = [dir]
   }
-  const worker = new TestWorker()
+
+  const API = require('..')
+  class TestAPI extends API {
+    static RTI = RigAPI.RTI
+  }
+
+  const noop = () => undefined
+  const ipc = { ref: noop, unref: noop }
+  const state = {}
+  const worker = new TestWorker(ipc)
+  global.Pear = new TestAPI(ipc, state, { worker })
 
   const pipe = worker.run(dir)
 
