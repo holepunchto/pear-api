@@ -75,10 +75,6 @@ test('run should run directly in a terminal app', async function ({ is, plan, co
   await Helper.untilClose(pipe)
 })
 
-// TODO: how to stage to generate a link?
-test.skip('worker should run as a link in a terminal app', () => {
-})
-
 test('run exit when child calls pipe.end()', async function ({ teardown }) {
   const workerParent = path.join(dirname, 'fixtures', 'run-parent')
   const workerEndFromChild = path.join(dirname, 'fixtures', 'run-end-from-child')
