@@ -56,7 +56,7 @@ test('run should receive args from the parent', async function ({ is, plan, tear
   await Helper.untilClose(pipe)
 })
 
-test('run should run directly in a terminal app', async function ({ is, plan, comment, teardown }) {
+test('run should run directly in a terminal app', async function ({ is, plan, teardown }) {
   plan(1)
 
   const runDir = path.join(dirname, 'fixtures', 'run-runner')
@@ -65,7 +65,6 @@ test('run should run directly in a terminal app', async function ({ is, plan, co
   const td = Helper.rig({ runtimeArgv: [runDir] })
   teardown(td)
 
-  comment('Running worker using worker-runner...')
   const pipe = Pear.run(runDir, [helloWorldDir])
 
   const response = await Helper.untilResult(pipe)
