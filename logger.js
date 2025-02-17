@@ -3,11 +3,11 @@ const { isBare } = require('which-runtime')
 const hrtime = isBare ? require('bare-hrtime') : process.hrtime
 const pear = require('./cmd')(global.Bare.argv.slice(2))
 const switches = {
-  log: pear?.flags.log,
-  level: pear?.flags.logLevel,
-  labels: pear?.flags.logLabels,
-  fields: pear?.flags.logFields,
-  stacks: pear?.flags.logStacks
+  log: pear?.flags.log ?? false,
+  level: pear?.flags.logLevel ?? 0,
+  labels: pear?.flags.logLabels ?? '',
+  fields: pear?.flags.logFields ?? '',
+  stacks: pear?.flags.logStacks ?? false
 }
 class Logger {
   static switches = switches
@@ -110,7 +110,7 @@ class Logger {
     return 2
   }
 
-  _parseFields (fields) {
+  _parseFields (fields = '') {
     const show = {
       date: false,
       time: false,
@@ -119,7 +119,7 @@ class Logger {
       delta: true
     }
     const seen = new Set()
-    for (let field of fields.split(',').concat(this.constructor.fields.split(','))) {
+    for (let field of fields.split(',').concat(this.constructor.switches.fields.split(','))) {
       if (seen.has(field)) continue
       field = field.trim()
       if (field.startsWith('h:')) {
