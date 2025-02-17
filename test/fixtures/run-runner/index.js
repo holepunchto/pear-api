@@ -1,4 +1,4 @@
-import Helper from '../../helper'
+const Helper = require('../../helper')
 
 const teardown = Helper.rig({ state: { config: { args: Bare.argv.slice(4) } } })
 const [workerPath] = Pear.config.args
