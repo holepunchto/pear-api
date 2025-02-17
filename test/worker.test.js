@@ -5,12 +5,8 @@ const path = require('path')
 
 const dirname = __dirname
 
-test('worker pipe', async function (t) {
-  t.teardown(() => { global.Pear = null })
-
-  t.plan(1)
-
-  const dir = path.join(dirname, 'fixtures', 'worker')
+const rig = ({ runtimeArgv } = {}) => {
+  if (global.Pear !== null) throw Error(`Prior Pear global not cleaned up: ${global.Pear}`)
 
   class RigAPI {
     static RTI = { checkout: { key: dirname, length: null, fork: null } }
@@ -20,9 +16,23 @@ test('worker pipe', async function (t) {
   const Worker = require('../worker')
   class TestWorker extends Worker {
     static RUNTIME = Bare.argv[0]
-    static RUNTIME_ARGV = [dir]
+    static RUNTIME_ARGV = runtimeArgv
   }
   const worker = new TestWorker()
+
+  return {
+    teardown: () => { global.Pear = null },
+    worker
+  }
+}
+
+test('worker pipe', async function (t) {
+  t.plan(1)
+
+  const dir = path.join(dirname, 'fixtures', 'worker')
+
+  const { teardown, worker } = rig({ runtimeArgv: [dir] })
+  t.teardown(teardown)
 
   const pipe = worker.run(dir)
 
