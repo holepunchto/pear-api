@@ -4,6 +4,7 @@ const { test } = require('brittle')
 const path = require('path')
 
 const dirname = __dirname
+global.Pear = null
 
 const rig = ({ runtimeArgv } = {}) => {
   if (global.Pear !== null) throw Error(`Prior Pear global not cleaned up: ${global.Pear}`)

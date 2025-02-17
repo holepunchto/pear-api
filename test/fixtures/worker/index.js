@@ -1,4 +1,5 @@
 const dirname = __dirname
+global.Pear = null
 
 const rig = () => {
   if (global.Pear !== null) throw Error(`Prior Pear global not cleaned up: ${global.Pear}`)
