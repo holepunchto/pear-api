@@ -1,18 +1,23 @@
 'use strict'
-const cmd = require('./cmd')
 const { isBare } = require('which-runtime')
 const hrtime = isBare ? require('bare-hrtime') : process.hrtime
 
-const pear = cmd(global.Bare.argv.slice(1))
-
 class Logger {
-  static settings = {
-    log: pear?.flags.log,
-    level: pear?.flags.logLevel,
-    labels: pear?.flags.logLabels,
-    fields: pear?.flags.logFields ?? '',
-    stacks: pear?.flags.logStacks ?? false
+  static get flags () {
+    const pear = require('./cmd')(global.Bare.argv.slice(1))
+    return {
+      log: pear?.flags.log,
+      level: pear?.flags.logLevel,
+      labels: pear?.flags.logLabels,
+      fields: pear?.flags.logFields,
+      stacks: pear?.flags.logStacks
+    }
   }
+
+  static OFF = 0
+  static ERR = 1
+  static INF = 2
+  static TRC = 3
 
   constructor ({ labels, fields, stacks, level, pretty } = {}) {
     level = level ?? this.constructor.defaults
@@ -32,10 +37,10 @@ class Logger {
     }
   }
 
-  get OFF () { return this.LEVEL === 0 }
-  get ERR () { return this.LEVEL === 1 }
-  get INF () { return this.LEVEL === 2 }
-  get TRC () { return this.LEVEL === 3 }
+  get OFF () { return this.LEVEL === this.constructor.OFF }
+  get ERR () { return this.LEVEL >= this.constructor.ERR }
+  get INF () { return this.LEVEL >= this.constructor.INF }
+  get TRC () { return this.LEVEL >= this.constructor.TRC }
 
   _args (level, label, ...args) {
     const now = hrtime.bigint()
@@ -52,7 +57,7 @@ class Logger {
   }
 
   error (label, ...args) {
-    if (this.LEVEL < 1) return
+    if (this.LEVEL < this.constructor.ERR) return
     if (Array.isArray(label)) {
       for (const lbl of label) this.error(lbl, ...args)
       return
@@ -69,7 +74,7 @@ class Logger {
   }
 
   info (label, ...args) {
-    if (this.LEVEL < 2) return
+    if (this.LEVEL < this.constructor.INF) return
     if (Array.isArray(label)) {
       for (const lbl of label) this.info(lbl, ...args)
       return
@@ -86,7 +91,7 @@ class Logger {
   }
 
   trace (label, ...args) {
-    if (this.LEVEL < 3) return
+    if (this.LEVEL < this.constructor.TRC) return
     if (Array.isArray(label)) {
       for (const lbl of label) this.trace(lbl, ...args)
       return
