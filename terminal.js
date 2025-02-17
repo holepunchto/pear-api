@@ -223,12 +223,18 @@ const outputter = (cmd, taggers = {}) => (opts, stream, info = {}, ipc) => {
         result.success = result.success ?? data?.success
         const { output, message, success = data?.success } = result
         if (log) {
-          log(message, { output, ...(typeof success === 'boolean' ? { success } : {}) })
+          const logOpts = { output, ...(typeof success === 'boolean' ? { success } : {}) }
+          if (Array.isArray(message) === false) log(message, logOpts)
+          else for (const msg of message) log(msg, logOpts)
           return
         }
-        if (output === 'print') print(message, success)
-        if (output === 'status') status(message, success)
-        if (tag === 'byte-diff') byteDiff(data)
+        if (tag === 'byte-diff') {
+          byteDiff(data)
+          return
+        }
+        const msg = Array.isArray(message) ? message.join('\n') : message
+        if (output === 'print') print(msg, success)
+        if (output === 'status') status(msg, success)
       }, reject)
     })
   }).finally(() => {
