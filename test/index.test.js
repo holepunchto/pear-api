@@ -7,7 +7,7 @@ const Helper = require('./helper')
 
 const dirname = __dirname
 
-test('run pipe', async function (t) {
+test('Pear.run pipe', async function (t) {
   t.plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'run')
@@ -38,7 +38,7 @@ test('run pipe', async function (t) {
   pipe.write('exit')
 })
 
-test('run should receive args from the parent', async function (t) {
+test('Pear.run should receive args from the parent', async function (t) {
   t.plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'print-args')
@@ -56,7 +56,7 @@ test('run should receive args from the parent', async function (t) {
   await Helper.untilClose(pipe)
 })
 
-test('run should run directly in a terminal app', async function (t) {
+test('Pear.run should run directly in a terminal app', async function (t) {
   t.plan(1)
 
   const runDir = path.join(dirname, 'fixtures', 'run-runner')
@@ -74,7 +74,7 @@ test('run should run directly in a terminal app', async function (t) {
   await Helper.untilClose(pipe)
 })
 
-test('run exit when child calls pipe.end()', async function (t) {
+test('Pear.run exit when child calls pipe.end()', async function (t) {
   const runParent = path.join(dirname, 'fixtures', 'run-parent')
   const runEndFromChild = path.join(dirname, 'fixtures', 'run-end-from-child')
 
@@ -86,7 +86,7 @@ test('run exit when child calls pipe.end()', async function (t) {
   await Helper.untilExit(pid)
 })
 
-test('run exit when child calls pipe.destroy()', async function (t) {
+test('Pear.run exit when child calls pipe.destroy()', async function (t) {
   const runParentErrorHandler = path.join(dirname, 'fixtures', 'run-parent-error-handler')
   const runDestroyFromChild = path.join(dirname, 'fixtures', 'run-destroy-from-child')
 
@@ -98,7 +98,7 @@ test('run exit when child calls pipe.destroy()', async function (t) {
   await Helper.untilExit(pid)
 })
 
-test('run exit when parent calls pipe.end()', async function (t) {
+test('Pear.run exit when parent calls pipe.end()', async function (t) {
   const runEndFromParent = path.join(dirname, 'fixtures', 'run-end-from-parent')
   const runChild = path.join(dirname, 'fixtures', 'run-child')
 
@@ -110,7 +110,7 @@ test('run exit when parent calls pipe.end()', async function (t) {
   await Helper.untilExit(pid)
 })
 
-test('run exit when parent calls pipe.destroy()', async function (t) {
+test('Pear.run exit when parent calls pipe.destroy()', async function (t) {
   const runDestroyFromParent = path.join(dirname, 'fixtures', 'run-destroy-from-parent')
   const runChildErrorHandler = path.join(dirname, 'fixtures', 'run-child-error-handler')
 
