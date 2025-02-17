@@ -1,6 +1,8 @@
 const dirname = __dirname
 
 const rig = () => {
+  if (global.Pear !== null) throw Error(`Prior Pear global not cleaned up: ${global.Pear}`)
+
   class RigAPI {
     static RTI = { checkout: { key: dirname, length: null, fork: null } }
   }
