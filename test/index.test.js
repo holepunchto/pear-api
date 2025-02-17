@@ -32,8 +32,8 @@ test('run pipe', async function (t) {
 
   pipe.write('ping')
 
-  const workerResponse = await response
-  t.is(workerResponse, '0123', 'pear pipe can send and receive data')
+  const runResponse = await response
+  t.is(runResponse, '0123', 'pear pipe can send and receive data')
 
   pipe.write('exit')
 })
@@ -51,7 +51,7 @@ test('run should receive args from the parent', async function (t) {
 
   const result = await Helper.untilResult(pipe)
 
-  t.is(result, JSON.stringify(args), 'worker should receive args from the parent')
+  t.is(result, JSON.stringify(args), 'run should receive args from the parent')
 
   await Helper.untilClose(pipe)
 })
@@ -69,55 +69,55 @@ test('run should run directly in a terminal app', async function (t) {
 
   const response = await Helper.untilResult(pipe)
 
-  t.is(response, 'hello world', 'worker should send expected response')
+  t.is(response, 'hello world', 'run should send expected response')
 
   await Helper.untilClose(pipe)
 })
 
 test('run exit when child calls pipe.end()', async function (t) {
-  const workerParent = path.join(dirname, 'fixtures', 'run-parent')
-  const workerEndFromChild = path.join(dirname, 'fixtures', 'run-end-from-child')
+  const runParent = path.join(dirname, 'fixtures', 'run-parent')
+  const runEndFromChild = path.join(dirname, 'fixtures', 'run-end-from-child')
 
-  const teardown = Helper.rig({ runtimeArgv: [workerParent] })
+  const teardown = Helper.rig({ runtimeArgv: [runParent] })
   t.teardown(teardown)
 
-  const pipe = await Pear.run(workerParent, [workerEndFromChild])
+  const pipe = await Pear.run(runParent, [runEndFromChild])
   const pid = await Helper.untilResult(pipe)
   await Helper.untilExit(pid)
 })
 
 test('run exit when child calls pipe.destroy()', async function (t) {
-  const workerParentErrorHandler = path.join(dirname, 'fixtures', 'run-parent-error-handler')
-  const workerDestroyFromChild = path.join(dirname, 'fixtures', 'run-destroy-from-child')
+  const runParentErrorHandler = path.join(dirname, 'fixtures', 'run-parent-error-handler')
+  const runDestroyFromChild = path.join(dirname, 'fixtures', 'run-destroy-from-child')
 
-  const teardown = Helper.rig({ runtimeArgv: [workerParentErrorHandler] })
+  const teardown = Helper.rig({ runtimeArgv: [runParentErrorHandler] })
   t.teardown(teardown)
 
-  const pipe = await Pear.run(workerParentErrorHandler, [workerDestroyFromChild])
+  const pipe = await Pear.run(runParentErrorHandler, [runDestroyFromChild])
   const pid = await Helper.untilResult(pipe)
   await Helper.untilExit(pid)
 })
 
 test('run exit when parent calls pipe.end()', async function (t) {
-  const workerEndFromParent = path.join(dirname, 'fixtures', 'run-end-from-parent')
-  const workerChild = path.join(dirname, 'fixtures', 'run-child')
+  const runEndFromParent = path.join(dirname, 'fixtures', 'run-end-from-parent')
+  const runChild = path.join(dirname, 'fixtures', 'run-child')
 
-  const teardown = Helper.rig({ runtimeArgv: [workerEndFromParent] })
+  const teardown = Helper.rig({ runtimeArgv: [runEndFromParent] })
   t.teardown(teardown)
 
-  const pipe = await Pear.run(workerEndFromParent, [workerChild])
+  const pipe = await Pear.run(runEndFromParent, [runChild])
   const pid = await Helper.untilResult(pipe)
   await Helper.untilExit(pid)
 })
 
 test('run exit when parent calls pipe.destroy()', async function (t) {
-  const workerDestroyFromParent = path.join(dirname, 'fixtures', 'run-destroy-from-parent')
-  const workerChildErrorHandler = path.join(dirname, 'fixtures', 'run-child-error-handler')
+  const runDestroyFromParent = path.join(dirname, 'fixtures', 'run-destroy-from-parent')
+  const runChildErrorHandler = path.join(dirname, 'fixtures', 'run-child-error-handler')
 
-  const teardown = Helper.rig({ runtimeArgv: [workerDestroyFromParent] })
+  const teardown = Helper.rig({ runtimeArgv: [runDestroyFromParent] })
   t.teardown(teardown)
 
-  const pipe = await Pear.run(workerDestroyFromParent, [workerChildErrorHandler])
+  const pipe = await Pear.run(runDestroyFromParent, [runChildErrorHandler])
   const pid = await Helper.untilResult(pipe)
   await Helper.untilExit(pid)
 })
