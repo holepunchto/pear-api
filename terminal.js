@@ -217,7 +217,7 @@ const outputter = (cmd, taggers = {}) => (opts, stream, info = {}, ipc) => {
         if (result === undefined) return
         if (typeof result === 'string') result = { output: 'print', message: result }
         if (result === false) {
-          if (tag === 'final') result = { output: 'print', message: data.success ? 'Success\n' : 'Failure\n' }
+          if (tag === 'final') result = { output: 'print', message: data.success ? 'Success' : 'Failure' }
           else result = {}
         }
         result.success = result.success ?? data?.success
@@ -232,7 +232,8 @@ const outputter = (cmd, taggers = {}) => (opts, stream, info = {}, ipc) => {
           byteDiff(data)
           return
         }
-        const msg = Array.isArray(message) ? message.join('\n') : message
+        let msg = Array.isArray(message) ? message.join('\n') : message
+        if (tag === 'final') msg += '\n'
         if (output === 'print') print(msg, success)
         if (output === 'status') status(msg, success)
       }, reject)
