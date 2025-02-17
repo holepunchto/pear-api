@@ -17,7 +17,7 @@ const main = async () => {
   })
   pipe.end()
 
-  await Helper.untilWorkerExit(pid)
+  await Helper.untilExit(pid)
   pipeIn.end()
 }
 main()

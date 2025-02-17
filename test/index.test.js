@@ -83,7 +83,7 @@ test('run exit when child calls pipe.end()', async function (t) {
 
   const pipe = await Pear.run(workerParent, [workerEndFromChild])
   const pid = await Helper.untilResult(pipe)
-  await Helper.untilWorkerExit(pid)
+  await Helper.untilExit(pid)
 })
 
 test('run exit when child calls pipe.destroy()', async function (t) {
@@ -95,7 +95,7 @@ test('run exit when child calls pipe.destroy()', async function (t) {
 
   const pipe = await Pear.run(workerParentErrorHandler, [workerDestroyFromChild])
   const pid = await Helper.untilResult(pipe)
-  await Helper.untilWorkerExit(pid)
+  await Helper.untilExit(pid)
 })
 
 test('run exit when parent calls pipe.end()', async function (t) {
@@ -107,7 +107,7 @@ test('run exit when parent calls pipe.end()', async function (t) {
 
   const pipe = await Pear.run(workerEndFromParent, [workerChild])
   const pid = await Helper.untilResult(pipe)
-  await Helper.untilWorkerExit(pid)
+  await Helper.untilExit(pid)
 })
 
 test('run exit when parent calls pipe.destroy()', async function (t) {
@@ -119,5 +119,5 @@ test('run exit when parent calls pipe.destroy()', async function (t) {
 
   const pipe = await Pear.run(workerDestroyFromParent, [workerChildErrorHandler])
   const pid = await Helper.untilResult(pipe)
-  await Helper.untilWorkerExit(pid)
+  await Helper.untilExit(pid)
 })
