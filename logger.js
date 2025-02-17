@@ -1,40 +1,33 @@
 'use strict'
 const { isBare } = require('which-runtime')
 const hrtime = isBare ? require('bare-hrtime') : process.hrtime
-
+const pear = require('./cmd')(global.Bare.argv.slice(2))
+const switches = {
+  log: pear?.flags.log,
+  level: pear?.flags.logLevel,
+  labels: pear?.flags.logLabels,
+  fields: pear?.flags.logFields,
+  stacks: pear?.flags.logStacks
+}
 class Logger {
-  static get flags () {
-    const pear = require('./cmd')(global.Bare.argv.slice(1))
-    return {
-      log: pear?.flags.log,
-      level: pear?.flags.logLevel,
-      labels: pear?.flags.logLabels,
-      fields: pear?.flags.logFields,
-      stacks: pear?.flags.logStacks
-    }
-  }
-
+  static switches = switches
   static OFF = 0
   static ERR = 1
   static INF = 2
   static TRC = 3
 
   constructor ({ labels, fields, stacks, level, pretty } = {}) {
-    level = level ?? this.constructor.defaults
-    labels = labels ?? this.constructor.defaults
-    fields = fields ?? this.constructor.defaults ?? ''
-    stacks = stacks ?? this.constructor.defaults ?? false
-    fields = this._parseFields(fields)
-    this._labels = new Set(this._parseLabels(labels))
-    this._show = fields.show
-    this._stacks = stacks
+    this._fields = this._parseFields(fields)
+    this._labels = new Set(this._parseLabels(labels).concat(this._parseLabels(this.constructor.switches.labels)))
+    this._show = this._fields.show
+    this._stacks = stacks ?? this.constructor.switches.stacks
     this._times = {}
-    this.stack = ''
-    this.LEVEL = this._parseLevel(level)
     if (pretty) {
-      if (fields.seen.has('level') === false) this._show.level = false
-      if (fields.seen.has('label') === false) this._show.label = this._labels.size > 2
+      if (this._fields.seen.has('level') === false) this._show.level = false
+      if (this._fields.seen.has('label') === false) this._show.label = this._labels.size > 2
     }
+    this.stack = ''
+    this.LEVEL = this._parseLevel(level ?? this.constructor.switches.level)
   }
 
   get OFF () { return this.LEVEL === this.constructor.OFF }
@@ -126,7 +119,7 @@ class Logger {
       delta: true
     }
     const seen = new Set()
-    for (let field of fields.split(',')) {
+    for (let field of fields.split(',').concat(this.constructor.fields.split(','))) {
       if (seen.has(field)) continue
       field = field.trim()
       if (field.startsWith('h:')) {
