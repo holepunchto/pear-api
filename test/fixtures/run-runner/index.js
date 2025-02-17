@@ -8,10 +8,10 @@ Helper.rig({ state: { config: { args: Bare.argv.slice(4) } }, runtimeArgv: [entr
 
 const pipe = Pear.pipe
 
-const workerPipe = Pear.run(entry)
-workerPipe.on('data', (data) => {
+const childPipe = Pear.run(entry)
+childPipe.on('data', (data) => {
   pipe.write(data)
-  workerPipe.end()
+  childPipe.end()
 })
 
-workerPipe.write('start')
+childPipe.write('start')
