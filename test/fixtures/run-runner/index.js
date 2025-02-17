@@ -1,8 +1,8 @@
 import Helper from '../../helper'
 
-const td = Helper.rig({ state: { config: { args: Bare.argv.slice(4) } } })
+const teardown = Helper.rig({ state: { config: { args: Bare.argv.slice(4) } } })
 const [workerPath] = Pear.config.args
-td()
+teardown()
 
 Helper.rig({ state: { config: { args: Bare.argv.slice(4) } }, runtimeArgv: [workerPath] })
 

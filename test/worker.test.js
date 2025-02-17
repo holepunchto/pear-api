@@ -5,10 +5,10 @@ const path = require('path')
 
 const dirname = __dirname
 
-test('worker pipe', async function ({ is, plan, teardown }) {
-  teardown(() => { global.Pear = null })
+test('worker pipe', async function (t) {
+  t.teardown(() => { global.Pear = null })
 
-  plan(1)
+  t.plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'worker')
 
@@ -42,7 +42,7 @@ test('worker pipe', async function ({ is, plan, teardown }) {
   pipe.write('ping')
 
   const workerResponse = await response
-  is(workerResponse, '0123', 'worker pipe can send and receive data')
+  t.is(workerResponse, '0123', 'worker pipe can send and receive data')
 
   pipe.write('exit')
 })
