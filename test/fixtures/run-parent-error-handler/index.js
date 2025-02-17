@@ -11,7 +11,7 @@ const main = async () => {
   pipeIn.write(`${Bare.pid}\n`)
   const pipe = Pear.run(workerPath)
   pipe.on('error', (err) => {
-    if (err.code === 'ENOTCONN') return
+    if (err.code === 'ENOTCONN') return // when the other side destroys the pipe
     throw err
   })
   const pid = await new Promise((resolve) => {

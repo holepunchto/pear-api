@@ -27,7 +27,7 @@ test('worker pipe', async function (t) {
   const pipe = worker.run(dir)
 
   pipe.on('error', (err) => {
-    if (err.code === 'ENOTCONN') return
+    if (err.code === 'ENOTCONN') return // when the other side destroys the pipe
     throw err
   })
 
