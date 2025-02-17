@@ -3,7 +3,7 @@ const cmd = require('./cmd')
 const { isBare } = require('which-runtime')
 const hrtime = isBare ? require('bare-hrtime') : process.hrtime
 
-const pear = global.Pear?.config.cmdArgs ? cmd(global.Pear.config.cmdArgs) : cmd(global.Bare.argv.slice(1))
+const pear = cmd(global.Bare.argv.slice(1))
 
 class Logger {
   static settings = {
