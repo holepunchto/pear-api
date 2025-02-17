@@ -1,16 +1,16 @@
 const Helper = require('../../helper')
 
 const teardown = Helper.rig({ state: { config: { args: Bare.argv.slice(4) } } })
-const [workerPath] = Pear.config.args
+const [entry] = Pear.config.args
 teardown()
 
-Helper.rig({ state: { config: { args: Bare.argv.slice(4) } }, runtimeArgv: [workerPath] })
+Helper.rig({ state: { config: { args: Bare.argv.slice(4) } }, runtimeArgv: [entry] })
 
 const main = async () => {
   const pipeIn = Pear.pipe
   pipeIn.write(`${Bare.pid}\n`)
 
-  const pipe = Pear.run(workerPath)
+  const pipe = Pear.run(entry)
 
   const pid = await new Promise((resolve) => {
     pipe.on('data', (data) => resolve(data.toString()))
