@@ -64,7 +64,7 @@ module.exports = class State {
     state.routes = pkg?.pear?.routes || null
     state.route = '/' + state.linkData
     const unrouted = new Set(Array.isArray(pkg?.pear?.unrouted) ? pkg?.pear?.unrouted : [])
-    state.unrouted.add('/node_modules/.bin/')
+    unrouted.add('/node_modules/.bin/')
     state.unrouted = Array.from(unrouted)
     let entrypoint = this.route(state.route, state.routes, state.unrouted)
     if (this.isEntrypoint(entrypoint) === false) return
