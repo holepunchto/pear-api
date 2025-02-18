@@ -33,6 +33,7 @@ module.exports = class State {
   applink = null
   dht = null
   ui = null
+  route = null
   routes = null
   entrypoint = null
   static injestPackage (state, pkg, overrides = {}) {
@@ -60,8 +61,11 @@ module.exports = class State {
     ]
     state.entrypoints = new Set(pkg?.pear?.stage?.entrypoints || [])
     state.routes = pkg?.pear?.routes || null
-    const entrypoint = this.route('/' + state.linkData, state.routes)
+    state.route = '/' + state.linkData
+    let entrypoint = this.route(state.route, state.routes)
     if (this.isEntrypoint(entrypoint) === false) return
+    if (entrypoint.startsWith('/') === false) entrypoint = '/' + entrypoint
+    else if (entrypoint.startsWith('./')) entrypoint = entrypoint.slice(1)
     state.entrypoint = entrypoint
   }
 
@@ -80,10 +84,10 @@ module.exports = class State {
   }
 
   static configFrom (state) {
-    const { id, startId, key, links, alias, env, gui, options, checkpoint, checkout, flags, dev, tier, stage, storage, name, main, dependencies, args, channel, release, applink, fragment, link, linkData, entrypoint, routes, dir, dht } = state
+    const { id, startId, key, links, alias, env, gui, options, checkpoint, checkout, flags, dev, tier, stage, storage, name, main, dependencies, args, channel, release, applink, fragment, link, linkData, entrypoint, route, routes, dir, dht } = state
     const pearDir = PLATFORM_DIR
     const swapDir = SWAP
-    return { id, startId, key, links, alias, env, gui, options, checkpoint, checkout, flags, dev, tier, stage, storage, name, main, dependencies, args, channel, release, applink, fragment, link, linkData, entrypoint, routes, dir, dht, pearDir, swapDir }
+    return { id, startId, key, links, alias, env, gui, options, checkpoint, checkout, flags, dev, tier, stage, storage, name, main, dependencies, args, channel, release, applink, fragment, link, linkData, entrypoint, route, routes, dir, dht, pearDir, swapDir }
   }
 
   static isKeetInvite (segment) {
