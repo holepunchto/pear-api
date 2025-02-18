@@ -1,41 +1,43 @@
 'use strict'
-const cmd = require('./cmd')
 const { isBare } = require('which-runtime')
 const hrtime = isBare ? require('bare-hrtime') : process.hrtime
-
-const pear = cmd(global.Bare.argv.slice(1))
+const pear = require('./cmd')(global.Bare.argv.slice(1))
+const switches = {
+  log: pear?.flags.log ?? false,
+  level: pear?.flags.logLevel ?? (pear?.flags.log ? 2 : 0),
+  labels: pear?.flags.logLabels ?? '',
+  fields: pear?.flags.logFields ?? '',
+  stacks: pear?.flags.logStacks ?? false
+}
 
 class Logger {
-  static settings = {
-    log: pear?.flags.log,
-    level: pear?.flags.logLevel,
-    labels: pear?.flags.logLabels,
-    fields: pear?.flags.logFields ?? '',
-    stacks: pear?.flags.logStacks ?? false
-  }
+  static switches = switches
+  static OFF = 0
+  static ERR = 1
+  static INF = 2
+  static TRC = 3
 
   constructor ({ labels, fields, stacks, level, pretty } = {}) {
-    level = level ?? this.constructor.defaults
-    labels = labels ?? this.constructor.defaults
-    fields = fields ?? this.constructor.defaults ?? ''
-    stacks = stacks ?? this.constructor.defaults ?? false
-    fields = this._parseFields(fields)
-    this._labels = new Set(this._parseLabels(labels))
-    this._show = fields.show
-    this._stacks = stacks
+    this._fields = this._parseFields(fields)
+    labels = this._parseLabels(labels)
+      .concat(this._parseLabels(this.constructor.switches.labels))
+      .filter(Boolean)
+    this._labels = new Set(labels)
+    this._show = this._fields.show
+    this._stacks = stacks ?? this.constructor.switches.stacks
     this._times = {}
-    this.stack = ''
-    this.LEVEL = this._parseLevel(level)
     if (pretty) {
-      if (fields.seen.has('level') === false) this._show.level = false
-      if (fields.seen.has('label') === false) this._show.label = this._labels.size > 2
+      if (this._fields.seen.has('level') === false) this._show.level = false
+      if (this._fields.seen.has('label') === false) this._show.label = this._labels.size > 2
     }
+    this.stack = ''
+    this.LEVEL = this._parseLevel(level ?? this.constructor.switches.level)
   }
 
-  get OFF () { return this.LEVEL === 0 }
-  get ERR () { return this.LEVEL === 1 }
-  get INF () { return this.LEVEL === 2 }
-  get TRC () { return this.LEVEL === 3 }
+  get OFF () { return this.LEVEL === this.constructor.OFF }
+  get ERR () { return this.LEVEL >= this.constructor.ERR }
+  get INF () { return this.LEVEL >= this.constructor.INF }
+  get TRC () { return this.LEVEL >= this.constructor.TRC }
 
   _args (level, label, ...args) {
     const now = hrtime.bigint()
@@ -52,7 +54,7 @@ class Logger {
   }
 
   error (label, ...args) {
-    if (this.LEVEL < 1) return
+    if (this.LEVEL < this.constructor.ERR) return
     if (Array.isArray(label)) {
       for (const lbl of label) this.error(lbl, ...args)
       return
@@ -69,7 +71,7 @@ class Logger {
   }
 
   info (label, ...args) {
-    if (this.LEVEL < 2) return
+    if (this.LEVEL < this.constructor.INF) return
     if (Array.isArray(label)) {
       for (const lbl of label) this.info(lbl, ...args)
       return
@@ -86,7 +88,7 @@ class Logger {
   }
 
   trace (label, ...args) {
-    if (this.LEVEL < 3) return
+    if (this.LEVEL < this.constructor.TRC) return
     if (Array.isArray(label)) {
       for (const lbl of label) this.trace(lbl, ...args)
       return
@@ -112,7 +114,7 @@ class Logger {
     return 2
   }
 
-  _parseFields (fields) {
+  _parseFields (fields = '') {
     const show = {
       date: false,
       time: false,
@@ -121,7 +123,7 @@ class Logger {
       delta: true
     }
     const seen = new Set()
-    for (let field of fields.split(',')) {
+    for (let field of fields.split(',').concat(this.constructor.switches.fields.split(','))) {
       if (seen.has(field)) continue
       field = field.trim()
       if (field.startsWith('h:')) {

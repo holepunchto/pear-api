@@ -33,6 +33,10 @@ module.exports = class State {
   applink = null
   dht = null
   ui = null
+  route = null
+  routes = null
+  unrouted = null
+  entrypoint = null
   static injestPackage (state, pkg, overrides = {}) {
     state.manifest = pkg
     state.main = pkg?.main || 'index.html'
@@ -57,6 +61,24 @@ module.exports = class State {
       ...(pkg?.bundledDependencies || [])
     ]
     state.entrypoints = new Set(pkg?.pear?.stage?.entrypoints || [])
+    state.routes = pkg?.pear?.routes || null
+    state.route = '/' + state.linkData
+    const unrouted = new Set(Array.isArray(pkg?.pear?.unrouted) ? pkg?.pear?.unrouted : [])
+    unrouted.add('/node_modules/.bin/')
+    state.unrouted = Array.from(unrouted)
+    let entrypoint = this.route(state.route, state.routes, state.unrouted)
+    if (this.isEntrypoint(entrypoint) === false) return
+    if (entrypoint.startsWith('/') === false) entrypoint = '/' + entrypoint
+    else if (entrypoint.startsWith('./')) entrypoint = entrypoint.slice(1)
+    state.entrypoint = entrypoint
+  }
+
+  static route (pathname, routes, unrouted) {
+    if (!routes) return pathname
+    if (unrouted.some((unroute) => pathname.startsWith(unroute))) return pathname
+    let route = typeof routes === 'string' ? routes : (routes[pathname] ?? pathname)
+    if (route[0] === '.') route = route.length === 1 ? '/' : route.slice(1)
+    return route
   }
 
   static storageFromLink (link) {
@@ -68,10 +90,10 @@ module.exports = class State {
   }
 
   static configFrom (state) {
-    const { id, startId, key, links, alias, env, gui, options, checkpoint, checkout, flags, dev, tier, stage, storage, name, main, dependencies, args, channel, release, applink, fragment, link, linkData, entrypoint, dir, dht } = state
+    const { id, startId, key, links, alias, env, gui, options, checkpoint, checkout, flags, dev, tier, stage, storage, name, main, dependencies, args, channel, release, applink, fragment, link, linkData, entrypoint, route, routes, dir, dht } = state
     const pearDir = PLATFORM_DIR
     const swapDir = SWAP
-    return { id, startId, key, links, alias, env, gui, options, checkpoint, checkout, flags, dev, tier, stage, storage, name, main, dependencies, args, channel, release, applink, fragment, link, linkData, entrypoint, dir, dht, pearDir, swapDir }
+    return { id, startId, key, links, alias, env, gui, options, checkpoint, checkout, flags, dev, tier, stage, storage, name, main, dependencies, args, channel, release, applink, fragment, link, linkData, entrypoint, route, routes, dir, dht, pearDir, swapDir }
   }
 
   static isKeetInvite (segment) {
@@ -103,7 +125,6 @@ module.exports = class State {
     const pathname = protocol === 'file:' ? (isWindows ? route.slice(1).slice(dir.length) : route.slice(dir.length)) : route
     const segment = pathname?.startsWith('/') ? pathname.slice(1) : pathname
     const fragment = hash ? hash.slice(1) : (this.constructor.isKeetInvite(segment) ? segment : null)
-    const entrypoint = this.constructor.isEntrypoint(pathname) ? pathname : null
     const pkgPath = path.join(dir, 'package.json')
     const pkg = key === null ? readPkg(pkgPath) : null
     const store = flags.tmpStore ? path.join(os.tmpdir(), crypto.randomBytes(16).toString('hex')) : flags.store
@@ -126,7 +147,6 @@ module.exports = class State {
     this.updates = updates
     this.stage = stage
     this.fragment = fragment
-    this.entrypoint = entrypoint
     this.linkData = segment
     this.link = link ? (link.startsWith(protocol) ? link : pathToFileURL(link).toString()) : null
     this.key = key

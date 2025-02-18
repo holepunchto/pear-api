@@ -19,12 +19,14 @@ class PearError extends Error {
   static ERR_INVALID_MANIFEST = ERR_INVALID_MANIFEST
   static ERR_ASSERTION = ERR_ASSERTION
   static ERR_UNKNOWN = ERR_UNKNOWN
+  static ERR_LEGACY = ERR_LEGACY
   static known = known
-  constructor (msg, code, fn = PearError, info = null) {
+  constructor (msg, code, fn = PearError, info = null, stackless = false) {
     super(msg)
     this.code = code
     if (this.info !== null) this.info = info
-    if (Error.captureStackTrace) Error.captureStackTrace(this, fn)
+    if (stackless) this.stack = this.message
+    else if (Error.captureStackTrace) Error.captureStackTrace(this, fn)
   }
 }
 
@@ -106,6 +108,10 @@ function ERR_ASSERTION (msg) {
 
 function ERR_UNKNOWN (msg) {
   return new PearError(msg, 'ERR_UNKNOWN', ERR_UNKNOWN)
+}
+
+function ERR_LEGACY (msg) {
+  return new PearError(msg, 'ERR_LEGACY', ERR_LEGACY, null, true)
 }
 
 module.exports = PearError
