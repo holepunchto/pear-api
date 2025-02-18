@@ -1,7 +1,7 @@
 'use strict'
 const { isBare } = require('which-runtime')
 const hrtime = isBare ? require('bare-hrtime') : process.hrtime
-const pear = require('./cmd')(global.Bare.argv.slice(2))
+const pear = require('./cmd')(global.Bare.argv.slice(1))
 const switches = {
   log: pear?.flags.log ?? false,
   level: pear?.flags.logLevel ?? 0,
