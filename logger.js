@@ -4,11 +4,12 @@ const hrtime = isBare ? require('bare-hrtime') : process.hrtime
 const pear = require('./cmd')(global.Bare.argv.slice(1))
 const switches = {
   log: pear?.flags.log ?? false,
-  level: pear?.flags.logLevel ?? 0,
+  level: pear?.flags.logLevel ?? (pear?.flags.log ? 2 : 0),
   labels: pear?.flags.logLabels ?? '',
   fields: pear?.flags.logFields ?? '',
   stacks: pear?.flags.logStacks ?? false
 }
+
 class Logger {
   static switches = switches
   static OFF = 0
