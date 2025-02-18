@@ -35,6 +35,7 @@ module.exports = class State {
   ui = null
   route = null
   routes = null
+  unrouted = null
   entrypoint = null
   static injestPackage (state, pkg, overrides = {}) {
     state.manifest = pkg
@@ -62,15 +63,19 @@ module.exports = class State {
     state.entrypoints = new Set(pkg?.pear?.stage?.entrypoints || [])
     state.routes = pkg?.pear?.routes || null
     state.route = '/' + state.linkData
-    let entrypoint = this.route(state.route, state.routes)
+    const unrouted = new Set(Array.isArray(pkg?.pear?.unrouted) ? pkg?.pear?.unrouted : [])
+    state.unrouted.add('/node_modules/.bin/')
+    state.unrouted = Array.from(unrouted)
+    let entrypoint = this.route(state.route, state.routes, state.unrouted)
     if (this.isEntrypoint(entrypoint) === false) return
     if (entrypoint.startsWith('/') === false) entrypoint = '/' + entrypoint
     else if (entrypoint.startsWith('./')) entrypoint = entrypoint.slice(1)
     state.entrypoint = entrypoint
   }
 
-  static route (pathname, routes) {
+  static route (pathname, routes, unrouted) {
     if (!routes) return pathname
+    if (unrouted.some((unroute) => pathname.startsWith(unroute))) return pathname
     if (typeof routes === 'string') return routes
     return routes[pathname] || routes[pathname.slice(1)] || pathname
   }
