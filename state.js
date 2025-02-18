@@ -76,8 +76,9 @@ module.exports = class State {
   static route (pathname, routes, unrouted) {
     if (!routes) return pathname
     if (unrouted.some((unroute) => pathname.startsWith(unroute))) return pathname
-    if (typeof routes === 'string') return routes
-    return routes[pathname] || routes[pathname.slice(1)] || pathname
+    let route = typeof routes === 'string' ? routes : (routes[pathname] ?? pathname)
+    if (route[0] === '.') route = route.length === 1 ? '/' : route.slice(1)
+    return route
   }
 
   static storageFromLink (link) {
