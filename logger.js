@@ -19,7 +19,10 @@ class Logger {
 
   constructor ({ labels, fields, stacks, level, pretty } = {}) {
     this._fields = this._parseFields(fields)
-    this._labels = new Set(this._parseLabels(labels).concat(this._parseLabels(this.constructor.switches.labels)))
+    labels = this._parseLabels(labels)
+      .concat(this._parseLabels(this.constructor.switches.labels))
+      .filter(Boolean)
+    this._labels = new Set(labels)
     this._show = this._fields.show
     this._stacks = stacks ?? this.constructor.switches.stacks
     this._times = {}
