@@ -46,6 +46,7 @@ test('messages client-server', async function (t) {
         resolve(messages)
       }
     })
+    t.teardown(() => sub.destroy())
   })
 
   const messages = await promise
