@@ -34,7 +34,7 @@ test('teardown on os kill', { skip: isWindows }, async function (t) {
   const pipe = Pear.run(dir)
 
   pipe.on('error', (err) => {
-    if (err.code === 'ENOTCONN') return
+    if (err.code === 'ENOTCONN') return // when the other side destroys the pipe
     throw err
   })
 
@@ -56,7 +56,7 @@ test('teardown on os kill with exit code', { skip: isWindows }, async function (
   const pipe = Pear.run(dir)
 
   pipe.on('error', (err) => {
-    if (err.code === 'ENOTCONN') return
+    if (err.code === 'ENOTCONN') return // when the other side destroys the pipe
     throw err
   })
 
@@ -71,7 +71,7 @@ test('teardown on os kill with exit code', { skip: isWindows }, async function (
     })
   })
 
-  const td = await Helper.untilResult(pipe, { timeout: 5000, runFn: () => os.kill(pid) })
+  const td = await Helper.untilResult(pipe, { runFn: () => os.kill(pid) })
   t.ok(td, 'teardown executed')
 
   const exitCode = await exitCodePromise
