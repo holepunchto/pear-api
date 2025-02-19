@@ -75,5 +75,5 @@ test('teardown on os kill with exit code', { skip: isWindows }, async function (
   t.ok(td, 'teardown executed')
 
   const exitCode = await exitCodePromise
-  t.is(exitCode, 124, 'exit code is 124')
+  t.is(exitCode, 124, 'exit code matches')
 })
