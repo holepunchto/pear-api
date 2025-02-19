@@ -30,8 +30,8 @@ test('messages single', async function (t) {
   bus.pub({ hello: 'world', time: Date.now() })
 
   const msg = await promise
-  t.is(msg.hello, 'world')
-  t.ok(typeof msg.time === 'number' && msg.time <= Date.now())
+  t.is(msg.hello, 'world', 'message matches')
+  t.ok(typeof msg.time === 'number' && msg.time <= Date.now(), 'message has time')
 })
 
 test('messages multiple', async function (t) {
@@ -62,9 +62,9 @@ test('messages multiple', async function (t) {
   })
 
   const messages = await promise
-  t.is(messages.length, 4)
-  t.ok(messages.every(msg => msg.hello === 'world'))
-  t.ok(messages.every(msg => typeof msg.time === 'number' && msg.time <= Date.now()))
+  t.is(messages.length, 4, 'received 4 messages')
+  t.ok(messages.every(msg => msg.hello === 'world'), 'all messages match')
+  t.ok(messages.every(msg => typeof msg.time === 'number' && msg.time <= Date.now()), 'all messages have time')
 })
 
 test('messages legacy', async function (t) {
@@ -90,6 +90,6 @@ test('messages legacy', async function (t) {
   bus.pub({ hello: 'world', time: Date.now() })
 
   const msg = await promise
-  t.is(msg.hello, 'world')
-  t.ok(typeof msg.time === 'number' && msg.time <= Date.now())
+  t.is(msg.hello, 'world', 'message matches')
+  t.ok(typeof msg.time === 'number' && msg.time <= Date.now(), 'message has time')
 })
