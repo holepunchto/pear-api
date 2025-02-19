@@ -69,6 +69,7 @@
   },
   "devDependencies": {
     "brittle": "^3.10.0",
+    "iambus": "^1.0.3",
     "standard": "^17.1.2"
   }
 }

@@ -5,8 +5,14 @@ global.Pear = null
 
 const STOP_CHAR = '\n'
 
+const noop = () => undefined
+
 class Helper {
-  static rig ({ state = {}, runtimeArgv } = {}) {
+  static rig ({
+    ipc = { ref: noop, unref: noop },
+    state = {},
+    runtimeArgv
+  } = {}) {
     if (global.Pear !== null) throw Error(`Prior Pear global not cleaned up: ${global.Pear}`)
 
     class RigAPI {
@@ -25,8 +31,6 @@ class Helper {
       static RTI = RigAPI.RTI
     }
 
-    const noop = () => undefined
-    const ipc = { ref: noop, unref: noop }
     const worker = new TestWorker(ipc)
     global.Pear = new TestAPI(ipc, state, { worker })
 

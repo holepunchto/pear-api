@@ -8,6 +8,7 @@ async function runTests () {
   test.pause()
 
   await import('./index.test.js')
+  await import('./messages.test.js')
   await import('./worker.test.js')
 
   test.resume()
