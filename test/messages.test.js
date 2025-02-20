@@ -45,6 +45,8 @@ test('messages single client', async function (t) {
 
   const teardown = Helper.rig({ ipc: client })
   t.teardown(teardown)
+  t.teardown(() => client.close())
+  t.teardown(() => server.close())
 
   const promise = new Promise((resolve) => {
     const messages = []
@@ -95,6 +97,8 @@ test.skip('messages multi clients', async function (t) {
   const dir = path.join(dirname, 'fixtures', 'run-messages-client')
   const teardown = Helper.rig({ ipc: client, runtimeArgv: [dir] })
   t.teardown(teardown)
+  t.teardown(() => client.close())
+  t.teardown(() => server.close())
 
   const pipe = Pear.run(dir)
 
