@@ -1,112 +1,90 @@
 'use strict'
 
-const { isWindows } = require('which-runtime')
 const { test } = require('brittle')
 const path = require('path')
 const Iambus = require('iambus')
-const { Server, Client } = require('pear-ipc')
 
 const Helper = require('./helper')
 
 const dirname = __dirname
-const socketPath = isWindows ? '\\\\.\\pipe\\pear-api-test-ipc' : 'test.sock'
 
 test('messages single client', async function (t) {
   t.plan(3)
 
-  async function startIpcServer () {
-    const server = new Server({
-      socketPath,
-      handlers: {
-        messages: (pattern) => {
-          const bus = new Iambus()
-          const interval = setInterval(() => bus.pub({ hello: 'world', time: Date.now() }), 500)
-          const stream = bus.sub(pattern)
-          stream.on('close', () => clearInterval(interval))
-          return stream
-        }
+  await Helper.startIpcServer({
+    handlers: {
+      messages: (pattern) => {
+        const bus = new Iambus()
+        const interval = setInterval(() => bus.pub({ hello: 'world', time: Date.now() }), 500)
+        const stream = bus.sub(pattern)
+        stream.on('close', () => clearInterval(interval))
+        return stream
       }
-    })
-    await server.ready()
-    return server
-  }
-
-  async function startIpcClient () {
-    const client = new Client({
-      socketPath,
-      connect: true
-    })
-    await client.ready()
-    return client
-  }
-
-  const server = await startIpcServer()
-  const client = await startIpcClient()
-
-  const teardown = Helper.rig({ ipc: client })
-  t.teardown(teardown)
-  t.teardown(() => client.close())
-  t.teardown(() => server.close())
-
-  const promise = new Promise((resolve) => {
-    const messages = []
-    const sub = Pear.messages({ hello: 'world' }, (data) => {
-      messages.push(data)
-      if (messages.length === 4) {
-        sub.destroy()
-        resolve(messages)
-      }
-    })
-    t.teardown(() => sub.destroy())
+    },
+    teardown: t.teardown
   })
+  const ipc = await Helper.startIpcClient()
 
-  const messages = await promise
+  const teardown = Helper.rig({ ipc })
+  t.teardown(teardown)
+
+  const messages = []
+  const lazyPromise = Helper.createLazyPromise()
+  const sub = Pear.messages({ hello: 'world' }, (data) => {
+    messages.push(data)
+    if (messages.length === 4) {
+      lazyPromise.resolve()
+    }
+  })
+  t.teardown(() => sub.destroy())
+
+  await lazyPromise.promise
   t.is(messages.length, 4, 'received 4 messages')
   t.ok(messages.every(msg => msg.hello === 'world'), 'all messages match')
   t.ok(messages.every(msg => typeof msg.time === 'number' && msg.time <= Date.now()), 'all messages have time')
+
+  await Helper.untilClose(sub)
 })
 
-test.skip('messages multi clients', async function (t) {
+test('messages multi clients', async function (t) {
   t.plan(1)
 
-  async function startIpcServer () {
-    const bus = new Iambus()
-    const server = new Server({
-      socketPath,
-      handlers: {
-        message: (pattern) => { return bus.pub(pattern) },
-        messages: (pattern) => { return bus.sub(pattern) }
-      }
-    })
-    await server.ready()
-    return server
-  }
-
-  async function startIpcClient () {
-    const client = new Client({
-      socketPath,
-      connect: true
-    })
-    await client.ready()
-    return client
-  }
-
-  const server = await startIpcServer()
-  const client = await startIpcClient()
+  const bus = new Iambus()
+  await Helper.startIpcServer({
+    handlers: {
+      messages: (pattern) => {
+        bus.pub({ type: 'subscribed', pattern })
+        return bus.sub(pattern)
+      },
+      message: (pattern) => { return bus.pub(pattern) }
+    },
+    teardown: t.teardown
+  })
+  const ipc = await Helper.startIpcClient()
 
   const dir = path.join(dirname, 'fixtures', 'run-messages-client')
-  const teardown = Helper.rig({ ipc: client, runtimeArgv: [dir] })
+  const teardown = Helper.rig({ ipc, runtimeArgv: [dir] })
   t.teardown(teardown)
-  t.teardown(() => client.close())
-  t.teardown(() => server.close())
+
+  const lazyPromise = Helper.createLazyPromise()
+  const sub = Pear.messages({ type: 'subscribed' }, (data) => {
+    if (data.pattern.type === 'broadcast' && data.pattern.tag === 'hello') {
+      lazyPromise.resolve()
+    }
+  })
+  t.teardown(() => sub.destroy())
 
   const pipe = Pear.run(dir)
 
-  // wait for run-messages-client to subscribe
-  await new Promise((resolve) => setTimeout(resolve, 2000))
+  // wait for Pear.messages in Pear.run process to finish subscribing
+  await lazyPromise.promise
 
+  // send message to server to broadcast it to all clients
   await Pear.message({ type: 'broadcast', tag: 'hello', msg: 'pear1' })
 
+  // Pear.run process should receive the message
   const msg = await Helper.untilResult(pipe)
   t.is(msg, 'pear1', 'message received')
+
+  await Helper.untilClose(sub)
 })

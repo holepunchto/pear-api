@@ -1,8 +1,11 @@
 'use strict'
-
-const dirname = __dirname
 global.Pear = null
 
+const { isWindows } = require('which-runtime')
+const IPC = require('pear-ipc')
+
+const dirname = __dirname
+const socketPath = isWindows ? '\\\\.\\pipe\\pear-api-test-ipc' : 'test.sock'
 const STOP_CHAR = '\n'
 
 const noop = () => undefined
@@ -101,6 +104,31 @@ class Helper {
       if (Date.now() - start > timeout) throw new Error('timed out')
       await new Promise((resolve) => setTimeout(resolve, 100))
     }
+  }
+
+  static createLazyPromise () {
+    let resolve
+    const promise = new Promise((_resolve) => { resolve = _resolve })
+    return { promise, resolve }
+  }
+
+  static async startIpcClient () {
+    const client = new IPC.Client({
+      socketPath,
+      connect: true
+    })
+    await client.ready()
+    return client
+  }
+
+  static async startIpcServer ({ handlers, teardown }) {
+    const server = new IPC.Server({
+      socketPath,
+      handlers
+    })
+    teardown(() => server.close())
+    await server.ready()
+    return server
   }
 }
 
