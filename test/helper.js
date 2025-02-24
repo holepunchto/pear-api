@@ -72,9 +72,9 @@ class Helper {
     return res
   }
 
-  static async untilClose (pipe, timeout = 5000) {
+  static async untilClose (pipe, opts = {}) {
     const res = new Promise((resolve, reject) => {
-      const timeoutId = setTimeout(() => reject(new Error('timed out')), timeout)
+      const timeoutId = setTimeout(() => reject(new Error('timed out')), opts.timeout ?? 5000)
       pipe.on('close', () => {
         clearTimeout(timeoutId)
         resolve('closed')
@@ -84,7 +84,11 @@ class Helper {
         resolve('ended')
       })
     })
-    pipe.end()
+    if (opts.runFn) {
+      await opts.runFn()
+    } else {
+      pipe.end()
+    }
     return res
   }
 
