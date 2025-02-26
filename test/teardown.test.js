@@ -77,3 +77,17 @@ test('teardown on os kill with exit code', { skip: isWindows }, async function (
   const exitCode = await exitCodePromise
   t.is(exitCode, 124, 'exit code matches')
 })
+
+test('teardown throw error', async function (t) {
+  t.plan(1)
+
+  const dir = path.join(dirname, 'fixtures', 'run-teardown-error')
+
+  const teardown = Helper.rig({ runtimeArgv: [dir] })
+  t.teardown(teardown)
+
+  const pipe = Pear.run(dir)
+
+  await Helper.untilClose(pipe)
+  t.pass('teardown error logged')
+})

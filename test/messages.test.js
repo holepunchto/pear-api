@@ -90,6 +90,8 @@ test('messages single client', async function (t) {
 test('messages multi clients', async function (t) {
   t.plan(1)
 
+  const dir = path.join(dirname, 'fixtures', 'run-messages-client')
+
   const bus = new Iambus()
   await Helper.startIpcServer({
     handlers: {
@@ -103,7 +105,6 @@ test('messages multi clients', async function (t) {
   })
   const ipc = await Helper.startIpcClient()
 
-  const dir = path.join(dirname, 'fixtures', 'run-messages-client')
   const teardown = Helper.rig({ ipc, runtimeArgv: [dir] })
   t.teardown(teardown)
 
