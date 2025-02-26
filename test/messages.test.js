@@ -8,6 +8,31 @@ const Helper = require('./helper')
 
 const dirname = __dirname
 
+test('messages with no listener', async function (t) {
+  t.plan(1)
+
+  const bus = new Iambus()
+  await Helper.startIpcServer({
+    handlers: {
+      messages: (pattern) => { return bus.sub(pattern) },
+      message: (pattern) => { bus.pub(pattern) }
+    },
+    teardown: t.teardown
+  })
+  const ipc = await Helper.startIpcClient()
+
+  const teardown = Helper.rig({ ipc })
+  t.teardown(teardown)
+
+  const stream = Pear.messages({ hello: 'world' })
+  t.teardown(() => stream.destroy())
+
+  await Pear.message({ hello: 'world' })
+
+  await Helper.untilClose(stream)
+  t.pass('no listener did not throw')
+})
+
 test('messages single client', async function (t) {
   t.plan(3)
 
@@ -102,7 +127,7 @@ test('messages multi clients', async function (t) {
   await Helper.untilClose(pipe)
 })
 
-test('messages legacy api', async function (t) {
+test('messages with function pattern', async function (t) {
   t.plan(2)
 
   const bus = new Iambus()
@@ -130,7 +155,6 @@ test('messages legacy api', async function (t) {
   t.teardown(() => subscribedStream.destroy())
 
   const received = Helper.createLazyPromise()
-  // in the legacy API, the listener is the first argument
   const receivedStream = Pear.messages((data) => { received.resolve(data) })
   t.teardown(() => receivedStream.destroy())
 
