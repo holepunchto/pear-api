@@ -7,14 +7,14 @@ const main = async () => {
 
   const pipe = Pear.pipe
 
-  const lazyPromise = Helper.createLazyPromise()
-  const sub = Pear.messages({ type: 'broadcast', tag: 'hello' }, async (data) => {
+  const received = Helper.createLazyPromise()
+  const receivedStream = Pear.messages({ hello: 'world' }, async (data) => {
     pipe.write(`${data.msg}\n`)
-    lazyPromise.resolve()
+    received.resolve()
   })
-  await lazyPromise.promise
+  await received.promise
 
-  await Helper.untilClose(sub)
+  await Helper.untilClose(receivedStream)
   pipe.end()
 }
 main()
