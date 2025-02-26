@@ -88,6 +88,6 @@ test('teardown throw error', async function (t) {
 
   const pipe = Pear.run(dir)
 
-  await Helper.untilClose(pipe)
-  t.pass('teardown error logged')
+  const td = await Helper.untilResult(pipe, { runFn: () => pipe.end() })
+  t.is(td, 'teardown', 'teardown executed')
 })
