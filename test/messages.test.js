@@ -96,8 +96,51 @@ test('messages multi clients', async function (t) {
   await Pear.message({ hello: 'world', msg: 'pear1' })
 
   const msg = await Helper.untilResult(pipe)
-  t.is(msg, 'pear1', 'message received')
+  t.ok(msg === 'pear1', 'message received')
 
   await Helper.untilClose(subscribedStream)
   await Helper.untilClose(pipe)
+})
+
+test('messages legacy api', async function (t) {
+  t.plan(2)
+
+  const bus = new Iambus()
+  await Helper.startIpcServer({
+    handlers: {
+      messages: (pattern) => {
+        bus.pub({ type: 'subscribed', pattern })
+        return bus.sub(pattern)
+      },
+      message: (pattern) => { bus.pub({ ...pattern, time: Date.now() }) }
+    },
+    teardown: t.teardown
+  })
+  const ipc = await Helper.startIpcClient()
+
+  const teardown = Helper.rig({ ipc })
+  t.teardown(teardown)
+
+  const subscribed = Helper.createLazyPromise()
+  const subscribedStream = Pear.messages({ type: 'subscribed' }, (data) => {
+    if (data.pattern) {
+      subscribed.resolve()
+    }
+  })
+  t.teardown(() => subscribedStream.destroy())
+
+  const received = Helper.createLazyPromise()
+  // in the legacy API, the listener is the first argument
+  const receivedStream = Pear.messages((data) => { received.resolve(data) })
+  t.teardown(() => receivedStream.destroy())
+
+  await subscribed.promise
+  await Pear.message({ hello: 'world' })
+
+  const msg = await received.promise
+  t.ok(msg.hello === 'world', 'message received')
+  t.ok(typeof msg.time === 'number' && msg.time <= Date.now(), 'message has time')
+
+  await Helper.untilClose(receivedStream)
+  await Helper.untilClose(subscribedStream)
 })
