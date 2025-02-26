@@ -6,7 +6,7 @@ const pipe = Pear.pipe
 
 Pear.teardown(async () => {
   try {
-    throw new Error('teardown error')
+    throw new Error('run-teardown-error')
   } catch (err) {
     await new Promise((resolve) => {
       pipe.write('teardown\n', resolve)
