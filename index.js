@@ -92,7 +92,7 @@ class API {
     await Promise.race([this.#teardowns, countdown]).catch((err) => {
       rejected = err
     })
-    if (timedout || rejected !== null) {
+    if (timedout || rejected) {
       if (timedout) console.error(`Max teardown wait reached after ${MAX_TEARDOWN_WAIT} ms. Exiting...`)
       if (rejected) console.error(`${rejected}. User teardown threw. Exiting...`)
       if (global.Bare) {
