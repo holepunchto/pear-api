@@ -142,7 +142,7 @@ class API {
 
   exists = (key) => this.#reftrack(this.#ipc.exists({ key }))
 
-  compare = (keyA, keyB) => this.#reftrack(this.#ipc.exists({ keyA, keyB }))
+  compare = (keyA, keyB) => this.#reftrack(this.#ipc.compare({ keyA, keyB }))
 
   restart = async (opts = {}) => {
     if (this.#state.ui === null) throw new Error('Pear.restart is not supported for terminal apps')
