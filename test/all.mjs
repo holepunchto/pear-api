@@ -7,6 +7,7 @@ async function runTests () {
 
   test.pause()
 
+  await import('./checkpoint.test.js')
   await import('./index.test.js')
   await import('./messages.test.js')
   await import('./reload.test.js')
