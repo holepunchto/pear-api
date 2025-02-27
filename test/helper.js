@@ -112,8 +112,12 @@ class Helper {
 
   static createLazyPromise () {
     let resolve
-    const promise = new Promise((_resolve) => { resolve = _resolve })
-    return { promise, resolve }
+    let reject
+    const promise = new Promise((_resolve, _reject) => {
+      resolve = _resolve
+      reject = _reject
+    })
+    return { promise, resolve, reject }
   }
 
   static async startIpcClient () {
