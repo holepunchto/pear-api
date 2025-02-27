@@ -12,6 +12,8 @@ async function runTests () {
   await import('./reload.test.js')
   await import('./restart.test.js')
   await import('./teardown.test.js')
+  await import('./updates.test.js')
+  await import('./wakeups.test.js')
   await import('./worker.test.js')
 
   test.resume()
