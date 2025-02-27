@@ -115,13 +115,14 @@ class API {
 
   message = (msg) => this.#reftrack(this.#ipc.message(msg))
 
-  messages = (pattern, listener) => {
+  messages = (pattern, listener, cb) => {
     if (typeof pattern === 'function') {
+      cb = listener
       listener = pattern
       pattern = {}
     }
     this.#ref()
-    const subscriber = this.#ipc.messages(pattern)
+    const subscriber = this.#ipc.messages(pattern, cb)
     subscriber.on('close', () => this.#unref())
     if (typeof listener === 'function') subscriber.on('data', listener)
     return subscriber

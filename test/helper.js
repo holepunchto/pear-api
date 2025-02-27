@@ -118,8 +118,7 @@ class Helper {
 
   static async startIpcClient () {
     const client = new IPC.Client({
-      socketPath,
-      connect: true
+      socketPath
     })
     await client.ready()
     return client

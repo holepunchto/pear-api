@@ -8,6 +8,56 @@ const Helper = require('./helper')
 
 const dirname = __dirname
 
+test.solo('test test test', async function (t) {
+  t.plan(3)
+
+  const bus = new Iambus()
+  await Helper.startIpcServer({
+    handlers: {
+      messages: (pattern) => { return bus.sub(pattern) },
+      message: (pattern) => {
+        bus.pub({ ...pattern, time: Date.now() })
+        bus.pub({ ...pattern, time: Date.now() })
+        bus.pub({ ...pattern, time: Date.now() })
+        bus.pub({ ...pattern, time: Date.now() })
+      }
+    },
+    teardown: t.teardown
+  })
+  const ipc = await Helper.startIpcClient()
+
+  const teardown = Helper.rig({ ipc })
+  t.teardown(teardown)
+
+  const subscribed = Helper.createLazyPromise()
+  const receivedStream = Pear.messages({ hello: 'world' }, undefined, () => {
+    console.log('subscribed')
+    subscribed.resolve()
+  })
+  const received = new Promise((resolve) => {
+    const messages = []
+    receivedStream.on('data', (data) => {
+      console.log('🚀 ~ receivedStream.on ~ data:', data)
+      messages.push(data)
+      if (messages.length === 4) {
+        resolve(messages)
+      }
+    })
+  })
+  t.teardown(() => receivedStream.destroy())
+
+  await subscribed.promise
+  // await new Promise((resolve) => setTimeout(resolve, 2000))
+  await Pear.message({ hello: 'world' })
+
+  const messages = await received
+  t.is(messages.length, 4, 'received 4 messages')
+  t.ok(messages.every(msg => msg.hello === 'world'), 'all messages match')
+  t.ok(messages.every(msg => typeof msg.time === 'number' && msg.time <= Date.now()), 'all messages have time')
+
+  await Helper.untilClose(receivedStream)
+})
+
 test('messages with no listener', async function (t) {
   t.plan(1)
 
