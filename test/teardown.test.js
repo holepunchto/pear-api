@@ -78,7 +78,7 @@ test('teardown on os kill with exit code', { skip: isWindows }, async function (
   t.is(exitCode, 124, 'exit code matches')
 })
 
-test('teardown run wait', async function (t) {
+test('teardown run wait', { skip: isWindows }, async function (t) {
   t.plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'run-teardown-wait')
