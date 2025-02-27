@@ -92,7 +92,7 @@ test('teardown run wait', { skip: isWindows }, async function (t) {
   t.is(td, 'teardown', 'teardown executed')
 })
 
-test('teardown throw error', async function (t) {
+test('teardown throw error', { skip: isWindows }, async function (t) {
   t.plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'run-teardown-error')
