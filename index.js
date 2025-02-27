@@ -150,7 +150,7 @@ class API {
     return this.#reftrack(this.#ipc.restart(opts))
   }
 
-  reload = (opts = {}) => {
+  reload = async (opts = {}) => {
     if (this.#state.ui === null) throw new Error('Pear.reload is not supported for terminal apps')
     if (opts.platform) throw new Error('Platform Pear.reload is not supported for desktop apps')
 
