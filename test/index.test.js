@@ -93,23 +93,25 @@ test('messages multi clients', async function (t) {
   const teardown = Helper.rig({ ipc, runtimeArgv: [dir] })
   t.teardown(teardown)
 
-  const subscribed = Helper.createLazyPromise()
-  const subscribedStream = Pear.messages({ type: 'subscribed' }, (data) => {
-    if (data.pattern.hello === 'world') {
-      subscribed.resolve()
-    }
+  const stream = Pear.messages({ type: 'subscribed' })
+  t.teardown(() => stream.destroy())
+
+  const subscribed = new Promise((resolve) => {
+    stream.on('data', (data) => {
+      if (data.type !== 'subscribed') return
+      if (data.pattern.hello === 'world') resolve()
+    })
   })
-  t.teardown(() => subscribedStream.destroy())
 
   const pipe = Pear.run(dir)
 
-  await subscribed.promise
+  await subscribed
   await Pear.message({ hello: 'world', msg: 'pear1' })
 
   const msg = await Helper.untilResult(pipe)
   t.ok(msg === 'pear1', 'message received')
 
-  await Helper.untilClose(subscribedStream)
+  await Helper.untilClose(stream)
   await Helper.untilClose(pipe)
 })
 
