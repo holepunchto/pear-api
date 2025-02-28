@@ -8,7 +8,7 @@ const Helper = require('./helper')
 
 const dirname = __dirname
 
-test.solo('messages single client', async function (t) {
+test('messages single client', async function (t) {
   t.plan(3)
 
   const bus = new Iambus()
@@ -36,19 +36,19 @@ test.solo('messages single client', async function (t) {
   const subscribed = Helper.createLazyPromise()
   const received = Helper.createLazyPromise()
   const messages = []
-  const receivedStream = Pear.messages({ hello: 'world' }, (data) => {
+  const stream = Pear.messages({ hello: 'world' }, (data) => {
     if (data.type === 'subscribed') {
       if (data.pattern.hello === 'world') {
         subscribed.resolve()
       }
-    } else {
-      messages.push(data)
-      if (messages.length === 4) {
-        received.resolve()
-      }
+      return
+    }
+    messages.push(data)
+    if (messages.length === 4) {
+      received.resolve()
     }
   })
-  t.teardown(() => receivedStream.destroy())
+  t.teardown(() => stream.destroy())
 
   await subscribed.promise
   await Pear.message({ hello: 'world' })
@@ -58,7 +58,7 @@ test.solo('messages single client', async function (t) {
   t.ok(messages.every(msg => msg.hello === 'world'), 'all messages match')
   t.ok(messages.every(msg => typeof msg.time === 'number' && msg.time <= Date.now()), 'all messages have time')
 
-  await Helper.untilClose(receivedStream)
+  await Helper.untilClose(stream)
 })
 
 test('messages multi clients', async function (t) {
@@ -70,8 +70,10 @@ test('messages multi clients', async function (t) {
   await Helper.startIpcServer({
     handlers: {
       messages: (pattern) => {
+        const stream = bus.sub(pattern)
+        stream.push({ type: 'subscribed', pattern })
         bus.pub({ type: 'subscribed', pattern })
-        return bus.sub(pattern)
+        return stream
       },
       message: (pattern) => { bus.pub({ ...pattern, time: Date.now() }) }
     },
@@ -134,8 +136,9 @@ test('messages with function pattern', async function (t) {
   await Helper.startIpcServer({
     handlers: {
       messages: (pattern) => {
-        bus.pub({ type: 'subscribed', pattern })
-        return bus.sub(pattern)
+        const stream = bus.sub(pattern)
+        stream.push({ type: 'subscribed', pattern })
+        return stream
       },
       message: (pattern) => { bus.pub({ ...pattern, time: Date.now() }) }
     },
@@ -147,16 +150,15 @@ test('messages with function pattern', async function (t) {
   t.teardown(teardown)
 
   const subscribed = Helper.createLazyPromise()
-  const subscribedStream = Pear.messages({ type: 'subscribed' }, (data) => {
-    if (data.pattern) {
-      subscribed.resolve()
-    }
-  })
-  t.teardown(() => subscribedStream.destroy())
-
   const received = Helper.createLazyPromise()
-  const receivedStream = Pear.messages((data) => { received.resolve(data) })
-  t.teardown(() => receivedStream.destroy())
+  const stream = Pear.messages((data) => {
+    if (data.type === 'subscribed') {
+      subscribed.resolve()
+      return
+    }
+    received.resolve(data)
+  })
+  t.teardown(() => stream.destroy())
 
   await subscribed.promise
   await Pear.message({ hello: 'world' })
@@ -165,6 +167,5 @@ test('messages with function pattern', async function (t) {
   t.ok(msg.hello === 'world', 'message received')
   t.ok(typeof msg.time === 'number' && msg.time <= Date.now(), 'message has time')
 
-  await Helper.untilClose(receivedStream)
-  await Helper.untilClose(subscribedStream)
+  await Helper.untilClose(stream)
 })

@@ -12,8 +12,9 @@ test('Pear.updates trigger', async function (t) {
   await Helper.startIpcServer({
     handlers: {
       messages: (pattern) => {
-        bus.pub({ type: 'subscribed', pattern })
-        return bus.sub(pattern)
+        const stream = bus.sub(pattern)
+        stream.push({ type: 'subscribed', pattern })
+        return stream
       },
       message: (pattern) => { bus.pub({ ...pattern, time: Date.now() }) }
     },
@@ -25,16 +26,17 @@ test('Pear.updates trigger', async function (t) {
   t.teardown(teardown)
 
   const subscribed = Helper.createLazyPromise()
-  const subscribedStream = Pear.messages({ type: 'subscribed' }, (data) => {
-    if (data.pattern.type === 'pear/updates') {
-      subscribed.resolve()
-    }
-  })
-  t.teardown(() => subscribedStream.destroy())
-
   const received = Helper.createLazyPromise()
-  const receivedStream = Pear.updates((data) => { received.resolve(data) })
-  t.teardown(() => receivedStream.destroy())
+  const stream = Pear.updates((data) => {
+    if (data.type === 'subscribed') {
+      if (data.pattern.type === 'pear/updates') {
+        subscribed.resolve()
+      }
+      return
+    }
+    received.resolve(data)
+  })
+  t.teardown(() => stream.destroy())
 
   await subscribed.promise
   await Pear.message({ type: 'pear/updates', hello: 'world' })
@@ -44,6 +46,5 @@ test('Pear.updates trigger', async function (t) {
   t.ok(msg.hello === 'world', 'message received')
   t.ok(typeof msg.time === 'number' && msg.time <= Date.now(), 'message has time')
 
-  await Helper.untilClose(receivedStream)
-  await Helper.untilClose(subscribedStream)
+  await Helper.untilClose(stream)
 })
