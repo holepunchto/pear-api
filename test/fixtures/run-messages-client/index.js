@@ -9,8 +9,10 @@ const main = async () => {
 
   const received = Helper.createLazyPromise()
   const stream = Pear.messages({ hello: 'world' }, async (data) => {
-    pipe.write(`${data.msg}\n`)
-    received.resolve()
+    if (data.hello === 'world') {
+      pipe.write(`${data.msg}\n`)
+      received.resolve()
+    }
   })
   await received.promise
 

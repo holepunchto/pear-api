@@ -67,7 +67,7 @@ test('messages single client', async function (t) {
   await Helper.untilClose(stream)
 })
 
-test('messages multi clients', async function (t) {
+test.solo('messages multi clients', async function (t) {
   t.plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'run-messages-client')
