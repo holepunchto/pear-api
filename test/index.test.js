@@ -39,27 +39,30 @@ test('messages single client', async function (t) {
   const teardown = Helper.rig({ ipc })
   t.teardown(teardown)
 
-  const subscribed = Helper.createLazyPromise()
-  const received = Helper.createLazyPromise()
-  const messages = []
-  const stream = Pear.messages({ hello: 'world' }, (data) => {
-    if (data.type === 'subscribed') {
-      if (data.pattern.hello === 'world') {
-        subscribed.resolve()
-      }
-      return
-    }
-    messages.push(data)
-    if (messages.length === 4) {
-      received.resolve()
-    }
-  })
+  const stream = Pear.messages({ hello: 'world' })
   t.teardown(() => stream.destroy())
 
-  await subscribed.promise
+  await new Promise((resolve) => {
+    stream.on('data', (data) => {
+      if (data.type !== 'subscribed') return
+      if (data.pattern.hello === 'world') resolve()
+    })
+  })
+
+  const received = new Promise((resolve) => {
+    const messages = []
+    stream.on('data', (data) => {
+      if (data.type === 'subscribed') return
+      messages.push(data)
+      if (messages.length === 4) {
+        resolve(messages)
+      }
+    })
+  })
+
   await Pear.message({ hello: 'world' })
 
-  await received.promise
+  const messages = await received
   t.is(messages.length, 4, 'received 4 messages')
   t.ok(messages.every(msg => msg.hello === 'world'), 'all messages match')
   t.ok(messages.every(msg => typeof msg.time === 'number' && msg.time <= Date.now()), 'all messages have time')
@@ -67,7 +70,7 @@ test('messages single client', async function (t) {
   await Helper.untilClose(stream)
 })
 
-test.solo('messages multi clients', async function (t) {
+test('messages multi clients', async function (t) {
   t.plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'run-messages-client')
@@ -562,23 +565,26 @@ test('Pear.wakeups trigger', async function (t) {
   const teardown = Helper.rig({ ipc })
   t.teardown(teardown)
 
-  const subscribed = Helper.createLazyPromise()
-  const received = Helper.createLazyPromise()
-  const stream = Pear.wakeups((data) => {
-    if (data.type === 'subscribed') {
-      if (data.pattern.type === 'pear/wakeup') {
-        subscribed.resolve()
-      }
-      return
-    }
-    received.resolve(data)
-  })
+  const stream = Pear.wakeups()
   t.teardown(() => stream.destroy())
 
-  await subscribed.promise
+  await new Promise((resolve) => {
+    stream.on('data', (data) => {
+      if (data.type !== 'subscribed') return
+      if (data.pattern.type === 'pear/wakeup') resolve()
+    })
+  })
+
+  const received = new Promise((resolve) => {
+    stream.on('data', (data) => {
+      if (data.type === 'subscribed') return
+      resolve(data)
+    })
+  })
+
   await Pear.message({ type: 'pear/wakeup', hello: 'world' })
 
-  const msg = await received.promise
+  const msg = await received
   t.ok(msg.type === 'pear/wakeup', 'wakeups triggered')
   t.ok(msg.hello === 'world', 'message received')
   t.ok(typeof msg.time === 'number' && msg.time <= Date.now(), 'message has time')
