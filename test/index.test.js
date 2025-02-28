@@ -14,7 +14,7 @@ const dirname = __dirname
 // messages
 //
 
-test('messages single client', async function (t) {
+test('Pear.messages single client', async function (t) {
   t.plan(3)
 
   const bus = new Iambus()
@@ -70,7 +70,7 @@ test('messages single client', async function (t) {
   await Helper.untilClose(stream)
 })
 
-test('messages multi clients', async function (t) {
+test('Pear.messages multi clients', async function (t) {
   t.plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'run-messages-client')
@@ -115,7 +115,7 @@ test('messages multi clients', async function (t) {
   await Helper.untilClose(pipe)
 })
 
-test('messages with no listener', async function (t) {
+test('Pear.messages with no listener', async function (t) {
   t.plan(1)
 
   const bus = new Iambus()
@@ -140,7 +140,7 @@ test('messages with no listener', async function (t) {
   t.pass('no listener did not throw')
 })
 
-test('messages with no pattern', async function (t) {
+test('Pear.messages with no pattern', async function (t) {
   t.plan(2)
 
   const bus = new Iambus()
@@ -435,7 +435,7 @@ test('Pear.compare returns', async function (t) {
 // restart
 //
 
-test('restart terminal app throw error', async function (t) {
+test('Pear.restart terminal app throw error', async function (t) {
   t.plan(1)
 
   const teardown = Helper.rig({ state: { ui: null } })
@@ -444,7 +444,7 @@ test('restart terminal app throw error', async function (t) {
   t.exception(() => Pear.restart(), 'Pear.restart threw an error for terminal app')
 })
 
-test('restart ok', async function (t) {
+test('Pear.restart ok', async function (t) {
   t.plan(2)
 
   await Helper.startIpcServer({
@@ -467,7 +467,7 @@ test('restart ok', async function (t) {
 // reload
 //
 
-test('reload terminal app throw error', async function (t) {
+test('Pear.reload terminal app throw error', async function (t) {
   t.plan(1)
 
   const teardown = Helper.rig({ state: { ui: null } })
@@ -476,7 +476,7 @@ test('reload terminal app throw error', async function (t) {
   t.exception(() => Pear.reload(), 'Pear.reload threw an error for terminal app')
 })
 
-test('reload desktop app throw error', async function (t) {
+test('Pear.reload desktop app throw error', async function (t) {
   t.plan(1)
 
   const teardown = Helper.rig()
@@ -485,7 +485,7 @@ test('reload desktop app throw error', async function (t) {
   t.exception(() => Pear.reload({ platform: 'darwin' }), 'Pear.reload threw an error for desktop app')
 })
 
-test('reload ok', async function (t) {
+test('Pear.reload ok', async function (t) {
   t.plan(1)
 
   const teardown = Helper.rig()
@@ -607,7 +607,7 @@ test('Pear.wakeups trigger', async function (t) {
 // teardown
 //
 
-test('teardown on pipe end', { skip: isWindows }, async function (t) {
+test('Pear.teardown on pipe end', { skip: isWindows }, async function (t) {
   t.plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'run-teardown')
@@ -621,7 +621,7 @@ test('teardown on pipe end', { skip: isWindows }, async function (t) {
   t.is(td, 'teardown', 'teardown executed')
 })
 
-test('teardown on os kill', { skip: isWindows }, async function (t) {
+test('Pear.teardown on os kill', { skip: isWindows }, async function (t) {
   t.plan(2)
 
   const dir = path.join(dirname, 'fixtures', 'run-teardown-os-kill')
@@ -643,7 +643,7 @@ test('teardown on os kill', { skip: isWindows }, async function (t) {
   t.is(td, 'teardown', 'teardown executed')
 })
 
-test('teardown on os kill with exit code', { skip: isWindows }, async function (t) {
+test('Pear.teardown on os kill with exit code', { skip: isWindows }, async function (t) {
   t.plan(3)
 
   const dir = path.join(dirname, 'fixtures', 'run-teardown-exit-code')
@@ -676,7 +676,7 @@ test('teardown on os kill with exit code', { skip: isWindows }, async function (
   t.is(exitCode, 124, 'exit code matches')
 })
 
-test('teardown run wait', { skip: isWindows }, async function (t) {
+test('Pear.teardown run wait', { skip: isWindows }, async function (t) {
   t.plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'run-teardown-wait')
@@ -690,7 +690,7 @@ test('teardown run wait', { skip: isWindows }, async function (t) {
   t.is(td, 'teardown', 'teardown executed')
 })
 
-test('teardown throw error', { skip: isWindows }, async function (t) {
+test('Pear.teardown throw error', { skip: isWindows }, async function (t) {
   t.plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'run-teardown-error')
