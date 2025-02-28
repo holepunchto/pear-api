@@ -138,7 +138,7 @@ test('messages with no listener', async function (t) {
   t.pass('no listener did not throw')
 })
 
-test('messages with function pattern', async function (t) {
+test('messages with no pattern', async function (t) {
   t.plan(2)
 
   const bus = new Iambus()
@@ -158,21 +158,26 @@ test('messages with function pattern', async function (t) {
   const teardown = Helper.rig({ ipc })
   t.teardown(teardown)
 
-  const subscribed = Helper.createLazyPromise()
-  const received = Helper.createLazyPromise()
-  const stream = Pear.messages((data) => {
-    if (data.type === 'subscribed') {
-      subscribed.resolve()
-      return
-    }
-    received.resolve(data)
-  })
+  const stream = Pear.messages()
   t.teardown(() => stream.destroy())
 
-  await subscribed.promise
+  await new Promise((resolve) => {
+    stream.on('data', (data) => {
+      if (data.type !== 'subscribed') return
+      resolve()
+    })
+  })
+
+  const received = new Promise((resolve) => {
+    stream.on('data', (data) => {
+      if (data.type === 'subscribed') return
+      resolve(data)
+    })
+  })
+
   await Pear.message({ hello: 'world' })
 
-  const msg = await received.promise
+  const msg = await received
   t.ok(msg.hello === 'world', 'message received')
   t.ok(typeof msg.time === 'number' && msg.time <= Date.now(), 'message has time')
 
@@ -484,12 +489,13 @@ test('reload ok', async function (t) {
   const teardown = Helper.rig()
   t.teardown(teardown)
 
-  const reloaded = Helper.createLazyPromise()
-  global.location = { reload: () => reloaded.resolve() }
+  const reloaded = new Promise((resolve) => {
+    global.location = { reload: () => resolve() }
+  })
 
   Pear.reload()
 
-  await reloaded.promise
+  await reloaded
   t.pass('Pear.reload ok')
 })
 
@@ -517,23 +523,26 @@ test('Pear.updates trigger', async function (t) {
   const teardown = Helper.rig({ ipc })
   t.teardown(teardown)
 
-  const subscribed = Helper.createLazyPromise()
-  const received = Helper.createLazyPromise()
-  const stream = Pear.updates((data) => {
-    if (data.type === 'subscribed') {
-      if (data.pattern.type === 'pear/updates') {
-        subscribed.resolve()
-      }
-      return
-    }
-    received.resolve(data)
-  })
+  const stream = Pear.updates()
   t.teardown(() => stream.destroy())
 
-  await subscribed.promise
+  await new Promise((resolve) => {
+    stream.on('data', (data) => {
+      if (data.type !== 'subscribed') return
+      if (data.pattern.type === 'pear/updates') resolve()
+    })
+  })
+
+  const received = new Promise((resolve) => {
+    stream.on('data', (data) => {
+      if (data.type === 'subscribed') return
+      resolve(data)
+    })
+  })
+
   await Pear.message({ type: 'pear/updates', hello: 'world' })
 
-  const msg = await received.promise
+  const msg = await received
   t.ok(msg.type === 'pear/updates', 'updates triggered')
   t.ok(msg.hello === 'world', 'message received')
   t.ok(typeof msg.time === 'number' && msg.time <= Date.now(), 'message has time')
