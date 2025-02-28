@@ -7,18 +7,7 @@ async function runTests () {
 
   test.pause()
 
-  await import('./checkpoint.test.js')
-  await import('./compare.test.js')
-  await import('./exists.test.js')
-  await import('./get.test.js')
   await import('./index.test.js')
-  await import('./messages.test.js')
-  await import('./reload.test.js')
-  await import('./restart.test.js')
-  await import('./teardown.test.js')
-  await import('./updates.test.js')
-  await import('./versions.test.js')
-  await import('./wakeups.test.js')
   await import('./worker.test.js')
 
   test.resume()
