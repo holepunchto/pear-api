@@ -39,7 +39,6 @@ class Helper {
 
     return () => {
       global.Pear = null
-      // TODO: clear require.cache
     }
   }
 
