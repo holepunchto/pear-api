@@ -67,10 +67,16 @@
     "which-runtime": "^1.2.1",
     "z32": "^1.1.0"
   },
+  "peerDependencies": {
+    "hypercore-crypto": "^3.5.0",
+    "script-linker": "^2.5.4"
+  },
   "devDependencies": {
     "brittle": "^3.10.0",
+    "hypercore-crypto": "^3.5.0",
     "iambus": "^1.0.3",
     "pear-ipc": "^3.3.0",
+    "script-linker": "^2.5.4",
     "standard": "^17.1.2"
   }
 }
