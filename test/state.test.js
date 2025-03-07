@@ -19,6 +19,8 @@ const rig = () => {
 }
 
 test('state', async function (t) {
+  t.plan(1)
+
   const { teardown } = rig()
   t.teardown(teardown)
 
