@@ -14,6 +14,4 @@ test('logger', async function (t) {
   const logger = new Logger({ labels: ['label-test'], level: Logger.INF })
   t.exception(() => logger.info('label-test', 'hello'), 'console.log called hello')
   logger.error('label-random', 'world')
-
-  console.log = consoleLogOrigin
 })
