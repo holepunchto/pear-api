@@ -8,12 +8,12 @@ const CHECKOUT = global.Pear?.constructor.RTI.checkout
 const MOUNT = global.Pear?.constructor.RTI.mount
 const BIN = 'by-arch/' + platform + '-' + arch + '/bin/'
 
-let mount = MOUNT ? new URL(MOUNT + '/', 'file:') : null
+let mount = MOUNT ? toURL(MOUNT + '/', 'file:') : null
 if (!mount) {
   let url = require.main?.url
   if (url?.href.endsWith('/boot.bundle')) url.href += '/'
   else url = new URL('.', url)
-  if (url && url.protocol === 'pear:') url = new URL(global.Pear.config.swapDir + '/', 'file:')
+  if (url && url.protocol === 'pear:') url = toURL(global.Pear.config.swapDir + '/', 'file:')
   mount = url
 }
 
@@ -76,6 +76,12 @@ exports.KNOWN_NODES_LIMIT = 100
 
 function toPath (u) {
   return fileURLToPath(u).replace(/[/\\]$/, '') || '/'
+}
+
+function toURL (s) {
+  if (s[1] === ':' && s[0] !== '/') return new URL('file:' + s)
+  if (s.startsWith('file:')) return new URL(s)
+  return new URL(s, 'file:')
 }
 
 function pipeId (s) {
