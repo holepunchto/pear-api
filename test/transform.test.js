@@ -32,7 +32,6 @@ test('transform stream', async function (t) {
   const final = await fs.promises.readFile(finalFile, 'utf8')
 
   const locals = { name: 'world', version: 'v.1.2.3', url: 'https://docs.pears.com/' }
-
   const stream = transform.stream(template, locals)
   t.teardown(() => stream.destroy())
 
