@@ -81,6 +81,7 @@ class API {
     const MAX_TEARDOWN_WAIT = 15000
     let timeout = null
     let timedout = false
+    let rejected = null
     const countdown = new Promise((resolve) => {
       timeout = setTimeout(() => {
         timedout = true
@@ -88,9 +89,12 @@ class API {
       }, MAX_TEARDOWN_WAIT)
     })
     this.#teardowns.finally(() => { clearTimeout(timeout) })
-    await Promise.race([this.#teardowns, countdown])
-    if (timedout) {
-      console.error(`Max teardown wait reached after ${MAX_TEARDOWN_WAIT} ms. Exiting...`)
+    await Promise.race([this.#teardowns, countdown]).catch((err) => {
+      rejected = err
+    })
+    if (timedout || rejected) {
+      if (timedout) console.error(`Max teardown wait reached after ${MAX_TEARDOWN_WAIT} ms. Exiting...`)
+      if (rejected) console.error(`${rejected}. User teardown threw. Exiting...`)
       if (global.Bare) {
         global.Bare.exit()
       } else {
