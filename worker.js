@@ -23,7 +23,7 @@ class Worker {
 
   #args (link) {
     const parser = command('pear', command('run', ...rundef))
-    const argv = ['run', '--trusted', ...global.Bare.argv.slice(2)]
+    const argv = ['run', ...global.Bare.argv.slice(2)]
     const cmd = parser.parse(argv, { sync: true })
     const args = argv.map((arg) => arg === cmd.args.link ? link : arg)
     if (cmd.indices.rest > 0) args.splice(cmd.indices.rest)
@@ -34,11 +34,12 @@ class Worker {
       if (linksIndex > cmd.indices.flags.startId) linksIndex -= linksElements
     }
     if (linksIndex > 0) args.splice(linksIndex, linksElements)
+    if (!cmd.flags.trusted) args.splice(1, 0, '--trusted')
     return args
   }
 
   run (link, args = []) {
-    args = [...this.#args(link), ...args]
+    args = [...this.constructor.RUNTIME_ARGV, ...this.#args(link), ...args]
     const sp = spawn(this.constructor.RUNTIME, args, {
       stdio: ['inherit', 'inherit', 'inherit', 'overlapped'],
       windowsHide: true
