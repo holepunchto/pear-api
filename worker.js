@@ -51,7 +51,6 @@ class Worker {
       this.#unref()
     })
     const pipe = sp.stdio[3]
-    pipe.on('end', () => pipe.end())
     return pipe
   }
 

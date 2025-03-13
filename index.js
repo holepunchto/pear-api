@@ -1,5 +1,4 @@
 'use strict'
-const { RUNTIME } = require('./constants')
 const Worker = require('./worker')
 const onteardown = global.Bare ? require('./teardown') : noop
 const program = global.Bare || global.process
@@ -29,8 +28,9 @@ class API {
   argv = program.argv
   pid = program.pid
   static RTI = global.Pear?.constructor.RTI ?? null
-  static RUNTIME = RUNTIME
   static IPC = kIPC
+  static get RUNTIME () { return Worker.RUNTIME }
+  static set RUNTIME (runtime) { return (Worker.RUNTIME = runtime) }
   constructor (ipc, state, { worker = new Worker({ ref: () => this.#ref(), unref: () => this.#unref() }), teardown = onteardown } = {}) {
     this.#ipc = ipc
     this.#state = state
