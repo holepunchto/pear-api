@@ -319,6 +319,7 @@ test('Pear.run exit when child calls pipe.end()', async function (t) {
   t.teardown(teardown)
 
   const pipe = Pear.run(runParent, [runEndFromChild])
+  pipe.on('end', () => pipe.end())
 
   const pid = await Helper.untilResult(pipe)
   await Helper.untilExit(pid)
@@ -332,6 +333,7 @@ test('Pear.run exit when child calls pipe.destroy()', async function (t) {
   t.teardown(teardown)
 
   const pipe = Pear.run(runParentErrorHandler, [runDestroyFromChild])
+  pipe.on('end', () => pipe.end())
 
   const pid = await Helper.untilResult(pipe)
   await Helper.untilExit(pid)
@@ -345,6 +347,7 @@ test('Pear.run exit when parent calls pipe.end()', async function (t) {
   t.teardown(teardown)
 
   const pipe = Pear.run(runEndFromParent, [runChild])
+  pipe.on('end', () => pipe.end())
 
   const pid = await Helper.untilResult(pipe)
   await Helper.untilExit(pid)
@@ -358,6 +361,7 @@ test('Pear.run exit when parent calls pipe.destroy()', async function (t) {
   t.teardown(teardown)
 
   const pipe = Pear.run(runDestroyFromParent, [runChildErrorHandler])
+  pipe.on('end', () => pipe.end())
 
   const pid = await Helper.untilResult(pipe)
   await Helper.untilExit(pid)
