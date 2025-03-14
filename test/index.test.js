@@ -637,7 +637,7 @@ test('Pear.teardown on os kill', { skip: isWindows }, async function (t) {
   })
 
   const pid = +(await Helper.untilResult(pipe))
-  t.ok(pid > 0, 'worker pid is valid')
+  t.ok(pid > 0, 'pid is valid')
 
   const td = await Helper.untilResult(pipe, { runFn: () => os.kill(pid) })
   t.is(td, 'teardown', 'teardown executed')
@@ -659,7 +659,7 @@ test('Pear.teardown on os kill with exit code', { skip: isWindows }, async funct
   })
 
   const pid = +(await Helper.untilResult(pipe))
-  t.ok(pid > 0, 'worker pid is valid')
+  t.ok(pid > 0, 'pid is valid')
 
   const exitCodePromise = new Promise((resolve, reject) => {
     const timeoutId = setTimeout(() => reject(new Error('timed out')), 5000)
