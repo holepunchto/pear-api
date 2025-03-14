@@ -318,7 +318,8 @@ test('Pear.run exit when child calls pipe.end()', async function (t) {
   const teardown = Helper.rig({ runtimeArgv: [runParent] })
   t.teardown(teardown)
 
-  const pipe = await Pear.run(runParent, [runEndFromChild])
+  const pipe = Pear.run(runParent, [runEndFromChild])
+
   const pid = await Helper.untilResult(pipe)
   await Helper.untilExit(pid)
 })
@@ -330,7 +331,8 @@ test('Pear.run exit when child calls pipe.destroy()', async function (t) {
   const teardown = Helper.rig({ runtimeArgv: [runParentErrorHandler] })
   t.teardown(teardown)
 
-  const pipe = await Pear.run(runParentErrorHandler, [runDestroyFromChild])
+  const pipe = Pear.run(runParentErrorHandler, [runDestroyFromChild])
+
   const pid = await Helper.untilResult(pipe)
   await Helper.untilExit(pid)
 })
@@ -342,7 +344,8 @@ test('Pear.run exit when parent calls pipe.end()', async function (t) {
   const teardown = Helper.rig({ runtimeArgv: [runEndFromParent] })
   t.teardown(teardown)
 
-  const pipe = await Pear.run(runEndFromParent, [runChild])
+  const pipe = Pear.run(runEndFromParent, [runChild])
+
   const pid = await Helper.untilResult(pipe)
   await Helper.untilExit(pid)
 })
@@ -354,7 +357,8 @@ test('Pear.run exit when parent calls pipe.destroy()', async function (t) {
   const teardown = Helper.rig({ runtimeArgv: [runDestroyFromParent] })
   t.teardown(teardown)
 
-  const pipe = await Pear.run(runDestroyFromParent, [runChildErrorHandler])
+  const pipe = Pear.run(runDestroyFromParent, [runChildErrorHandler])
+
   const pid = await Helper.untilResult(pipe)
   await Helper.untilExit(pid)
 })
