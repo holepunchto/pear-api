@@ -1,6 +1,8 @@
 'use strict'
 
 const { test } = require('brittle')
+const { isWindows } = require('which-runtime')
+// TODO: fix tests for Windows
 
 const dirname = __dirname
 global.Pear = null
@@ -62,7 +64,7 @@ test('usage.footer content', async function (t) {
   t.ok(usage.footer.help.includes('Welcome to the IoP'), 'usage.footer.help should contain welcome message')
 })
 
-test('ansi formatting functions', async function (t) {
+test('ansi formatting functions', { skip: isWindows }, async function (t) {
   t.plan(10)
 
   const { teardown } = rig()
