@@ -18,19 +18,6 @@ const rig = () => {
   }
 }
 
-test('terminal indicator', async function (t) {
-  t.plan(4)
-
-  const { teardown } = rig()
-  t.teardown(teardown)
-
-  const { indicator, ansi } = require('../terminal')
-  t.ok(indicator() === '')
-  t.ok(indicator(null) === ansi.gray('- '))
-  t.ok(indicator(true) === ansi.tick + ' ')
-  t.ok(indicator(false) === ansi.cross + ' ')
-})
-
 test('usage object structure', async function (t) {
   t.plan(4)
 
@@ -73,4 +60,106 @@ test('usage.footer content', async function (t) {
   const { usage } = require('../terminal')
   t.ok(usage.footer.overview.includes('Legend'), 'usage.footer.overview should contain legend')
   t.ok(usage.footer.help.includes('Welcome to the IoP'), 'usage.footer.help should contain welcome message')
+})
+
+test('ansi formatting functions', async function (t) {
+  t.plan(10)
+
+  const { teardown } = rig()
+  t.teardown(teardown)
+
+  const { ansi } = require('../terminal')
+  t.is(ansi.bold('text'), '\x1B[1mtext\x1B[22m', 'ansi.bold should format text correctly')
+  t.is(ansi.dim('text'), '\x1B[2mtext\x1B[22m', 'ansi.dim should format text correctly')
+  t.is(ansi.italic('text'), '\x1B[3mtext\x1B[23m', 'ansi.italic should format text correctly')
+  t.is(ansi.underline('text'), '\x1B[4mtext\x1B[24m', 'ansi.underline should format text correctly')
+  t.is(ansi.inverse('text'), '\x1B[7mtext\x1B[27m', 'ansi.inverse should format text correctly')
+  t.is(ansi.red('text'), '\x1B[31mtext\x1B[39m', 'ansi.red should format text correctly')
+  t.is(ansi.green('text'), '\x1B[32mtext\x1B[39m', 'ansi.green should format text correctly')
+  t.is(ansi.yellow('text'), '\x1B[33mtext\x1B[39m', 'ansi.yellow should format text correctly')
+  t.is(ansi.gray('text'), '\x1B[90mtext\x1B[39m', 'ansi.gray should format text correctly')
+  t.is(ansi.hideCursor(), '\x1B[?25l', 'ansi.hideCursor should format text correctly')
+})
+
+test('ansi special characters', async function (t) {
+  t.plan(8)
+
+  const { teardown } = rig()
+  t.teardown(teardown)
+
+  const { ansi } = require('../terminal')
+  t.is(ansi.sep, ansi.dim(ansi.green('∞')), 'ansi.sep should be formatted correctly')
+  t.is(ansi.tick, ansi.green('✔'), 'ansi.tick should be formatted correctly')
+  t.is(ansi.cross, ansi.red('✖'), 'ansi.cross should be formatted correctly')
+  t.is(ansi.warning, '⚠️', 'ansi.warning should be formatted correctly')
+  t.is(ansi.pear, '🍐', 'ansi.pear should be formatted correctly')
+  t.is(ansi.dot, 'o', 'ansi.dot should be formatted correctly')
+  t.is(ansi.key, '🔑', 'ansi.key should be formatted correctly')
+  t.is(ansi.upHome(2), '\x1B[2F', 'ansi.upHome should format text correctly')
+})
+test('indicator function', async function (t) {
+  t.plan(6)
+
+  const { teardown } = rig()
+  t.teardown(teardown)
+
+  const { indicator, ansi } = require('../terminal')
+
+  t.is(indicator(true), ansi.tick + ' ', 'indicator should return tick for true')
+  t.is(indicator(false), ansi.cross + ' ', 'indicator should return cross for false')
+  t.is(indicator(null), ansi.gray('- '), 'indicator should return gray dash for null')
+  t.is(indicator(1), ansi.tick + ' ', 'indicator should return tick for positive number')
+  t.is(indicator(-1), ansi.cross + ' ', 'indicator should return cross for negative number')
+  t.is(indicator(0), ansi.gray('- '), 'indicator should return gray dash for zero')
+})
+
+test('status function', async function (t) {
+  t.plan(3)
+
+  const { teardown } = rig()
+  t.teardown(teardown)
+
+  const { status, stdio, ansi } = require('../terminal')
+
+  const originalWrite = stdio.out.write
+  let output = ''
+  stdio.out.write = (str) => { output += str }
+
+  status('Test message', true)
+  t.ok(output.includes(ansi.tick + ' Test message'), 'status should print success message correctly')
+
+  output = ''
+  status('Test message', false)
+  t.ok(output.includes(ansi.cross + ' Test message'), 'status should print failure message correctly')
+
+  output = ''
+  status('Test message')
+  t.ok(output.includes('Test message'), 'status should print message without success indicator')
+
+  stdio.out.write = originalWrite
+})
+
+test('print function', async function (t) {
+  t.plan(3)
+
+  const { teardown } = rig()
+  t.teardown(teardown)
+
+  const { print, ansi } = require('../terminal')
+
+  const originalConsoleLog = console.log
+  let output = ''
+  console.log = (str) => { output += str }
+  t.teardown(() => { console.log = originalConsoleLog })
+
+  print('Test message', true)
+  t.ok(output.includes(ansi.tick + ' Test message'), 'print should print success message correctly')
+
+  output = ''
+  print('Test message', false)
+  t.ok(output.includes(ansi.cross + ' Test message'), 'print should print failure message correctly')
+
+  output = ''
+  print('Test message')
+  t.ok(output.includes('Test message'), 'print should print message without success indicator')
 })
