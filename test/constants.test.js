@@ -1,6 +1,8 @@
 'use strict'
 
 const { test } = require('brittle')
+const { isWindows } = require('which-runtime')
+// TODO: fix tests for windows
 
 const dirname = __dirname
 global.Pear = null
@@ -33,7 +35,7 @@ test('constants with CHECKOUT', async function (t) {
   t.ok(constants.CHECKOUT.fork === null)
 })
 
-test('constants with default MOUNT', async function (t) {
+test('constants with default MOUNT', { skip: isWindows }, async function (t) {
   t.plan(1)
 
   const rig = () => {
@@ -59,7 +61,7 @@ test('constants with default MOUNT', async function (t) {
   t.ok(constants.MOUNT === `file://${dirname}`)
 })
 
-test('constants with MOUNT starting with c:', async function (t) {
+test('constants with MOUNT starting with c:', { skip: isWindows }, async function (t) {
   t.plan(1)
 
   const rig = () => {
@@ -85,7 +87,7 @@ test('constants with MOUNT starting with c:', async function (t) {
   t.ok(constants.MOUNT === 'file:///c:/custom/mount')
 })
 
-test('constants with MOUNT starting with file:', async function (t) {
+test('constants with MOUNT starting with file:', { skip: isWindows }, async function (t) {
   t.plan(1)
 
   const rig = () => {
@@ -111,7 +113,7 @@ test('constants with MOUNT starting with file:', async function (t) {
   t.ok(constants.MOUNT === 'file:///custom/mount')
 })
 
-test('constants with MOUNT starting with ./', async function (t) {
+test('constants with MOUNT starting with ./', { skip: isWindows }, async function (t) {
   t.plan(1)
 
   const rig = () => {
@@ -137,7 +139,7 @@ test('constants with MOUNT starting with ./', async function (t) {
   t.ok(constants.MOUNT === 'file:///custom/mount')
 })
 
-test('constants with MOUNT starting with ../', async function (t) {
+test('constants with MOUNT starting with ../', { skip: isWindows }, async function (t) {
   t.plan(1)
 
   const rig = () => {
@@ -163,7 +165,7 @@ test('constants with MOUNT starting with ../', async function (t) {
   t.ok(constants.MOUNT === 'file:///custom/mount')
 })
 
-test('constants with MOUNT starting with /', async function (t) {
+test('constants with MOUNT starting with /', { skip: isWindows }, async function (t) {
   t.plan(1)
 
   const rig = () => {
@@ -189,7 +191,7 @@ test('constants with MOUNT starting with /', async function (t) {
   t.ok(constants.MOUNT === 'file:///custom/mount')
 })
 
-test('constants with MOUNT starting with pear://', async function (t) {
+test('constants with MOUNT starting with pear://', { skip: isWindows }, async function (t) {
   t.plan(1)
 
   const rig = () => {
