@@ -83,7 +83,7 @@ test('ansi formatting functions', { skip: isWindows }, async function (t) {
   t.is(ansi.hideCursor(), '\x1B[?25l', 'ansi.hideCursor should format text correctly')
 })
 
-test('ansi special characters', async function (t) {
+test('ansi special characters', { skip: isWindows }, async function (t) {
   t.plan(8)
 
   const { teardown } = rig()
