@@ -271,3 +271,47 @@ test('errors ERR_LEGACY', async function (t) {
   t.ok(error.info === null)
   t.ok(error.stack.includes('legacy'))
 })
+
+test('PearError with stackless true', async function (t) {
+  t.plan(4)
+
+  const error = new PearError('stackless error', 'ERR_STACKLESS', PearError, null, true)
+  t.exception(() => { throw error }, PearError)
+  t.ok(error.message === 'stackless error')
+  t.ok(error.code === 'ERR_STACKLESS')
+  t.ok(error.stack === 'stackless error')
+})
+
+test('PearError with stackless false', async function (t) {
+  t.plan(5)
+
+  const error = new PearError('normal error', 'ERR_NORMAL', PearError, null, false)
+  t.exception(() => { throw error }, PearError)
+  t.ok(error.message === 'normal error')
+  t.ok(error.code === 'ERR_NORMAL')
+  t.ok(error.info === null)
+  t.ok(error.stack.includes('normal error'))
+})
+
+test('PearError with info', async function (t) {
+  t.plan(6)
+
+  const error = new PearError('error with info', 'ERR_WITH_INFO', PearError, { detail: 'some detail' })
+  t.exception(() => { throw error }, PearError)
+  t.ok(error.message === 'error with info')
+  t.ok(error.code === 'ERR_WITH_INFO')
+  t.ok(error.info.detail === 'some detail')
+  t.ok(error.info !== null)
+  t.ok(error.stack.includes('error with info'))
+})
+
+test('PearError without info', async function (t) {
+  t.plan(5)
+
+  const error = new PearError('error without info', 'ERR_WITHOUT_INFO')
+  t.exception(() => { throw error }, PearError)
+  t.ok(error.message === 'error without info')
+  t.ok(error.code === 'ERR_WITHOUT_INFO')
+  t.ok(error.info === null)
+  t.ok(error.stack.includes('error without info'))
+})
