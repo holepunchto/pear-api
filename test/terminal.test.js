@@ -9,7 +9,7 @@ const rig = () => {
   if (global.Pear !== null) throw Error(`Prior Pear global not cleaned up: ${global.Pear}`)
 
   class RigAPI {
-    static RTI = { checkout: { key: dirname, length: 20, fork: 10 } }
+    static RTI = { checkout: { key: dirname, length: null, fork: null } }
   }
   global.Pear = new RigAPI()
 
@@ -61,7 +61,7 @@ test('usage.version format', async function (t) {
   t.teardown(teardown)
 
   const { usage } = require('../terminal')
-  t.ok(/^\d+\.\d+\.[\w-_/\\]+$/.test(usage.version), 'usage.version should follow the format x.y.z')
+  t.ok(usage.version === `0.dev.${dirname}`)
 })
 
 test('usage.footer content', async function (t) {
