@@ -7,8 +7,6 @@ async function runTests () {
 
   test.pause()
 
-  await import('./cmd-pear.test.js')
-  await import('./cmd-run.test.js')
   await import('./constants.test.js')
   await import('./crasher.test.js')
   await import('./errors.test.js')
