@@ -18,7 +18,6 @@ async function runTests () {
   await import('./teardown.test.js')
   await import('./terminal.test.js')
   await import('./transform.test.js')
-  await import('./tryboot.test.js')
   await import('./worker.test.js')
 
   test.resume()
