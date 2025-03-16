@@ -191,7 +191,7 @@ test('constants with MOUNT starting with /', { skip: isWindows }, async function
   t.ok(constants.MOUNT === 'file:///custom/mount')
 })
 
-test('constants with MOUNT starting with pear://', { skip: isWindows }, async function (t) {
+test('constants with MOUNT starting with pear://', async function (t) {
   t.plan(1)
 
   const rig = () => {
