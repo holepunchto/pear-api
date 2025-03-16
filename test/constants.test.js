@@ -2,7 +2,7 @@
 
 const { test } = require('brittle')
 const { isWindows } = require('which-runtime')
-// TODO: fix tests for windows
+const { pathToFileURL } = require('url-file-url')
 
 const dirname = __dirname
 global.Pear = null
@@ -35,7 +35,7 @@ test('constants with CHECKOUT', async function (t) {
   t.ok(constants.CHECKOUT.fork === null)
 })
 
-test('constants with default MOUNT', { skip: isWindows }, async function (t) {
+test('constants with default MOUNT', async function (t) {
   t.plan(1)
 
   const rig = () => {
@@ -58,7 +58,7 @@ test('constants with default MOUNT', { skip: isWindows }, async function (t) {
   t.teardown(teardown)
 
   const constants = require('../constants')
-  t.ok(constants.MOUNT === `file://${dirname}`)
+  t.ok(constants.MOUNT === pathToFileURL(dirname).href)
 })
 
 test('constants with MOUNT starting with c:', { skip: isWindows }, async function (t) {
