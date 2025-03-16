@@ -3,6 +3,7 @@ global.Pear = null
 
 const { isWindows } = require('which-runtime')
 const IPC = require('pear-ipc')
+const fs = require('bare-fs')
 
 const dirname = __dirname
 const socketPath = isWindows ? '\\\\.\\pipe\\pear-api-test-ipc' : 'test.sock'
@@ -107,6 +108,28 @@ class Helper {
       if (Date.now() - start > timeout) throw new Error('timed out')
       await new Promise((resolve) => setTimeout(resolve, 100))
     }
+  }
+
+  static async untilExists (path, timeout = 5000, start = Date.now()) {
+    if (Date.now() - start > timeout) throw new Error('timed out')
+    try {
+      await fs.promises.stat(path)
+      return true
+    } catch (err) {
+      if (err.code !== 'ENOENT') throw err
+    }
+    await new Promise((resolve) => setTimeout(resolve, 100))
+    await Helper.untilExists(path, timeout, start)
+  }
+
+  static async untilHandler (handler, timeout = 5000, start = Date.now()) {
+    if (Date.now() - start > timeout) throw new Error('timed out')
+    try {
+      const res = await handler()
+      if (res) return res
+    } catch {}
+    await new Promise((resolve) => setTimeout(resolve, 100))
+    await Helper.untilHandler(handler, timeout, start)
   }
 
   static async startIpcClient () {

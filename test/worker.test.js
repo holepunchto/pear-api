@@ -1,7 +1,7 @@
 'use strict'
 
 const { test } = require('brittle')
-const path = require('path')
+const path = require('bare-path')
 
 const dirname = __dirname
 global.Pear = null

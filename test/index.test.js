@@ -2,7 +2,7 @@
 
 const { test } = require('brittle')
 const { isWindows } = require('which-runtime')
-const path = require('path')
+const path = require('bare-path')
 const os = require('bare-os')
 const Iambus = require('iambus')
 
