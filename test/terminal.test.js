@@ -81,6 +81,7 @@ test('ansi formatting functions', async function (t) {
     t.is(ansi.yellow('text'), 'text', 'ansi.yellow should format text correctly')
     t.is(ansi.gray('text'), 'text', 'ansi.gray should format text correctly')
     t.is(ansi.upHome(), '', 'ansi.upHome should format text correctly')
+    t.is(ansi.upHome(35), '', 'ansi.upHome should format text correctly')
     t.is(ansi.link('text'), 'text', 'ansi.link should format text correctly')
     t.is(ansi.hideCursor(), '', 'ansi.hideCursor should format text correctly')
     t.is(ansi.showCursor(), '', 'ansi.showCursor should format text correctly')
