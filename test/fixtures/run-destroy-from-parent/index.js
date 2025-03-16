@@ -11,6 +11,7 @@ const main = async () => {
   pipeIn.write(`${Bare.pid}\n`)
 
   const pipe = Pear.run(entry)
+  pipe.on('end', () => pipe.end())
 
   const pid = await new Promise((resolve) => {
     pipe.on('data', (data) => resolve(data.toString()))
