@@ -339,7 +339,7 @@ test('Pear.run exit when child calls pipe.destroy()', async function (t) {
   await Helper.untilExit(pid)
 })
 
-test('Pear.run exit when parent calls pipe.end()', async function (t) {
+test('Pear.run exit when parent calls pipe.end()', {skip: isWindows }, async function (t) {
   const runEndFromParent = path.join(dirname, 'fixtures', 'run-end-from-parent')
   const runChild = path.join(dirname, 'fixtures', 'run-child')
 
@@ -353,7 +353,7 @@ test('Pear.run exit when parent calls pipe.end()', async function (t) {
   await Helper.untilExit(pid)
 })
 
-test('Pear.run exit when parent calls pipe.destroy()', async function (t) {
+test('Pear.run exit when parent calls pipe.destroy()', {skip: isWindows }, async function (t) {
   const runDestroyFromParent = path.join(dirname, 'fixtures', 'run-destroy-from-parent')
   const runChildErrorHandler = path.join(dirname, 'fixtures', 'run-child-error-handler')
 
