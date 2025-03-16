@@ -4,6 +4,7 @@ global.Pear = null
 const { isWindows } = require('which-runtime')
 const IPC = require('pear-ipc')
 const fs = require('bare-fs')
+const { pathToFileURL } = require('url-file-url')
 
 const dirname = __dirname
 const socketPath = isWindows ? '\\\\.\\pipe\\pear-api-test-ipc' : 'test.sock'
@@ -15,7 +16,8 @@ class Helper {
   static rig ({
     ipc = { ref: noop, unref: noop },
     state = {},
-    runtimeArgv
+    runtimeArgv,
+    clearRequireCache
   } = {}) {
     if (global.Pear !== null) throw Error(`Prior Pear global not cleaned up: ${global.Pear}`)
 
@@ -39,6 +41,9 @@ class Helper {
     global.Pear = new TestAPI(ipc, state, { worker })
 
     return () => {
+      if (clearRequireCache) {
+        delete require.cache[pathToFileURL(require.resolve(clearRequireCache))]
+      }
       global.Pear = null
     }
   }
