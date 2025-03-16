@@ -5,6 +5,7 @@ const fs = isBare ? require('bare-fs') : require('fs')
 const path = isBare ? require('bare-path') : require('path')
 const { pathToFileURL } = require('url-file-url')
 const hypercoreid = require('hypercore-id-encoding')
+const pearLink = require('pear-link')
 const z32 = require('z32')
 const crypto = require('hypercore-crypto')
 const { PLATFORM_DIR, SWAP, RUNTIME } = require('pear-api/constants')
@@ -40,7 +41,7 @@ module.exports = class State {
   static injestPackage (state, pkg, overrides = {}) {
     state.manifest = pkg
     state.main = pkg?.main || 'index.html'
-    state.options = pkg?.pear || null
+    state.options = pkg?.pear || {}
     state.name = pkg?.pear?.name || pkg?.name || null
     state.links = pkg?.pear?.links || null
     state.gui = pkg?.pear?.gui || null
@@ -148,7 +149,7 @@ module.exports = class State {
     this.stage = stage
     this.fragment = fragment
     this.linkData = segment
-    this.link = link ? (link.startsWith(protocol) ? link : pathToFileURL(link).toString()) : null
+    this.link = link ? (link.startsWith(protocol) ? link : pearLink.normalize(pathToFileURL(link).toString())) : null
     this.key = key
     this.applink = key ? this.link.slice(0, -(~~(pathname?.length) + ~~(hash?.length))) : null
     this.alias = alias
@@ -165,7 +166,8 @@ module.exports = class State {
       this.env.NODE_ENV = this.env.NODE_ENV || 'production'
     }
     this.constructor.injestPackage(this, pkg, { links })
-    const invalidStorage = this.key === null && this.storage !== null && this.storage.startsWith(this.dir) && this.storage.includes('/pear/pear/') === false
+    const invalidStorage = this.key === null && this.storage !== null 
+      && this.storage.startsWith(this.dir) && this.storage.includes(path.sep + 'pear' + path.sep + 'pear' + path.sep) === false
     if (invalidStorage) throw ERR_INVALID_APP_STORAGE('Application Storage may not be inside the project directory. --store "' + this.storage + '" is invalid')
     const invalidName = /^[@/a-z0-9-_]+$/.test(this.name) === false
     if (invalidName) throw ERR_INVALID_APP_NAME('The package.json name / pear.name field must be lowercase and one word, and may contain letters, numbers, hyphens (-), underscores (_), forward slashes (/) and asperands (@).')
