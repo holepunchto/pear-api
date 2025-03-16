@@ -620,7 +620,7 @@ test('Pear.teardown on pipe end', { skip: isWindows }, async function (t) {
 
   const dir = path.join(dirname, 'fixtures', 'run-teardown')
 
-  const teardown = Helper.rig({ runtimeArgv: [dir] })
+  const teardown = Helper.rig({ runtimeArgv: [dir], clearRequireCache: '../teardown' })
   t.teardown(teardown)
 
   const pipe = Pear.run(dir)
@@ -634,7 +634,7 @@ test('Pear.teardown on os kill', { skip: isWindows }, async function (t) {
 
   const dir = path.join(dirname, 'fixtures', 'run-teardown-os-kill')
 
-  const teardown = Helper.rig({ runtimeArgv: [dir] })
+  const teardown = Helper.rig({ runtimeArgv: [dir], clearRequireCache: '../teardown' })
   t.teardown(teardown)
 
   const pipe = Pear.run(dir)
@@ -656,7 +656,7 @@ test('Pear.teardown on os kill with exit code', { skip: isWindows }, async funct
 
   const dir = path.join(dirname, 'fixtures', 'run-teardown-exit-code')
 
-  const teardown = Helper.rig({ runtimeArgv: [dir] })
+  const teardown = Helper.rig({ runtimeArgv: [dir], clearRequireCache: '../teardown' })
   t.teardown(teardown)
 
   const pipe = Pear.run(dir)
@@ -689,7 +689,7 @@ test('Pear.teardown run wait', { skip: isWindows }, async function (t) {
 
   const dir = path.join(dirname, 'fixtures', 'run-teardown-wait')
 
-  const teardown = Helper.rig({ runtimeArgv: [dir] })
+  const teardown = Helper.rig({ runtimeArgv: [dir], clearRequireCache: '../teardown' })
   t.teardown(teardown)
 
   const pipe = Pear.run(dir)
@@ -703,7 +703,7 @@ test('Pear.teardown throw error', { skip: isWindows }, async function (t) {
 
   const dir = path.join(dirname, 'fixtures', 'run-teardown-error')
 
-  const teardown = Helper.rig({ runtimeArgv: [dir] })
+  const teardown = Helper.rig({ runtimeArgv: [dir], clearRequireCache: '../teardown' })
   t.teardown(teardown)
 
   const pipe = Pear.run(dir)
