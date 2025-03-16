@@ -10,6 +10,8 @@ const Helper = require('./helper')
 const dirname = __dirname
 
 test('crasher uncaught exception', async function (t) {
+  t.plan(2)
+
   const dir = path.join(dirname, 'fixtures', 'crasher-uncaught-exception')
 
   const teardown = Helper.rig({ runtimeArgv: [dir] })
@@ -39,6 +41,8 @@ test('crasher uncaught exception', async function (t) {
 })
 
 test('crasher unhandled rejection', async function (t) {
+  t.plan(2)
+
   const dir = path.join(dirname, 'fixtures', 'crasher-unhandled-rejection')
 
   const teardown = Helper.rig({ runtimeArgv: [dir] })
