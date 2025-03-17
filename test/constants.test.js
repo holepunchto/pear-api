@@ -84,11 +84,7 @@ test('constants with MOUNT starting with c:/', async function (t) {
   t.teardown(teardown)
 
   const constants = require('../constants')
-  if (isWindows) {
-    t.ok(constants.MOUNT === pathToFileURL('c:/custom/mount').href)
-  } else {
-    t.ok(constants.MOUNT === 'file:///c:/custom/mount')
-  }
+  t.ok(constants.MOUNT === 'file:///c:/custom/mount')
 })
 
 test('constants with MOUNT starting with c:\\', async function (t) {
@@ -114,11 +110,7 @@ test('constants with MOUNT starting with c:\\', async function (t) {
   t.teardown(teardown)
 
   const constants = require('../constants')
-  if (isWindows) {
-    t.ok(constants.MOUNT === pathToFileURL('c:/custom/mount').href)
-  } else {
-    t.ok(constants.MOUNT === 'file:///c:/custom/mount')
-  }
+  t.ok(constants.MOUNT === 'file:///c:/custom/mount')
 })
 
 test('constants with MOUNT starting with file:', async function (t) {
