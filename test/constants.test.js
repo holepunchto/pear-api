@@ -61,7 +61,7 @@ test('constants with default MOUNT', async function (t) {
   t.ok(constants.MOUNT === pathToFileURL(dirname).href)
 })
 
-test('constants with MOUNT starting with c:', async function (t) {
+test('constants with MOUNT starting with c:/', async function (t) {
   t.plan(1)
 
   const rig = () => {
@@ -69,6 +69,36 @@ test('constants with MOUNT starting with c:', async function (t) {
 
     class RigAPI {
       static RTI = { checkout: { key: dirname, length: null, fork: null }, mount: 'c:/custom/mount' }
+    }
+    global.Pear = new RigAPI()
+
+    return {
+      teardown: () => {
+        delete require.cache[pathToFileURL(require.resolve('../constants'))]
+        global.Pear = null
+      }
+    }
+  }
+
+  const { teardown } = rig()
+  t.teardown(teardown)
+
+  const constants = require('../constants')
+  if (isWindows) {
+    t.ok(constants.MOUNT === pathToFileURL('c:/custom/mount').href)
+  } else {
+    t.ok(constants.MOUNT === 'file:///c:/custom/mount')
+  }
+})
+
+test('constants with MOUNT starting with c:\\', async function (t) {
+  t.plan(1)
+
+  const rig = () => {
+    if (global.Pear !== null) throw Error(`Prior Pear global not cleaned up: ${global.Pear}`)
+
+    class RigAPI {
+      static RTI = { checkout: { key: dirname, length: null, fork: null }, mount: 'c:\\custom\\mount' }
     }
     global.Pear = new RigAPI()
 
