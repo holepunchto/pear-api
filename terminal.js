@@ -196,10 +196,10 @@ function indicator (value, type = 'success') {
 const outputter = (cmd, taggers = {}) => (opts, stream, info = {}, ipc) => {
   if (Array.isArray(stream)) stream = Readable.from(stream)
   if (isTTY) stdio.out.write(ansi.hideCursor())
-  const dereg = teardown(() => {
-    if (!isWindows && isTTY) stdio.out.write('\x1B[1K\x1B[G' + statusFrag) // clear ^C
-    if (isTTY) stdio.out.write(ansi.showCursor())
-  })
+  const dereg = isTTY ? teardown(() => {
+    if (!isWindows) stdio.out.write('\x1B[1K\x1B[G' + statusFrag) // clear ^C
+    stdio.out.write(ansi.showCursor())
+  }) : null
   if (typeof opts === 'boolean') opts = { json: opts }
   const { json = false, log } = opts
   return new Promise((resolve, reject) => {
@@ -239,7 +239,8 @@ const outputter = (cmd, taggers = {}) => (opts, stream, info = {}, ipc) => {
       }, reject)
     })
   }).finally(() => {
-    if (isTTY) stdio.out.write(ansi.showCursor())
+    if (!isTTY) return
+    stdio.out.write(ansi.showCursor())
     dereg()
   })
 }
