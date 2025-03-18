@@ -195,10 +195,10 @@ function indicator (value, type = 'success') {
 
 const outputter = (cmd, taggers = {}) => (opts, stream, info = {}, ipc) => {
   if (Array.isArray(stream)) stream = Readable.from(stream)
-  stdio.out.write(ansi.hideCursor())
+  if (isTTY) stdio.out.write(ansi.hideCursor())
   const dereg = teardown(() => {
     if (!isWindows && isTTY) stdio.out.write('\x1B[1K\x1B[G' + statusFrag) // clear ^C
-    stdio.out.write(ansi.showCursor())
+    if (isTTY) stdio.out.write(ansi.showCursor())
   })
   if (typeof opts === 'boolean') opts = { json: opts }
   const { json = false, log } = opts
@@ -239,7 +239,7 @@ const outputter = (cmd, taggers = {}) => (opts, stream, info = {}, ipc) => {
       }, reject)
     })
   }).finally(() => {
-    stdio.out.write(ansi.showCursor())
+    if (isTTY) stdio.out.write(ansi.showCursor())
     dereg()
   })
 }
