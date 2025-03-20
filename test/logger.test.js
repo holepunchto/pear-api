@@ -188,3 +188,63 @@ test('logger with multiple labels', async function (t) {
   t.is(consoleLogCount, 1, 'console.log called once for matching labels')
   t.is(consoleErrorCount, 1, 'console.error called once for matching labels')
 })
+
+test('Logger constructor with default switches', async function (t) {
+  t.plan(2)
+
+  const Logger = require('../logger')
+
+  let consoleLogCount = 0
+  console.log = () => { consoleLogCount += 1 }
+  t.teardown(() => { console.log = consoleLogOrigin })
+
+  let consoleErrorCount = 0
+  console.error = () => { consoleErrorCount += 1 }
+  t.teardown(() => { console.error = consoleErrorOrigin })
+
+  const logger = new Logger()
+  try {
+    logger.error('label-test', 'error')
+    logger.info('label-test', 'info')
+    logger.trace('label-test', 'trace')
+  } finally {
+    console.log = consoleLogOrigin
+    console.error = consoleErrorOrigin
+  }
+
+  t.is(consoleLogCount, 0, 'console.log not called')
+  t.is(consoleErrorCount, 0, 'console.error not called')
+})
+
+test('Logger constructor with custom switches', async function (t) {
+  t.plan(2)
+
+  const Logger = require('../logger')
+
+  Logger.switches = {
+    ...Logger.switches,
+    level: Logger.ERR,
+    labels: ['label-test']
+  }
+
+  let consoleLogCount = 0
+  console.log = () => { consoleLogCount += 1 }
+  t.teardown(() => { console.log = consoleLogOrigin })
+
+  let consoleErrorCount = 0
+  console.error = () => { consoleErrorCount += 1 }
+  t.teardown(() => { console.error = consoleErrorOrigin })
+
+  const logger = new Logger()
+  try {
+    logger.error('label-test', 'error')
+    logger.info('label-test', 'info')
+    logger.trace('label-test', 'trace')
+  } finally {
+    console.log = consoleLogOrigin
+    console.error = consoleErrorOrigin
+  }
+
+  t.is(consoleLogCount, 0, 'console.log not called')
+  t.is(consoleErrorCount, 1, 'console.error called once')
+})
