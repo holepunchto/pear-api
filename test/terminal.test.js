@@ -3,6 +3,7 @@
 const { test } = require('brittle')
 const { isWindows } = require('which-runtime')
 const { pathToFileURL } = require('url-file-url')
+const hypercoreid = require('hypercore-id-encoding')
 
 const dirname = __dirname
 global.Pear = null
@@ -286,4 +287,112 @@ test('confirm function with invalid input', async function (t) {
   } catch {
     t.ok(output.includes('Invalid input'), 'confirm should reject invalid input')
   }
+})
+
+test('permit function with unencrypted key', async function (t) {
+  t.plan(3)
+
+  const { teardown } = rig()
+  t.teardown(teardown)
+
+  const { ansi, permit } = require('../terminal')
+
+  const mockCreateInterface = () => ({
+    _prompt: '',
+    once: (event, callback) => {
+      if (event === 'data') {
+        setTimeout(() => callback(Buffer.from('TRUST\n')), 10)
+      }
+    },
+    on: () => {},
+    off: () => {},
+    input: { setMode: () => {} },
+    close: () => {}
+  })
+  const originalCreateInterface = require.cache[pathToFileURL(require.resolve('bare-readline'))].exports.createInterface
+  require.cache[pathToFileURL(require.resolve('bare-readline'))].exports.createInterface = mockCreateInterface
+  t.teardown(() => { require.cache[pathToFileURL(require.resolve('bare-readline'))].exports.createInterface = originalCreateInterface })
+
+  const originalBareExit = Bare.exit
+  Bare.exit = () => {}
+  t.teardown(() => { Bare.exit = originalBareExit })
+
+  let output = ''
+  const originalConsoleLog = console.log
+  console.log = (str) => { output += str }
+  t.teardown(() => { console.log = originalConsoleLog })
+
+  const mockKey = hypercoreid.decode('d47c1dfecec0f74a067985d2f8d7d9ad15f9ae5ff648f7bc6ca28e41d70ed221')
+  const mockIpc = {
+    permit: async ({ key }) => {
+      t.is(key, mockKey, 'permit should call ipc.permit with the correct key')
+    },
+    close: async () => {
+      t.pass('ipc.close should be called')
+    }
+  }
+  const mockInfo = { key: mockKey, encrypted: false }
+  const mockCmd = 'run'
+
+  await permit(mockIpc, mockInfo, mockCmd)
+  t.ok(output.includes(`${ansi.tick} pear://${hypercoreid.encode(mockKey)} is now trusted`), 'permit should print trust confirmation message')
+})
+
+test('permit function with encrypted key', async function (t) {
+  t.plan(4)
+
+  const { teardown } = rig()
+  t.teardown(teardown)
+
+  const { ansi, permit } = require('../terminal')
+
+  const mockPassword = 'MYPASSWORD'
+
+  const mockCreateInterface = () => ({
+    _prompt: '',
+    once: (event, callback) => {
+      if (event === 'data') {
+        setTimeout(() => callback(Buffer.from(`${mockPassword}\n`)), 10)
+      }
+    },
+    on: () => {},
+    off: () => {},
+    input: { setMode: () => {} },
+    close: () => {}
+  })
+  const originalCreateInterface = require.cache[pathToFileURL(require.resolve('bare-readline'))].exports.createInterface
+  require.cache[pathToFileURL(require.resolve('bare-readline'))].exports.createInterface = mockCreateInterface
+  t.teardown(() => { require.cache[pathToFileURL(require.resolve('bare-readline'))].exports.createInterface = originalCreateInterface })
+
+  const originalBareExit = Bare.exit
+  Bare.exit = () => {}
+  t.teardown(() => { Bare.exit = originalBareExit })
+
+  let output = ''
+  const originalConsoleLog = console.log
+  console.log = (str) => { output += str }
+  t.teardown(() => { console.log = originalConsoleLog })
+
+  const mockKey = hypercoreid.decode('d47c1dfecec0f74a067985d2f8d7d9ad15f9ae5ff648f7bc6ca28e41d70ed221')
+  const mockIpc = {
+    permit: async ({ key, password }) => {
+      t.is(key, mockKey, 'permit should call ipc.permit with the correct key')
+      t.is(password, mockPassword, 'permit should call ipc.permit with the correct password')
+    },
+    close: async () => {
+      t.pass('ipc.close should be called')
+    }
+  }
+  const mockInfo = { key: mockKey, encrypted: true }
+  const mockCmd = 'run'
+  const mockInteract = {
+    run: async () => ({ value: mockPassword })
+  }
+
+  const originalInteract = require.cache[pathToFileURL(require.resolve('../terminal'))].exports.Interact
+  require.cache[pathToFileURL(require.resolve('../terminal'))].exports.Interact = function () { return mockInteract }
+  t.teardown(() => { require.cache[pathToFileURL(require.resolve('../terminal'))].exports.Interact = originalInteract })
+
+  await permit(mockIpc, mockInfo, mockCmd)
+  t.ok(output.includes(`${ansi.tick} Added encryption key for pear://${hypercoreid.encode(mockKey)}`), 'permit should print encryption confirmation message')
 })
