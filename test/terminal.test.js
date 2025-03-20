@@ -8,7 +8,7 @@ const dirname = __dirname
 global.Pear = null
 
 const BARE_READLINE_URL = pathToFileURL(require.resolve('bare-readline'))
-const TERMINAL_URL = pathToFileURL(require('../terminal'))
+const TERMINAL_URL = pathToFileURL(require.resolve('../terminal'))
 
 const rig = () => {
   if (global.Pear !== null) throw Error(`Prior Pear global not cleaned up: ${global.Pear}`)
