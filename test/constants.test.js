@@ -32,9 +32,9 @@ test('constants with CHECKOUT', async function (t) {
   t.teardown(teardown)
 
   const constants = require('../constants')
-  t.ok(constants.CHECKOUT.key === dirname)
-  t.ok(constants.CHECKOUT.length === null)
-  t.ok(constants.CHECKOUT.fork === null)
+  t.is(constants.CHECKOUT.key, dirname)
+  t.is(constants.CHECKOUT.length, null)
+  t.is(constants.CHECKOUT.fork, null)
 })
 
 test('constants with default MOUNT', async function (t) {
@@ -60,7 +60,7 @@ test('constants with default MOUNT', async function (t) {
   t.teardown(teardown)
 
   const constants = require('../constants')
-  t.ok(constants.MOUNT === pathToFileURL(dirname).href)
+  t.is(constants.MOUNT, pathToFileURL(dirname).href)
 })
 
 test('constants with MOUNT starting with c:/', async function (t) {
@@ -86,7 +86,7 @@ test('constants with MOUNT starting with c:/', async function (t) {
   t.teardown(teardown)
 
   const constants = require('../constants')
-  t.ok(constants.MOUNT === 'file:///c:/custom/mount')
+  t.is(constants.MOUNT, 'file:///c:/custom/mount')
 })
 
 test('constants with MOUNT starting with c:\\', async function (t) {
@@ -112,7 +112,7 @@ test('constants with MOUNT starting with c:\\', async function (t) {
   t.teardown(teardown)
 
   const constants = require('../constants')
-  t.ok(constants.MOUNT === 'file:///c:/custom/mount')
+  t.is(constants.MOUNT, 'file:///c:/custom/mount')
 })
 
 test('constants with MOUNT starting with file:', async function (t) {
@@ -142,7 +142,7 @@ test('constants with MOUNT starting with file:', async function (t) {
     return
   }
   const constants = require('../constants')
-  t.ok(constants.MOUNT === 'file:///custom/mount')
+  t.is(constants.MOUNT, 'file:///custom/mount')
 })
 
 test('constants with MOUNT starting with ./', async function (t) {
@@ -172,7 +172,7 @@ test('constants with MOUNT starting with ./', async function (t) {
     return
   }
   const constants = require('../constants')
-  t.ok(constants.MOUNT === 'file:///custom/mount')
+  t.is(constants.MOUNT, 'file:///custom/mount')
 })
 
 test('constants with MOUNT starting with ../', async function (t) {
@@ -202,7 +202,7 @@ test('constants with MOUNT starting with ../', async function (t) {
     return
   }
   const constants = require('../constants')
-  t.ok(constants.MOUNT === 'file:///custom/mount')
+  t.is(constants.MOUNT, 'file:///custom/mount')
 })
 
 test('constants with MOUNT starting with /', async function (t) {
@@ -233,7 +233,7 @@ test('constants with MOUNT starting with /', async function (t) {
   }
 
   const constants = require('../constants')
-  t.ok(constants.MOUNT === 'file:///custom/mount')
+  t.is(constants.MOUNT, 'file:///custom/mount')
 })
 
 test('constants with MOUNT starting with pear://', async function (t) {

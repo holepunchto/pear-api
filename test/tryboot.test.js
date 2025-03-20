@@ -36,11 +36,11 @@ test('tryboot default', async function (t) {
   const res = await spawnCalled
 
   const constants = require('../constants')
-  t.ok(res.cmd === constants.RUNTIME, 'spawn called with RUNTIME')
+  t.is(res.cmd, constants.RUNTIME, 'spawn called with RUNTIME')
   t.ok(res.args.includes('--sidecar'), 'spawn called with --sidecar')
   t.ok(res.options.detached, 'spawn called with detached')
-  t.ok(res.options.stdio === 'ignore', 'spawn called with stdio ignore')
-  t.ok(res.options.cwd === constants.PLATFORM_DIR, 'spawn called with cwd PLATFORM')
+  t.is(res.options.stdio, 'ignore', 'spawn called with stdio ignore')
+  t.is(res.options.cwd, constants.PLATFORM_DIR, 'spawn called with cwd PLATFORM')
 })
 
 test('tryboot with --dht-bootstrap flag', async function (t) {
@@ -60,7 +60,7 @@ test('tryboot with --dht-bootstrap flag', async function (t) {
   t.ok(res.args.includes('--dht-bootstrap'), 'spawn called with --dht-bootstrap')
   t.ok(res.args.includes('bootstrap-value'), 'spawn called with correct bootstrap value')
   t.ok(res.options.detached, 'spawn called with detached')
-  t.ok(res.options.stdio === 'ignore', 'spawn called with stdio ignore')
+  t.is(res.options.stdio, 'ignore', 'spawn called with stdio ignore')
 
   await Helper.untilClose(pipe)
 })
@@ -96,12 +96,12 @@ test('tryboot with --log flag', async function (t) {
   const res = await spawnCalled
 
   const constants = require('../constants')
-  t.ok(res.cmd === constants.RUNTIME, 'spawn called with RUNTIME')
+  t.is(res.cmd, constants.RUNTIME, 'spawn called with RUNTIME')
   t.ok(res.args.includes('--sidecar'), 'spawn called with --sidecar')
   t.ok(res.args.includes('--log'), 'spawn called with --log')
-  t.ok(res.options.detached === false, 'spawn called with detached')
-  t.ok(res.options.stdio === 'inherit', 'spawn called with stdio ignore')
-  t.ok(res.options.cwd === constants.PLATFORM_DIR, 'spawn called with cwd PLATFORM')
+  t.is(res.options.detached, false, 'spawn called with detached')
+  t.is(res.options.stdio, 'inherit', 'spawn called with stdio ignore')
+  t.is(res.options.cwd, constants.PLATFORM_DIR, 'spawn called with cwd PLATFORM')
 })
 
 test('tryboot with --log-level and --log-fields flags', async function (t) {
@@ -140,7 +140,7 @@ test('tryboot with --log-level and --log-fields flags', async function (t) {
   const res = await spawnCalled
 
   const constants = require('../constants')
-  t.ok(res.cmd === constants.RUNTIME, 'spawn called with RUNTIME')
+  t.is(res.cmd, constants.RUNTIME, 'spawn called with RUNTIME')
   t.ok(res.args.includes('--sidecar'), 'spawn called with --sidecar')
   t.ok(res.args.includes('--log-level'), 'spawn called with --log-level')
   t.ok(res.args.includes(Logger.ERR), 'spawn called with correct log-level value')
@@ -183,12 +183,12 @@ test('tryboot with --log-labels flag', async function (t) {
   const res = await spawnCalled
 
   const constants = require('../constants')
-  t.ok(res.cmd === constants.RUNTIME, 'spawn called with RUNTIME')
+  t.is(res.cmd, constants.RUNTIME, 'spawn called with RUNTIME')
   t.ok(res.args.includes('--sidecar'), 'spawn called with --sidecar')
   t.ok(res.args.includes('--log-labels'), 'spawn called with --log-labels')
   t.ok(res.args.includes('label1,label2'), 'spawn called with correct log-labels value')
-  t.ok(res.options.detached === false, 'spawn called with detached')
-  t.ok(res.options.stdio === 'inherit', 'spawn called with stdio inherit')
+  t.is(res.options.detached, false, 'spawn called with detached')
+  t.is(res.options.stdio, 'inherit', 'spawn called with stdio inherit')
 })
 
 test('tryboot with --log-stacks flag', async function (t) {
@@ -226,9 +226,9 @@ test('tryboot with --log-stacks flag', async function (t) {
   const res = await spawnCalled
 
   const constants = require('../constants')
-  t.ok(res.cmd === constants.RUNTIME, 'spawn called with RUNTIME')
+  t.is(res.cmd, constants.RUNTIME, 'spawn called with RUNTIME')
   t.ok(res.args.includes('--sidecar'), 'spawn called with --sidecar')
   t.ok(res.args.includes('--log-stacks'), 'spawn called with --log-stacks')
   t.ok(res.options.detached, 'spawn called with detached')
-  t.ok(res.options.stdio === 'ignore', 'spawn called with stdio ignore')
+  t.is(res.options.stdio, 'ignore', 'spawn called with stdio ignore')
 })

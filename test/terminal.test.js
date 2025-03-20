@@ -223,7 +223,7 @@ test('permit function with unencrypted key', async function (t) {
   t.ok(output.includes(`${ansi.tick} pear://${hypercoreid.encode(mockKey)} is now trusted`), 'permit should print trust confirmation message')
 
   const exitedRes = await exited
-  t.ok(exitedRes === true, 'Pear.exit ok')
+  t.is(exitedRes, true, 'Pear.exit ok')
 })
 
 test('permit function with encrypted key', async function (t) {
@@ -285,5 +285,5 @@ test('permit function with encrypted key', async function (t) {
   t.ok(output.includes(`${ansi.tick} Added encryption key for pear://${hypercoreid.encode(mockKey)}`), 'permit should print encryption confirmation message')
 
   const exitedRes = await exited
-  t.ok(exitedRes === true, 'Pear.exit ok')
+  t.is(exitedRes, true, 'Pear.exit ok')
 })

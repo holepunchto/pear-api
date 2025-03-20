@@ -27,13 +27,13 @@ test('parse-link file:///some/path/to/a/file.js', async function (t) {
   const parseLink = require('../parse-link')
 
   const res = parseLink('file:///some/path/to/a/file.js')
-  t.ok(res.protocol === 'file:')
-  t.ok(res.pathname === '/some/path/to/a/file.js')
-  t.ok(res.hash === '')
-  t.ok(res.drive.key === null)
-  t.ok(res.drive.length === null)
-  t.ok(res.drive.fork === null)
-  t.ok(res.drive.hash === null)
+  t.is(res.protocol, 'file:')
+  t.is(res.pathname, '/some/path/to/a/file.js')
+  t.is(res.hash, '')
+  t.is(res.drive.key, null)
+  t.is(res.drive.length, null)
+  t.is(res.drive.fork, null)
+  t.is(res.drive.hash, null)
 })
 
 test('parse-link pear://key', async function (t) {
@@ -46,14 +46,14 @@ test('parse-link pear://key', async function (t) {
 
   const key = 'd47c1dfecec0f74a067985d2f8d7d9ad15f9ae5ff648f7bc6ca28e41d70ed221'
   const res = parseLink(`pear://${key}`)
-  t.ok(res.protocol === 'pear:')
-  t.ok(res.pathname === '')
-  t.ok(res.hash === '')
-  t.ok(res.drive.key.toString('hex') === key)
-  t.ok(res.drive.length === 0)
-  t.ok(res.drive.fork === null)
-  t.ok(res.drive.hash === null)
-  t.ok(res.drive.alias === null)
+  t.is(res.protocol, 'pear:')
+  t.is(res.pathname, '')
+  t.is(res.hash, '')
+  t.is(res.drive.key.toString('hex'), key)
+  t.is(res.drive.length, 0)
+  t.is(res.drive.fork, null)
+  t.is(res.drive.hash, null)
+  t.is(res.drive.alias, null)
 })
 
 test('parse-link alias pear://alias', async function (t) {
@@ -68,14 +68,14 @@ test('parse-link alias pear://alias', async function (t) {
   const aliases = ['keet', 'runtime', 'doctor']
   for (const alias of aliases) {
     const res = parseLink(`pear://${alias}`)
-    t.ok(res.protocol === 'pear:')
-    t.ok(res.pathname === '')
-    t.ok(res.hash === '')
-    t.ok(res.drive.key === constants.ALIASES[alias])
-    t.ok(res.drive.length === 0)
-    t.ok(res.drive.fork === null)
-    t.ok(res.drive.hash === null)
-    t.ok(res.drive.alias === alias)
+    t.is(res.protocol, 'pear:')
+    t.is(res.pathname, '')
+    t.is(res.hash, '')
+    t.is(res.drive.key, constants.ALIASES[alias])
+    t.is(res.drive.length, 0)
+    t.is(res.drive.fork, null)
+    t.is(res.drive.hash, null)
+    t.is(res.drive.alias, alias)
   }
 })
 
@@ -89,14 +89,14 @@ test('parse-link pear://fork.length.key', async function (t) {
 
   const key = 'd47c1dfecec0f74a067985d2f8d7d9ad15f9ae5ff648f7bc6ca28e41d70ed221'
   const res = parseLink(`pear://123.456.${key}`)
-  t.ok(res.protocol === 'pear:')
-  t.ok(res.pathname === '')
-  t.ok(res.hash === '')
-  t.ok(res.drive.key.toString('hex') === key)
-  t.ok(res.drive.length === 456)
-  t.ok(res.drive.fork === 123)
-  t.ok(res.drive.hash === null)
-  t.ok(res.drive.alias === null)
+  t.is(res.protocol, 'pear:')
+  t.is(res.pathname, '')
+  t.is(res.hash, '')
+  t.is(res.drive.key.toString('hex'), key)
+  t.is(res.drive.length, 456)
+  t.is(res.drive.fork, 123)
+  t.is(res.drive.hash, null)
+  t.is(res.drive.alias, null)
 })
 
 test('parse-link alias pear://fork.length.alias', async function (t) {
@@ -111,14 +111,14 @@ test('parse-link alias pear://fork.length.alias', async function (t) {
   const aliases = ['keet', 'runtime', 'doctor']
   for (const alias of aliases) {
     const res = parseLink(`pear://123.456.${alias}`)
-    t.ok(res.protocol === 'pear:')
-    t.ok(res.pathname === '')
-    t.ok(res.hash === '')
-    t.ok(res.drive.key === constants.ALIASES[alias])
-    t.ok(res.drive.length === 456)
-    t.ok(res.drive.fork === 123)
-    t.ok(res.drive.hash === null)
-    t.ok(res.drive.alias === alias)
+    t.is(res.protocol, 'pear:')
+    t.is(res.pathname, '')
+    t.is(res.hash, '')
+    t.is(res.drive.key, constants.ALIASES[alias])
+    t.is(res.drive.length, 456)
+    t.is(res.drive.fork, 123)
+    t.is(res.drive.hash, null)
+    t.is(res.drive.alias, alias)
   }
 })
 
@@ -133,14 +133,14 @@ test('parse-link pear://fork.length.key.dhash', async function (t) {
   const key = 'd47c1dfecec0f74a067985d2f8d7d9ad15f9ae5ff648f7bc6ca28e41d70ed221'
   const dhash = '38d8296e972167f4ad37803999fbcac17025271162f44dcdce1188d4bc5bac1d'
   const res = parseLink(`pear://123.456.${key}.${dhash}`)
-  t.ok(res.protocol === 'pear:')
-  t.ok(res.pathname === '')
-  t.ok(res.hash === '')
-  t.ok(res.drive.key.toString('hex') === key)
-  t.ok(res.drive.length === 456)
-  t.ok(res.drive.fork === 123)
-  t.ok(res.drive.hash.toString('hex') === dhash)
-  t.ok(res.drive.alias === null)
+  t.is(res.protocol, 'pear:')
+  t.is(res.pathname, '')
+  t.is(res.hash, '')
+  t.is(res.drive.key.toString('hex'), key)
+  t.is(res.drive.length, 456)
+  t.is(res.drive.fork, 123)
+  t.is(res.drive.hash.toString('hex'), dhash)
+  t.is(res.drive.alias, null)
 })
 
 test('parse-link incorrect hostname', async function (t) {

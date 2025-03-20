@@ -40,7 +40,7 @@ test('state constructor handles missing package.json gracefully', async function
   const State = require('../state')
   const state = new State({ dir: '/nonexistent/dir', flags: {} })
 
-  t.ok(state.manifest === null, 'manifest should be null when package.json is missing')
+  t.is(state.manifest, null, 'manifest should be null when package.json is missing')
 })
 
 test('state constructor sets NODE_ENV to production in stage mode', async function (t) {
@@ -76,7 +76,7 @@ test('state constructor handles invalid flags gracefully', async function (t) {
   const State = require('../state')
   const state = new State({ flags: { invalidFlag: true } })
 
-  t.ok(state.flags.invalidFlag === true, 'invalid flags should be preserved in state')
+  t.is(state.flags.invalidFlag, true, 'invalid flags should be preserved in state')
 })
 
 test('state update method merges new state properties', async function (t) {
@@ -89,7 +89,7 @@ test('state update method merges new state properties', async function (t) {
   const state = new State({ flags: {} })
   state.update({ newProp: 'newValue' })
 
-  t.ok(state.newProp === 'newValue', 'new property should be added to state')
+  t.is(state.newProp, 'newValue', 'new property should be added to state')
   t.ok(state.flags !== undefined, 'existing properties should not be removed')
 })
 

@@ -19,7 +19,7 @@ test('transform sync', async function (t) {
 
   const locals = { name: 'world', version: 'v.1.2.3', url: 'https://docs.pears.com/' }
   const res = transform.sync(template, locals)
-  t.ok(res === final)
+  t.is(res, final)
 })
 
 test('transform stream', async function (t) {
@@ -41,5 +41,5 @@ test('transform stream', async function (t) {
   })
   await new Promise((resolve) => stream.on('end', resolve))
 
-  t.ok(res === final)
+  t.is(res, final)
 })

@@ -109,7 +109,7 @@ test('Pear.messages multi clients', async function (t) {
   await Pear.message({ hello: 'world', msg: 'pear1' })
 
   const msg = await Helper.untilResult(pipe)
-  t.ok(msg === 'pear1', 'message received')
+  t.is(msg, 'pear1', 'message received')
 
   await Helper.untilClose(stream)
   await Helper.untilClose(pipe)
@@ -180,7 +180,7 @@ test('Pear.messages with no pattern', async function (t) {
   await Pear.message({ hello: 'world' })
 
   const msg = await received
-  t.ok(msg.hello === 'world', 'message received')
+  t.is(msg.hello, 'world', 'message received')
   t.ok(typeof msg.time === 'number' && msg.time <= Date.now(), 'message has time')
 
   await Helper.untilClose(stream)
@@ -207,14 +207,14 @@ test('Pear.checkpoint returns', async function (t) {
   const teardown = Helper.rig({ ipc, state })
   t.teardown(teardown)
 
-  t.ok(Pear.config.hello === 'world', 'Pear.config is set')
+  t.is(Pear.config.hello, 'world', 'Pear.config is set')
 
   const cp = await Pear.checkpoint({ magic: 'trick' })
-  t.ok(cp.magic === 'trick', 'checkpoint returned')
+  t.is(cp.magic, 'trick', 'checkpoint returned')
   t.ok(typeof cp.time === 'number' && cp.time <= Date.now(), 'checkpoint has time')
 
-  t.ok(Pear.config.hello === 'world', 'Pear.config is still set')
-  t.ok(Pear.config.checkpoint.magic === 'trick', 'Pear.config is updated')
+  t.is(Pear.config.hello, 'world', 'Pear.config is still set')
+  t.is(Pear.config.checkpoint.magic, 'trick', 'Pear.config is updated')
 })
 
 //
@@ -236,7 +236,7 @@ test('Pear.versions returns', async function (t) {
   t.teardown(teardown)
 
   const ver = await Pear.versions()
-  t.ok(ver.hello === 'world', 'versions returned')
+  t.is(ver.hello, 'world', 'versions returned')
   t.ok(typeof ver.time === 'number' && ver.time <= Date.now(), 'versions has time')
 })
 
@@ -386,8 +386,8 @@ test('Pear.get returns', async function (t) {
   t.teardown(teardown)
 
   const res = await Pear.get('hello', { magic: 'trick' })
-  t.ok(res.key === 'hello', 'get returned')
-  t.ok(res.magic === 'trick', 'get has data')
+  t.is(res.key, 'hello', 'get returned')
+  t.is(res.magic, 'trick', 'get has data')
   t.ok(typeof res.time === 'number' && res.time <= Date.now(), 'versions has time')
 })
 
@@ -410,7 +410,7 @@ test('Pear.exists returns', async function (t) {
   t.teardown(teardown)
 
   const res = await Pear.exists('hello')
-  t.ok(res.key === 'hello', 'exists returned')
+  t.is(res.key, 'hello', 'exists returned')
   t.ok(typeof res.time === 'number' && res.time <= Date.now(), 'versions has time')
 })
 
@@ -433,9 +433,9 @@ test('Pear.compare returns', async function (t) {
   t.teardown(teardown)
 
   const res = await Pear.compare('hello', 'world')
-  t.ok(res.keyA === 'hello', 'compare returned keyA')
-  t.ok(res.keyB === 'world', 'compare returned keyB')
-  t.ok(res.check === false, 'compare returned check')
+  t.is(res.keyA, 'hello', 'compare returned keyA')
+  t.is(res.keyB, 'world', 'compare returned keyB')
+  t.is(res.check, false, 'compare returned check')
   t.ok(typeof res.time === 'number' && res.time <= Date.now(), 'compare has time')
 })
 
@@ -467,7 +467,7 @@ test('Pear.restart ok', async function (t) {
   t.teardown(teardown)
 
   const res = await Pear.restart({ hello: 'world' })
-  t.ok(res.hello === 'world', 'restart returned')
+  t.is(res.hello, 'world', 'restart returned')
   t.ok(typeof res.time === 'number' && res.time <= Date.now(), 'restart has time')
 })
 
@@ -553,8 +553,8 @@ test('Pear.updates trigger', async function (t) {
   await Pear.message({ type: 'pear/updates', hello: 'world' })
 
   const msg = await received
-  t.ok(msg.type === 'pear/updates', 'updates triggered')
-  t.ok(msg.hello === 'world', 'message received')
+  t.is(msg.type, 'pear/updates', 'updates triggered')
+  t.is(msg.hello, 'world', 'message received')
   t.ok(typeof msg.time === 'number' && msg.time <= Date.now(), 'message has time')
 
   await Helper.untilClose(stream)
@@ -604,8 +604,8 @@ test('Pear.wakeups trigger', async function (t) {
   await Pear.message({ type: 'pear/wakeup', hello: 'world' })
 
   const msg = await received
-  t.ok(msg.type === 'pear/wakeup', 'wakeups triggered')
-  t.ok(msg.hello === 'world', 'message received')
+  t.is(msg.type, 'pear/wakeup', 'wakeups triggered')
+  t.is(msg.hello, 'world', 'message received')
   t.ok(typeof msg.time === 'number' && msg.time <= Date.now(), 'message has time')
 
   await Helper.untilClose(stream)
@@ -729,5 +729,5 @@ test('Pear.exit', async function (t) {
   Pear.exit()
 
   const exitedRes = await exited
-  t.ok(exitedRes === true, 'Pear.exit ok')
+  t.is(exitedRes, true, 'Pear.exit ok')
 })
