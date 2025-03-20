@@ -290,7 +290,7 @@ test('confirm function with invalid input', async function (t) {
 })
 
 test('permit function with unencrypted key', async function (t) {
-  t.plan(3)
+  t.plan(4)
 
   const { teardown } = rig()
   t.teardown(teardown)
@@ -314,7 +314,7 @@ test('permit function with unencrypted key', async function (t) {
   t.teardown(() => { require.cache[pathToFileURL(require.resolve('bare-readline'))].exports.createInterface = originalCreateInterface })
 
   const originalBareExit = Bare.exit
-  Bare.exit = () => {}
+  const exited = new Promise((resolve) => { Bare.exit = () => resolve(true) })
   t.teardown(() => { Bare.exit = originalBareExit })
 
   let output = ''
@@ -336,10 +336,13 @@ test('permit function with unencrypted key', async function (t) {
 
   await permit(mockIpc, mockInfo, mockCmd)
   t.ok(output.includes(`${ansi.tick} pear://${hypercoreid.encode(mockKey)} is now trusted`), 'permit should print trust confirmation message')
+
+  const exitedRes = await exited
+  t.ok(exitedRes === true, 'Pear.exit ok')
 })
 
 test('permit function with encrypted key', async function (t) {
-  t.plan(4)
+  t.plan(5)
 
   const { teardown } = rig()
   t.teardown(teardown)
@@ -365,7 +368,7 @@ test('permit function with encrypted key', async function (t) {
   t.teardown(() => { require.cache[pathToFileURL(require.resolve('bare-readline'))].exports.createInterface = originalCreateInterface })
 
   const originalBareExit = Bare.exit
-  Bare.exit = () => {}
+  const exited = new Promise((resolve) => { Bare.exit = () => resolve(true) })
   t.teardown(() => { Bare.exit = originalBareExit })
 
   let output = ''
@@ -395,4 +398,7 @@ test('permit function with encrypted key', async function (t) {
 
   await permit(mockIpc, mockInfo, mockCmd)
   t.ok(output.includes(`${ansi.tick} Added encryption key for pear://${hypercoreid.encode(mockKey)}`), 'permit should print encryption confirmation message')
+
+  const exitedRes = await exited
+  t.ok(exitedRes === true, 'Pear.exit ok')
 })

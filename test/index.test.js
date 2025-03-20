@@ -711,3 +711,23 @@ test('Pear.teardown throw error', { skip: isWindows }, async function (t) {
   const td = await Helper.untilResult(pipe, { runFn: () => pipe.end() })
   t.is(td, 'teardown', 'teardown executed')
 })
+
+//
+// exit
+//
+
+test('Pear.exit', async function (t) {
+  t.plan(1)
+
+  const teardown = Helper.rig()
+  t.teardown(teardown)
+
+  const originalBareExit = Bare.exit
+  const exited = new Promise((resolve) => { Bare.exit = () => resolve(true) })
+  t.teardown(() => { Bare.exit = originalBareExit })
+
+  Pear.exit()
+
+  const exitedRes = await exited
+  t.ok(exitedRes === true, 'Pear.exit ok')
+})
