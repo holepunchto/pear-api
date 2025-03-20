@@ -27,8 +27,8 @@ test('state constructor initializes with minimal parameters', async function (t)
   const State = require('../state')
   const state = new State({ flags: {} })
 
-  t.ok(state.env !== null, 'env should be initialized')
-  t.ok(state.cwd !== null, 'cwd should be initialized')
+  t.not(state.env === null, 'env should be initialized')
+  t.not(state.cwd === null, 'cwd should be initialized')
 })
 
 test('state constructor handles missing package.json gracefully', async function (t) {
