@@ -17,7 +17,7 @@ class Logger {
   static INF = 2
   static TRC = 3
 
-  constructor ({ labels, fields, stacks, level, pretty } = {}) {
+  constructor ({ labels = '', fields, stacks, level, pretty } = {}) {
     this._fields = this._parseFields(fields)
     labels = this._parseLabels(labels)
       .concat(this._parseLabels(this.constructor.switches.labels))
