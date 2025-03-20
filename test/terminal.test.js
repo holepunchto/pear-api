@@ -2,6 +2,7 @@
 
 const { test } = require('brittle')
 const { isWindows } = require('which-runtime')
+const { pathToFileURL } = require('url-file-url')
 
 const dirname = __dirname
 global.Pear = null
@@ -201,4 +202,88 @@ test('print function', async function (t) {
   output = ''
   print('Test message')
   t.ok(output.includes('Test message'), 'print should print message without success indicator')
+})
+
+test('confirm function with valid input', async function (t) {
+  t.plan(1)
+
+  const { teardown } = rig()
+  t.teardown(teardown)
+
+  const { stdio, ansi, confirm } = require('../terminal')
+
+  const mockCreateInterface = () => ({
+    _prompt: '',
+    once: (event, callback) => {
+      if (event === 'data') {
+        setTimeout(() => callback(Buffer.from('YES\n')), 10)
+      }
+    },
+    on: () => {},
+    off: () => {},
+    input: { setMode: () => {} },
+    close: () => {}
+  })
+  const originalCreateInterface = require.cache[pathToFileURL(require.resolve('bare-readline'))].exports.createInterface
+  require.cache[pathToFileURL(require.resolve('bare-readline'))].exports.createInterface = mockCreateInterface
+  t.teardown(() => { require.cache[pathToFileURL(require.resolve('bare-readline'))].exports.createInterface = originalCreateInterface })
+
+  let output = ''
+  const originalWrite = stdio.out.write
+  stdio.out.write = (str) => { output += str }
+  t.teardown(() => { stdio.out.write = originalWrite })
+
+  const dialog = `${ansi.warning} Are you sure you want to proceed?`
+  const ask = 'Type YES to confirm'
+  const delim = ':'
+  const validation = (value) => value === 'YES'
+  const msg = 'Invalid input. Please type YES to confirm.'
+
+  await confirm(dialog, ask, delim, validation, msg)
+  t.ok(output.includes('YES'), 'confirm should accept valid input')
+})
+
+test('confirm function with invalid input', async function (t) {
+  t.plan(1)
+
+  const { teardown } = rig()
+  t.teardown(teardown)
+
+  const { stdio, ansi, confirm } = require('../terminal')
+
+  const mockCreateInterface = () => ({
+    _prompt: '',
+    once: (event, callback) => {
+      if (event === 'data') {
+        setTimeout(() => callback(Buffer.from('NO\n')), 10)
+      }
+    },
+    on: () => {},
+    off: () => {},
+    input: { setMode: () => {} },
+    close: () => {}
+  })
+  const originalCreateInterface = require.cache[pathToFileURL(require.resolve('bare-readline'))].exports.createInterface
+  require.cache[pathToFileURL(require.resolve('bare-readline'))].exports.createInterface = mockCreateInterface
+  t.teardown(() => { require.cache[pathToFileURL(require.resolve('bare-readline'))].exports.createInterface = originalCreateInterface })
+
+  let output = ''
+  const originalWrite = stdio.out.write
+  stdio.out.write = (str) => {
+    output += str
+    if (str.includes('Invalid input')) throw Error('Invalid input')
+  }
+  t.teardown(() => { stdio.out.write = originalWrite })
+
+  const dialog = `${ansi.warning} Are you sure you want to proceed?`
+  const ask = 'Type YES to confirm'
+  const delim = ':'
+  const validation = (value) => value === 'YES'
+  const msg = 'Invalid input. Please type YES to confirm.'
+
+  try {
+    await confirm(dialog, ask, delim, validation, msg)
+  } catch {
+    t.ok(output.includes('Invalid input'), 'confirm should reject invalid input')
+  }
 })
