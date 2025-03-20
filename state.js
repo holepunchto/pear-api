@@ -8,7 +8,7 @@ const hypercoreid = require('hypercore-id-encoding')
 const pearLink = require('pear-link')
 const z32 = require('z32')
 const crypto = require('hypercore-crypto')
-const { PLATFORM_DIR, SWAP, RUNTIME } = require('pear-api/constants')
+const { PLATFORM_DIR, SWAP, RUNTIME } = require('./constants')
 const CWD = isBare ? os.cwd() : process.cwd()
 const ENV = isBare ? require('bare-env') : process.env
 const parseLink = require('./parse-link')
@@ -166,8 +166,8 @@ module.exports = class State {
       this.env.NODE_ENV = this.env.NODE_ENV || 'production'
     }
     this.constructor.injestPackage(this, pkg, { links })
-    const invalidStorage = this.key === null && this.storage !== null 
-      && this.storage.startsWith(this.dir) && this.storage.includes(path.sep + 'pear' + path.sep + 'pear' + path.sep) === false
+    const invalidStorage = this.key === null && this.storage !== null &&
+      this.storage.startsWith(this.dir) && this.storage.includes(path.sep + 'pear' + path.sep + 'pear' + path.sep) === false
     if (invalidStorage) throw ERR_INVALID_APP_STORAGE('Application Storage may not be inside the project directory. --store "' + this.storage + '" is invalid')
     const invalidName = /^[@/a-z0-9-_]+$/.test(this.name) === false
     if (invalidName) throw ERR_INVALID_APP_NAME('The package.json name / pear.name field must be lowercase and one word, and may contain letters, numbers, hyphens (-), underscores (_), forward slashes (/) and asperands (@).')
