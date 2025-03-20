@@ -144,3 +144,88 @@ test('tryboot with --log-level and --log-fields flags', async function (t) {
   t.ok(res.args.includes('--log-fields'), 'spawn called with --log-fields')
   t.ok(res.args.includes('field1,field2'), 'spawn called with correct log-fields value')
 })
+
+test('tryboot with --log-labels flag', async function (t) {
+  t.plan(6)
+
+  const teardown = Helper.rig({ clearRequireCache: '../tryboot' })
+  t.teardown(teardown)
+
+  let resolve = () => {}
+  const spawnCalled = new Promise((_resolve) => {
+    resolve = _resolve
+  })
+  const childProcess = require('child_process')
+  const originalSpawn = childProcess.spawn
+  require.cache[pathToFileURL(require.resolve('child_process'))].exports.spawn = (cmd, args, options) => {
+    resolve({ cmd, args, options })
+    return { unref: () => {} }
+  }
+  t.teardown(() => { require.cache[pathToFileURL(require.resolve('child_process'))].exports.spawn = originalSpawn })
+
+  const pear = require('../cmd')
+  const originalPear = pear
+  require.cache[pathToFileURL(require.resolve('../cmd'))].exports = (argv) => {
+    return {
+      flags: {
+        logLabels: 'label1,label2'
+      }
+    }
+  }
+  t.teardown(() => { require.cache[pathToFileURL(require.resolve('../cmd'))].exports = originalPear })
+
+  const tryboot = require('../tryboot')
+  tryboot()
+
+  const res = await spawnCalled
+
+  const constants = require('../constants')
+  t.ok(res.cmd === constants.RUNTIME, 'spawn called with RUNTIME')
+  t.ok(res.args.includes('--sidecar'), 'spawn called with --sidecar')
+  t.ok(res.args.includes('--log-labels'), 'spawn called with --log-labels')
+  t.ok(res.args.includes('label1,label2'), 'spawn called with correct log-labels value')
+  t.ok(res.options.detached === false, 'spawn called with detached')
+  t.ok(res.options.stdio === 'inherit', 'spawn called with stdio inherit')
+})
+
+test('tryboot with --log-stacks flag', async function (t) {
+  t.plan(5)
+
+  const teardown = Helper.rig({ clearRequireCache: '../tryboot' })
+  t.teardown(teardown)
+
+  let resolve = () => {}
+  const spawnCalled = new Promise((_resolve) => {
+    resolve = _resolve
+  })
+  const childProcess = require('child_process')
+  const originalSpawn = childProcess.spawn
+  require.cache[pathToFileURL(require.resolve('child_process'))].exports.spawn = (cmd, args, options) => {
+    resolve({ cmd, args, options })
+    return { unref: () => {} }
+  }
+  t.teardown(() => { require.cache[pathToFileURL(require.resolve('child_process'))].exports.spawn = originalSpawn })
+
+  const pear = require('../cmd')
+  const originalPear = pear
+  require.cache[pathToFileURL(require.resolve('../cmd'))].exports = (argv) => {
+    return {
+      flags: {
+        logStacks: true
+      }
+    }
+  }
+  t.teardown(() => { require.cache[pathToFileURL(require.resolve('../cmd'))].exports = originalPear })
+
+  const tryboot = require('../tryboot')
+  tryboot()
+
+  const res = await spawnCalled
+
+  const constants = require('../constants')
+  t.ok(res.cmd === constants.RUNTIME, 'spawn called with RUNTIME')
+  t.ok(res.args.includes('--sidecar'), 'spawn called with --sidecar')
+  t.ok(res.args.includes('--log-stacks'), 'spawn called with --log-stacks')
+  t.ok(res.options.detached, 'spawn called with detached')
+  t.ok(res.options.stdio === 'ignore', 'spawn called with stdio ignore')
+})
