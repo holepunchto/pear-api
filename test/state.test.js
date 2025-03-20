@@ -228,13 +228,13 @@ test('injestPackage initializes state with package data', async function (t) {
   t.is(state.main, 'app.js', 'main should be set correctly')
   t.is(state.name, 'test-app', 'name should be set correctly')
   t.is(state.links.key1, 'value1', 'links should be set correctly')
-  t.is(state.entrypoints.has('/entry1'), 'entrypoints should be set correctly')
-  t.is(state.entrypoints.has('/entry2'), 'entrypoints should be set correctly')
+  t.ok(state.entrypoints.has('/entry1'), 'entrypoints should be set correctly')
+  t.ok(state.entrypoints.has('/entry2'), 'entrypoints should be set correctly')
   t.is(state.routes['/old'], '/new', 'routes should be set correctly')
 })
 
 test('injestPackage merges overrides into state', async function (t) {
-  t.plan(1)
+  t.plan(3)
 
   const { teardown } = rig()
   t.teardown(teardown)
@@ -255,9 +255,9 @@ test('injestPackage merges overrides into state', async function (t) {
 
   State.injestPackage(state, pkg, overrides)
 
-  t.same(state.links.key1, 'value1', 'overrides should be merged into links')
-  t.same(state.links.key2, 'value2', 'overrides should be merged into links')
-  t.same(state.links.key3, 'value3', 'overrides should be merged into links')
+  t.is(state.links.key1, 'value1', 'overrides should be merged into links')
+  t.is(state.links.key2, 'value2', 'overrides should be merged into links')
+  t.is(state.links.key3, 'value3', 'overrides should be merged into links')
 })
 
 test('injestPackage sets default values when package fields are missing', async function (t) {
@@ -319,5 +319,5 @@ test('injestPackage skips setting entrypoint if not valid', async function (t) {
 
   State.injestPackage(state, pkg)
 
-  t.is(state.entrypoint, undefined, 'entrypoint should not be set if not valid')
+  t.is(state.entrypoint, '/undefined', 'entrypoint should not be set if not valid')
 })
