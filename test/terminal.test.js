@@ -7,6 +7,9 @@ const hypercoreid = require('hypercore-id-encoding')
 const dirname = __dirname
 global.Pear = null
 
+const BARE_READLINE_URL = pathToFileURL(require.resolve('bare-readline'))
+const TERMINAL_URL = pathToFileURL(require('../terminal'))
+
 const rig = () => {
   if (global.Pear !== null) throw Error(`Prior Pear global not cleaned up: ${global.Pear}`)
 
@@ -107,9 +110,9 @@ test('confirm function with valid input', async function (t) {
     input: { setMode: () => {} },
     close: () => {}
   })
-  const originalCreateInterface = require.cache[pathToFileURL(require.resolve('bare-readline'))].exports.createInterface
-  require.cache[pathToFileURL(require.resolve('bare-readline'))].exports.createInterface = mockCreateInterface
-  t.teardown(() => { require.cache[pathToFileURL(require.resolve('bare-readline'))].exports.createInterface = originalCreateInterface })
+  const originalCreateInterface = require.cache[BARE_READLINE_URL].exports.createInterface
+  require.cache[BARE_READLINE_URL].exports.createInterface = mockCreateInterface
+  t.teardown(() => { require.cache[BARE_READLINE_URL].exports.createInterface = originalCreateInterface })
 
   let output = ''
   const originalWrite = stdio.out.write
@@ -146,9 +149,9 @@ test('confirm function with invalid input', async function (t) {
     input: { setMode: () => {} },
     close: () => {}
   })
-  const originalCreateInterface = require.cache[pathToFileURL(require.resolve('bare-readline'))].exports.createInterface
-  require.cache[pathToFileURL(require.resolve('bare-readline'))].exports.createInterface = mockCreateInterface
-  t.teardown(() => { require.cache[pathToFileURL(require.resolve('bare-readline'))].exports.createInterface = originalCreateInterface })
+  const originalCreateInterface = require.cache[BARE_READLINE_URL].exports.createInterface
+  require.cache[BARE_READLINE_URL].exports.createInterface = mockCreateInterface
+  t.teardown(() => { require.cache[BARE_READLINE_URL].exports.createInterface = originalCreateInterface })
 
   let output = ''
   const originalWrite = stdio.out.write
@@ -191,9 +194,9 @@ test('permit function with unencrypted key', async function (t) {
     input: { setMode: () => {} },
     close: () => {}
   })
-  const originalCreateInterface = require.cache[pathToFileURL(require.resolve('bare-readline'))].exports.createInterface
-  require.cache[pathToFileURL(require.resolve('bare-readline'))].exports.createInterface = mockCreateInterface
-  t.teardown(() => { require.cache[pathToFileURL(require.resolve('bare-readline'))].exports.createInterface = originalCreateInterface })
+  const originalCreateInterface = require.cache[BARE_READLINE_URL].exports.createInterface
+  require.cache[BARE_READLINE_URL].exports.createInterface = mockCreateInterface
+  t.teardown(() => { require.cache[BARE_READLINE_URL].exports.createInterface = originalCreateInterface })
 
   const originalBareExit = Bare.exit
   const exited = new Promise((resolve) => { Bare.exit = () => resolve(true) })
@@ -245,9 +248,9 @@ test('permit function with encrypted key', async function (t) {
     input: { setMode: () => {} },
     close: () => {}
   })
-  const originalCreateInterface = require.cache[pathToFileURL(require.resolve('bare-readline'))].exports.createInterface
-  require.cache[pathToFileURL(require.resolve('bare-readline'))].exports.createInterface = mockCreateInterface
-  t.teardown(() => { require.cache[pathToFileURL(require.resolve('bare-readline'))].exports.createInterface = originalCreateInterface })
+  const originalCreateInterface = require.cache[BARE_READLINE_URL].exports.createInterface
+  require.cache[BARE_READLINE_URL].exports.createInterface = mockCreateInterface
+  t.teardown(() => { require.cache[BARE_READLINE_URL].exports.createInterface = originalCreateInterface })
 
   const originalBareExit = Bare.exit
   const exited = new Promise((resolve) => { Bare.exit = () => resolve(true) })
@@ -274,9 +277,9 @@ test('permit function with encrypted key', async function (t) {
     run: async () => ({ value: mockPassword })
   }
 
-  const originalInteract = require.cache[pathToFileURL(require.resolve('../terminal'))].exports.Interact
-  require.cache[pathToFileURL(require.resolve('../terminal'))].exports.Interact = function () { return mockInteract }
-  t.teardown(() => { require.cache[pathToFileURL(require.resolve('../terminal'))].exports.Interact = originalInteract })
+  const originalInteract = require.cache[TERMINAL_URL].exports.Interact
+  require.cache[TERMINAL_URL].exports.Interact = function () { return mockInteract }
+  t.teardown(() => { require.cache[TERMINAL_URL].exports.Interact = originalInteract })
 
   await permit(mockIpc, mockInfo, mockCmd)
   t.ok(output.includes(`${ansi.tick} Added encryption key for pear://${hypercoreid.encode(mockKey)}`), 'permit should print encryption confirmation message')

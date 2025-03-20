@@ -7,6 +7,8 @@ const { pathToFileURL } = require('url-file-url')
 const dirname = __dirname
 global.Pear = null
 
+const CONSTANTS_URL = pathToFileURL(require.resolve('../constants'))
+
 test('constants with CHECKOUT', async function (t) {
   t.plan(3)
 
@@ -20,7 +22,7 @@ test('constants with CHECKOUT', async function (t) {
 
     return {
       teardown: () => {
-        delete require.cache[pathToFileURL(require.resolve('../constants'))]
+        delete require.cache[CONSTANTS_URL]
         global.Pear = null
       }
     }
@@ -48,7 +50,7 @@ test('constants with default MOUNT', async function (t) {
 
     return {
       teardown: () => {
-        delete require.cache[pathToFileURL(require.resolve('../constants'))]
+        delete require.cache[CONSTANTS_URL]
         global.Pear = null
       }
     }
@@ -74,7 +76,7 @@ test('constants with MOUNT starting with c:/', async function (t) {
 
     return {
       teardown: () => {
-        delete require.cache[pathToFileURL(require.resolve('../constants'))]
+        delete require.cache[CONSTANTS_URL]
         global.Pear = null
       }
     }
@@ -100,7 +102,7 @@ test('constants with MOUNT starting with c:\\', async function (t) {
 
     return {
       teardown: () => {
-        delete require.cache[pathToFileURL(require.resolve('../constants'))]
+        delete require.cache[CONSTANTS_URL]
         global.Pear = null
       }
     }
@@ -126,7 +128,7 @@ test('constants with MOUNT starting with file:', async function (t) {
 
     return {
       teardown: () => {
-        delete require.cache[pathToFileURL(require.resolve('../constants'))]
+        delete require.cache[CONSTANTS_URL]
         global.Pear = null
       }
     }
@@ -156,7 +158,7 @@ test('constants with MOUNT starting with ./', async function (t) {
 
     return {
       teardown: () => {
-        delete require.cache[pathToFileURL(require.resolve('../constants'))]
+        delete require.cache[CONSTANTS_URL]
         global.Pear = null
       }
     }
@@ -186,7 +188,7 @@ test('constants with MOUNT starting with ../', async function (t) {
 
     return {
       teardown: () => {
-        delete require.cache[pathToFileURL(require.resolve('../constants'))]
+        delete require.cache[CONSTANTS_URL]
         global.Pear = null
       }
     }
@@ -216,7 +218,7 @@ test('constants with MOUNT starting with /', async function (t) {
 
     return {
       teardown: () => {
-        delete require.cache[pathToFileURL(require.resolve('../constants'))]
+        delete require.cache[CONSTANTS_URL]
         global.Pear = null
       }
     }
@@ -247,7 +249,7 @@ test('constants with MOUNT starting with pear://', async function (t) {
 
     return {
       teardown: () => {
-        delete require.cache[pathToFileURL(require.resolve('../constants'))]
+        delete require.cache[CONSTANTS_URL]
         global.Pear = null
       }
     }

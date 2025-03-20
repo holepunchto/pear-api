@@ -9,6 +9,9 @@ const Helper = require('./helper')
 
 const dirname = __dirname
 
+const CHILD_PROCESS_URL = pathToFileURL(require.resolve('child_process'))
+const CMD_URL = pathToFileURL(require.resolve('../cmd'))
+
 test('tryboot default', async function (t) {
   t.plan(5)
 
@@ -21,11 +24,11 @@ test('tryboot default', async function (t) {
   })
   const childProcess = require('child_process')
   const originalSpawn = childProcess.spawn
-  require.cache[pathToFileURL(require.resolve('child_process'))].exports.spawn = (cmd, args, options) => {
+  require.cache[CHILD_PROCESS_URL].exports.spawn = (cmd, args, options) => {
     resolve({ cmd, args, options })
     return { unref: () => {} }
   }
-  t.teardown(() => { require.cache[pathToFileURL(require.resolve('child_process'))].exports.spawn = originalSpawn })
+  t.teardown(() => { require.cache[CHILD_PROCESS_URL].exports.spawn = originalSpawn })
 
   const tryboot = require('../tryboot')
   tryboot()
@@ -74,18 +77,18 @@ test('tryboot with --log flag', async function (t) {
   })
   const childProcess = require('child_process')
   const originalSpawn = childProcess.spawn
-  require.cache[pathToFileURL(require.resolve('child_process'))].exports.spawn = (cmd, args, options) => {
+  require.cache[CHILD_PROCESS_URL].exports.spawn = (cmd, args, options) => {
     resolve({ cmd, args, options })
     return { unref: () => {} }
   }
-  t.teardown(() => { require.cache[pathToFileURL(require.resolve('child_process'))].exports.spawn = originalSpawn })
+  t.teardown(() => { require.cache[CHILD_PROCESS_URL].exports.spawn = originalSpawn })
 
   const pear = require('../cmd')
   const originalPear = pear
-  require.cache[pathToFileURL(require.resolve('../cmd'))].exports = (argv) => {
+  require.cache[CMD_URL].exports = (argv) => {
     return { flags: { log: true } }
   }
-  t.teardown(() => { require.cache[pathToFileURL(require.resolve('../cmd'))].exports = originalPear })
+  t.teardown(() => { require.cache[CMD_URL].exports = originalPear })
 
   const tryboot = require('../tryboot')
   tryboot()
@@ -113,15 +116,15 @@ test('tryboot with --log-level and --log-fields flags', async function (t) {
   })
   const childProcess = require('child_process')
   const originalSpawn = childProcess.spawn
-  require.cache[pathToFileURL(require.resolve('child_process'))].exports.spawn = (cmd, args, options) => {
+  require.cache[CHILD_PROCESS_URL].exports.spawn = (cmd, args, options) => {
     resolve({ cmd, args, options })
     return { unref: () => {} }
   }
-  t.teardown(() => { require.cache[pathToFileURL(require.resolve('child_process'))].exports.spawn = originalSpawn })
+  t.teardown(() => { require.cache[CHILD_PROCESS_URL].exports.spawn = originalSpawn })
 
   const pear = require('../cmd')
   const originalPear = pear
-  require.cache[pathToFileURL(require.resolve('../cmd'))].exports = (argv) => {
+  require.cache[CMD_URL].exports = (argv) => {
     return {
       flags: {
         logLevel: Logger.ERR,
@@ -129,7 +132,7 @@ test('tryboot with --log-level and --log-fields flags', async function (t) {
       }
     }
   }
-  t.teardown(() => { require.cache[pathToFileURL(require.resolve('../cmd'))].exports = originalPear })
+  t.teardown(() => { require.cache[CMD_URL].exports = originalPear })
 
   const tryboot = require('../tryboot')
   tryboot()
@@ -157,22 +160,22 @@ test('tryboot with --log-labels flag', async function (t) {
   })
   const childProcess = require('child_process')
   const originalSpawn = childProcess.spawn
-  require.cache[pathToFileURL(require.resolve('child_process'))].exports.spawn = (cmd, args, options) => {
+  require.cache[CHILD_PROCESS_URL].exports.spawn = (cmd, args, options) => {
     resolve({ cmd, args, options })
     return { unref: () => {} }
   }
-  t.teardown(() => { require.cache[pathToFileURL(require.resolve('child_process'))].exports.spawn = originalSpawn })
+  t.teardown(() => { require.cache[CHILD_PROCESS_URL].exports.spawn = originalSpawn })
 
   const pear = require('../cmd')
   const originalPear = pear
-  require.cache[pathToFileURL(require.resolve('../cmd'))].exports = (argv) => {
+  require.cache[CMD_URL].exports = (argv) => {
     return {
       flags: {
         logLabels: 'label1,label2'
       }
     }
   }
-  t.teardown(() => { require.cache[pathToFileURL(require.resolve('../cmd'))].exports = originalPear })
+  t.teardown(() => { require.cache[CMD_URL].exports = originalPear })
 
   const tryboot = require('../tryboot')
   tryboot()
@@ -200,22 +203,22 @@ test('tryboot with --log-stacks flag', async function (t) {
   })
   const childProcess = require('child_process')
   const originalSpawn = childProcess.spawn
-  require.cache[pathToFileURL(require.resolve('child_process'))].exports.spawn = (cmd, args, options) => {
+  require.cache[CHILD_PROCESS_URL].exports.spawn = (cmd, args, options) => {
     resolve({ cmd, args, options })
     return { unref: () => {} }
   }
-  t.teardown(() => { require.cache[pathToFileURL(require.resolve('child_process'))].exports.spawn = originalSpawn })
+  t.teardown(() => { require.cache[CHILD_PROCESS_URL].exports.spawn = originalSpawn })
 
   const pear = require('../cmd')
   const originalPear = pear
-  require.cache[pathToFileURL(require.resolve('../cmd'))].exports = (argv) => {
+  require.cache[CMD_URL].exports = (argv) => {
     return {
       flags: {
         logStacks: true
       }
     }
   }
-  t.teardown(() => { require.cache[pathToFileURL(require.resolve('../cmd'))].exports = originalPear })
+  t.teardown(() => { require.cache[CMD_URL].exports = originalPear })
 
   const tryboot = require('../tryboot')
   tryboot()
