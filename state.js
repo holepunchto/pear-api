@@ -6,7 +6,6 @@ const path = isBare ? require('bare-path') : require('path')
 const { pathToFileURL } = require('url-file-url')
 const hypercoreid = require('hypercore-id-encoding')
 const pearLink = require('pear-link')
-const z32 = require('z32')
 const crypto = require('hypercore-crypto')
 const { PLATFORM_DIR, SWAP, RUNTIME } = require('./constants')
 const CWD = isBare ? os.cwd() : process.cwd()
@@ -38,6 +37,7 @@ module.exports = class State {
   routes = null
   unrouted = null
   entrypoint = null
+
   static injestPackage (state, pkg, overrides = {}) {
     state.manifest = pkg
     state.main = pkg?.main || 'index.html'
@@ -68,7 +68,6 @@ module.exports = class State {
     unrouted.add('/node_modules/.bin/')
     state.unrouted = Array.from(unrouted)
     let entrypoint = this.route(state.route, state.routes, state.unrouted)
-    if (this.isEntrypoint(entrypoint) === false) return
     if (entrypoint.startsWith('/') === false) entrypoint = '/' + entrypoint
     else if (entrypoint.startsWith('./')) entrypoint = entrypoint.slice(1)
     state.entrypoint = entrypoint
@@ -97,19 +96,6 @@ module.exports = class State {
     return { id, startId, key, links, alias, env, gui, options, checkpoint, checkout, flags, dev, tier, stage, storage, name, main, dependencies, args, channel, release, applink, fragment, link, linkData, entrypoint, route, routes, dir, dht, pearDir, swapDir }
   }
 
-  static isKeetInvite (segment) {
-    if (!segment || segment.length < 100) return false
-    try { z32.decode(segment) } catch { return false }
-    return true
-  }
-
-  static isEntrypoint (pathname) {
-    if (pathname === null || pathname === '/') return false
-    // NOTE: return true once keet invite code detection is no longer needed, assess for removal October 2024
-    const segment = pathname = pathname?.startsWith('/') ? pathname.slice(1) : pathname
-    return this.isKeetInvite(segment) === false
-  }
-
   update (state) {
     Object.assign(this, state)
     this.#onupdate()
@@ -124,8 +110,6 @@ module.exports = class State {
     } = flags
     const { drive: { alias = null, key = null }, pathname: route, protocol, hash } = link ? parseLink(link) : { drive: {} }
     const pathname = protocol === 'file:' ? (isWindows ? route.slice(1).slice(dir.length) : route.slice(dir.length)) : route
-    const segment = pathname?.startsWith('/') ? pathname.slice(1) : pathname
-    const fragment = hash ? hash.slice(1) : (this.constructor.isKeetInvite(segment) ? segment : null)
     const pkgPath = path.join(dir, 'package.json')
     const pkg = key === null ? readPkg(pkgPath) : null
     const store = flags.tmpStore ? path.join(os.tmpdir(), crypto.randomBytes(16).toString('hex')) : flags.store
@@ -147,8 +131,8 @@ module.exports = class State {
     this.updatesDiff = this.dev || updatesDiff
     this.updates = updates
     this.stage = stage
-    this.fragment = fragment
-    this.linkData = segment
+    this.fragment = hash ? hash.slice(1) : null
+    this.linkData = pathname?.startsWith('/') ? pathname.slice(1) : pathname
     this.link = link ? (link.startsWith(protocol) ? link : pearLink.normalize(pathToFileURL(link).toString())) : null
     this.key = key
     this.applink = key ? this.link.slice(0, -(~~(pathname?.length) + ~~(hash?.length))) : null
