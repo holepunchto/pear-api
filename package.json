@@ -4,7 +4,10 @@
   "description": "Pear API Base & Integration Module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "standard",
+    "lint:fix": "standard --fix",
+    "test:gen": "brittle -r test/all.mjs test/*.test.js",
+    "test": "bare test/all.mjs"
   },
   "files": [
     "cmd/",
@@ -34,6 +37,12 @@
   ],
   "author": "Holepunch",
   "license": "Apache-2.0",
+  "standard": {
+    "globals": [
+      "Pear",
+      "Bare"
+    ]
+  },
   "dependencies": {
     "b4a": "^1.6.7",
     "bare-hrtime": "^2.0.10",
@@ -57,5 +66,17 @@
     "url-file-url": "^1.0.4",
     "which-runtime": "^1.2.1",
     "z32": "^1.1.0"
+  },
+  "peerDependencies": {
+    "hypercore-crypto": "^3.5.0",
+    "script-linker": "^2.5.4"
+  },
+  "devDependencies": {
+    "brittle": "^3.10.0",
+    "hypercore-crypto": "^3.5.0",
+    "iambus": "^1.0.3",
+    "pear-ipc": "^3.3.0",
+    "script-linker": "^2.5.4",
+    "standard": "^17.1.2"
   }
 }
