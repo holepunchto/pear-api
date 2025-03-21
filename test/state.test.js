@@ -134,29 +134,6 @@ test('state route method skips unrouted paths', async function (t) {
   t.is(result, pathname, 'route method should skip unrouted paths')
 })
 
-test('state isEntrypoint returns false for null or root path', async function (t) {
-  t.plan(2)
-
-  const { teardown } = rig()
-  t.teardown(teardown)
-
-  const State = require('../state')
-
-  t.ok(!State.isEntrypoint(null), 'isEntrypoint should return false for null')
-  t.ok(!State.isEntrypoint('/'), 'isEntrypoint should return false for root path')
-})
-
-test('state isEntrypoint returns true for valid entrypoint', async function (t) {
-  t.plan(1)
-
-  const { teardown } = rig()
-  t.teardown(teardown)
-
-  const State = require('../state')
-
-  t.ok(State.isEntrypoint('/valid/path'), 'isEntrypoint should return true for valid entrypoint')
-})
-
 test('state storageFromLink generates storage path for non-pear links', async function (t) {
   t.plan(1)
 

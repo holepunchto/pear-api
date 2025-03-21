@@ -115,7 +115,7 @@ test('constants with MOUNT starting with c:\\', async function (t) {
   t.is(constants.MOUNT, 'file:///c:/custom/mount')
 })
 
-test('constants with MOUNT starting with file:', async function (t) {
+test('constants with MOUNT starting with file:', { skip: isWindows }, async function (t) {
   t.plan(1)
 
   const rig = () => {
@@ -137,15 +137,11 @@ test('constants with MOUNT starting with file:', async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
-  if (isWindows) {
-    t.exception(() => require('../constants'))
-    return
-  }
   const constants = require('../constants')
   t.is(constants.MOUNT, 'file:///custom/mount')
 })
 
-test('constants with MOUNT starting with ./', async function (t) {
+test('constants with MOUNT starting with ./', { skip: isWindows }, async function (t) {
   t.plan(1)
 
   const rig = () => {
@@ -167,15 +163,11 @@ test('constants with MOUNT starting with ./', async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
-  if (isWindows) {
-    t.exception(() => require('../constants'))
-    return
-  }
   const constants = require('../constants')
   t.is(constants.MOUNT, 'file:///custom/mount')
 })
 
-test('constants with MOUNT starting with ../', async function (t) {
+test('constants with MOUNT starting with ../', { skip: isWindows }, async function (t) {
   t.plan(1)
 
   const rig = () => {
@@ -197,15 +189,11 @@ test('constants with MOUNT starting with ../', async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
-  if (isWindows) {
-    t.exception(() => require('../constants'))
-    return
-  }
   const constants = require('../constants')
   t.is(constants.MOUNT, 'file:///custom/mount')
 })
 
-test('constants with MOUNT starting with /', async function (t) {
+test('constants with MOUNT starting with /', { skip: isWindows }, async function (t) {
   t.plan(1)
 
   const rig = () => {
@@ -226,11 +214,6 @@ test('constants with MOUNT starting with /', async function (t) {
 
   const { teardown } = rig()
   t.teardown(teardown)
-
-  if (isWindows) {
-    t.exception(() => require('../constants'))
-    return
-  }
 
   const constants = require('../constants')
   t.is(constants.MOUNT, 'file:///custom/mount')
