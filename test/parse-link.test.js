@@ -1,7 +1,7 @@
 'use strict'
 
 const { test } = require('brittle')
-const path = require('path')
+const { pathToFileURL } = require('url-file-url')
 
 const dirname = __dirname
 global.Pear = null
@@ -29,7 +29,7 @@ test('parse-link ./some/path/to/a/file.js', async function (t) {
 
   const res = parseLink('./some/path/to/a/file.js')
   t.is(res.protocol, 'file:')
-  t.is(res.pathname, path.resolve('./some/path/to/a/file.js'))
+  t.is(res.pathname, pathToFileURL('./some/path/to/a/file.js').pathname)
   t.is(res.hash, '')
   t.is(res.drive.key, null)
   t.is(res.drive.length, null)
