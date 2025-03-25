@@ -162,8 +162,8 @@ test('parse-link pear://fork.length.key.dhash', async function (t) {
   t.is(res.drive.alias, null)
 })
 
-test.solo('parse-link invalid link', async function (t) {
-  // t.plan(10)
+test('parse-link invalid link', async function (t) {
+  t.plan(10)
 
   const { teardown } = rig()
   t.teardown(teardown)
