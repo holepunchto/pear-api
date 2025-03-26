@@ -9,24 +9,24 @@ global.Pear = null
 
 const CONSTANTS_URL = pathToFileURL(require.resolve('../constants'))
 
-test('constants with CHECKOUT', async function (t) {
-  t.plan(3)
+const rig = (mount) => {
+  if (global.Pear !== null) throw Error(`Prior Pear global not cleaned up: ${global.Pear}`)
 
-  const rig = () => {
-    if (global.Pear !== null) throw Error(`Prior Pear global not cleaned up: ${global.Pear}`)
+  class RigAPI {
+    static RTI = { checkout: { key: dirname, length: null, fork: null }, mount }
+  }
+  global.Pear = new RigAPI()
 
-    class RigAPI {
-      static RTI = { checkout: { key: dirname, length: null, fork: null } }
-    }
-    global.Pear = new RigAPI()
-
-    return {
-      teardown: () => {
-        delete require.cache[CONSTANTS_URL]
-        global.Pear = null
-      }
+  return {
+    teardown: () => {
+      delete require.cache[CONSTANTS_URL]
+      global.Pear = null
     }
   }
+}
+
+test('constants with CHECKOUT', async function (t) {
+  t.plan(3)
 
   const { teardown } = rig()
   t.teardown(teardown)
@@ -40,22 +40,6 @@ test('constants with CHECKOUT', async function (t) {
 test('constants with default MOUNT', async function (t) {
   t.plan(1)
 
-  const rig = () => {
-    if (global.Pear !== null) throw Error(`Prior Pear global not cleaned up: ${global.Pear}`)
-
-    class RigAPI {
-      static RTI = { checkout: { key: dirname, length: null, fork: null } }
-    }
-    global.Pear = new RigAPI()
-
-    return {
-      teardown: () => {
-        delete require.cache[CONSTANTS_URL]
-        global.Pear = null
-      }
-    }
-  }
-
   const { teardown } = rig()
   t.teardown(teardown)
 
@@ -66,23 +50,7 @@ test('constants with default MOUNT', async function (t) {
 test('constants with MOUNT starting with c:/', async function (t) {
   t.plan(1)
 
-  const rig = () => {
-    if (global.Pear !== null) throw Error(`Prior Pear global not cleaned up: ${global.Pear}`)
-
-    class RigAPI {
-      static RTI = { checkout: { key: dirname, length: null, fork: null }, mount: 'c:/custom/mount' }
-    }
-    global.Pear = new RigAPI()
-
-    return {
-      teardown: () => {
-        delete require.cache[CONSTANTS_URL]
-        global.Pear = null
-      }
-    }
-  }
-
-  const { teardown } = rig()
+  const { teardown } = rig('c:/custom/mount')
   t.teardown(teardown)
 
   const constants = require('../constants')
@@ -92,23 +60,7 @@ test('constants with MOUNT starting with c:/', async function (t) {
 test('constants with MOUNT starting with c:\\', async function (t) {
   t.plan(1)
 
-  const rig = () => {
-    if (global.Pear !== null) throw Error(`Prior Pear global not cleaned up: ${global.Pear}`)
-
-    class RigAPI {
-      static RTI = { checkout: { key: dirname, length: null, fork: null }, mount: 'c:\\custom\\mount' }
-    }
-    global.Pear = new RigAPI()
-
-    return {
-      teardown: () => {
-        delete require.cache[CONSTANTS_URL]
-        global.Pear = null
-      }
-    }
-  }
-
-  const { teardown } = rig()
+  const { teardown } = rig('c:\\custom\\mount')
   t.teardown(teardown)
 
   const constants = require('../constants')
@@ -118,23 +70,7 @@ test('constants with MOUNT starting with c:\\', async function (t) {
 test('constants with MOUNT starting with file:', { skip: isWindows }, async function (t) {
   t.plan(1)
 
-  const rig = () => {
-    if (global.Pear !== null) throw Error(`Prior Pear global not cleaned up: ${global.Pear}`)
-
-    class RigAPI {
-      static RTI = { checkout: { key: dirname, length: null, fork: null }, mount: 'file:///custom/mount' }
-    }
-    global.Pear = new RigAPI()
-
-    return {
-      teardown: () => {
-        delete require.cache[CONSTANTS_URL]
-        global.Pear = null
-      }
-    }
-  }
-
-  const { teardown } = rig()
+  const { teardown } = rig('file:///custom/mount')
   t.teardown(teardown)
 
   const constants = require('../constants')
@@ -144,23 +80,7 @@ test('constants with MOUNT starting with file:', { skip: isWindows }, async func
 test('constants with MOUNT starting with ./', { skip: isWindows }, async function (t) {
   t.plan(1)
 
-  const rig = () => {
-    if (global.Pear !== null) throw Error(`Prior Pear global not cleaned up: ${global.Pear}`)
-
-    class RigAPI {
-      static RTI = { checkout: { key: dirname, length: null, fork: null }, mount: './custom/mount' }
-    }
-    global.Pear = new RigAPI()
-
-    return {
-      teardown: () => {
-        delete require.cache[CONSTANTS_URL]
-        global.Pear = null
-      }
-    }
-  }
-
-  const { teardown } = rig()
+  const { teardown } = rig('./custom/mount')
   t.teardown(teardown)
 
   const constants = require('../constants')
@@ -170,23 +90,7 @@ test('constants with MOUNT starting with ./', { skip: isWindows }, async functio
 test('constants with MOUNT starting with ../', { skip: isWindows }, async function (t) {
   t.plan(1)
 
-  const rig = () => {
-    if (global.Pear !== null) throw Error(`Prior Pear global not cleaned up: ${global.Pear}`)
-
-    class RigAPI {
-      static RTI = { checkout: { key: dirname, length: null, fork: null }, mount: '../custom/mount' }
-    }
-    global.Pear = new RigAPI()
-
-    return {
-      teardown: () => {
-        delete require.cache[CONSTANTS_URL]
-        global.Pear = null
-      }
-    }
-  }
-
-  const { teardown } = rig()
+  const { teardown } = rig('../custom/mount')
   t.teardown(teardown)
 
   const constants = require('../constants')
@@ -196,23 +100,7 @@ test('constants with MOUNT starting with ../', { skip: isWindows }, async functi
 test('constants with MOUNT starting with /', { skip: isWindows }, async function (t) {
   t.plan(1)
 
-  const rig = () => {
-    if (global.Pear !== null) throw Error(`Prior Pear global not cleaned up: ${global.Pear}`)
-
-    class RigAPI {
-      static RTI = { checkout: { key: dirname, length: null, fork: null }, mount: '/custom/mount' }
-    }
-    global.Pear = new RigAPI()
-
-    return {
-      teardown: () => {
-        delete require.cache[CONSTANTS_URL]
-        global.Pear = null
-      }
-    }
-  }
-
-  const { teardown } = rig()
+  const { teardown } = rig('/custom/mount')
   t.teardown(teardown)
 
   const constants = require('../constants')
@@ -222,23 +110,7 @@ test('constants with MOUNT starting with /', { skip: isWindows }, async function
 test('constants with MOUNT starting with pear://', async function (t) {
   t.plan(1)
 
-  const rig = () => {
-    if (global.Pear !== null) throw Error(`Prior Pear global not cleaned up: ${global.Pear}`)
-
-    class RigAPI {
-      static RTI = { checkout: { key: dirname, length: null, fork: null }, mount: 'pear://custom/mount' }
-    }
-    global.Pear = new RigAPI()
-
-    return {
-      teardown: () => {
-        delete require.cache[CONSTANTS_URL]
-        global.Pear = null
-      }
-    }
-  }
-
-  const { teardown } = rig()
+  const { teardown } = rig('pear://custom/mount')
   t.teardown(teardown)
 
   t.exception(() => require('../constants'))
