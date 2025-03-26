@@ -15,6 +15,5 @@ module.exports = [
   flag('--rti <info>').hide(),
   flag('--key <key>', 'Advanced. Switch release lines').hide(),
   flag('--mem', 'Memory mode: RAM corestore').hide(),
-  flag('--dht-bootstrap <nodes>').hide(),
-  flag('--start-id <id>').hide()
+  flag('--dht-bootstrap <nodes>').hide()
 ]

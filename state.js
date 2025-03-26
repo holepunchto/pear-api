@@ -32,7 +32,6 @@ module.exports = class State {
   entrypoints = null
   applink = null
   dht = null
-  ui = null
   route = null
   routes = null
   unrouted = null
@@ -102,9 +101,9 @@ module.exports = class State {
   }
 
   constructor (params = {}) {
-    const { dht, link, id = null, args = null, env = ENV, cwd = CWD, dir = cwd, cmdArgs, onupdate = () => {}, flags, run, storage = null } = params
+    const { dht, link, startId = null, id = null, args = null, env = ENV, cwd = CWD, dir = cwd, cmdArgs, onupdate = () => {}, flags, run, storage = null } = params
     const {
-      startId, appling, channel, devtools, checkout, links,
+      appling, channel, devtools, checkout, links,
       dev = false, stage, updates, updatesDiff, followSymlinks,
       unsafeClearAppStorage, chromeWebrtcInternals
     } = flags
@@ -114,7 +113,7 @@ module.exports = class State {
     const pkg = key === null ? readPkg(pkgPath) : null
     const store = flags.tmpStore ? path.join(os.tmpdir(), crypto.randomBytes(16).toString('hex')) : flags.store
     this.#onupdate = onupdate
-    this.startId = startId || null
+    this.startId = startId
     this.dht = dht
     this.store = store
     this.args = args
