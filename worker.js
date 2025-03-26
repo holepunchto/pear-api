@@ -16,6 +16,7 @@ class Worker {
   #ref = null
   #unref = null
   static RUNTIME = RUNTIME
+  static RUNTIME_ARGV = []
   constructor ({ ref = noop, unref = noop } = {}) {
     this.#ref = ref
     this.#unref = unref
@@ -39,7 +40,7 @@ class Worker {
   }
 
   run (link, args = []) {
-    args = [...this.#args(link), ...args]
+    args = [...this.constructor.RUNTIME_ARGV, ...this.#args(link), ...args]
     const sp = spawn(this.constructor.RUNTIME, args, {
       stdio: ['inherit', 'inherit', 'inherit', 'overlapped'],
       windowsHide: true
