@@ -9,7 +9,7 @@ global.Pear = null
 
 const CONSTANTS_URL = pathToFileURL(require.resolve('../constants'))
 
-const rig = (mount) => {
+const rig = ({ mount } = {}) => {
   if (global.Pear !== null) throw Error(`Prior Pear global not cleaned up: ${global.Pear}`)
 
   class RigAPI {
@@ -50,7 +50,7 @@ test('constants with default MOUNT', async function (t) {
 test('constants with MOUNT starting with c:/', async function (t) {
   t.plan(1)
 
-  const { teardown } = rig('c:/custom/mount')
+  const { teardown } = rig({ mount: 'c:/custom/mount' })
   t.teardown(teardown)
 
   const constants = require('../constants')
@@ -60,7 +60,7 @@ test('constants with MOUNT starting with c:/', async function (t) {
 test('constants with MOUNT starting with c:\\', async function (t) {
   t.plan(1)
 
-  const { teardown } = rig('c:\\custom\\mount')
+  const { teardown } = rig({ mount: 'c:\\custom\\mount' })
   t.teardown(teardown)
 
   const constants = require('../constants')
@@ -70,7 +70,7 @@ test('constants with MOUNT starting with c:\\', async function (t) {
 test('constants with MOUNT starting with file:', { skip: isWindows }, async function (t) {
   t.plan(1)
 
-  const { teardown } = rig('file:///custom/mount')
+  const { teardown } = rig({ mount: 'file:///custom/mount' })
   t.teardown(teardown)
 
   const constants = require('../constants')
@@ -80,7 +80,7 @@ test('constants with MOUNT starting with file:', { skip: isWindows }, async func
 test('constants with MOUNT starting with ./', { skip: isWindows }, async function (t) {
   t.plan(1)
 
-  const { teardown } = rig('./custom/mount')
+  const { teardown } = rig({ mount: './custom/mount' })
   t.teardown(teardown)
 
   const constants = require('../constants')
@@ -90,7 +90,7 @@ test('constants with MOUNT starting with ./', { skip: isWindows }, async functio
 test('constants with MOUNT starting with ../', { skip: isWindows }, async function (t) {
   t.plan(1)
 
-  const { teardown } = rig('../custom/mount')
+  const { teardown } = rig({ mount: '../custom/mount' })
   t.teardown(teardown)
 
   const constants = require('../constants')
@@ -100,7 +100,7 @@ test('constants with MOUNT starting with ../', { skip: isWindows }, async functi
 test('constants with MOUNT starting with /', { skip: isWindows }, async function (t) {
   t.plan(1)
 
-  const { teardown } = rig('/custom/mount')
+  const { teardown } = rig({ mount: '/custom/mount' })
   t.teardown(teardown)
 
   const constants = require('../constants')
@@ -110,7 +110,7 @@ test('constants with MOUNT starting with /', { skip: isWindows }, async function
 test('constants with MOUNT starting with pear://', async function (t) {
   t.plan(1)
 
-  const { teardown } = rig('pear://custom/mount')
+  const { teardown } = rig({ mount: 'pear://custom/mount' })
   t.teardown(teardown)
 
   t.exception(() => require('../constants'))
