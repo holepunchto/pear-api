@@ -318,21 +318,20 @@ test('state constructor throws error for invalid storage path', async function (
   }, ERR_INVALID_APP_STORAGE())
 })
 
-// test.skip('state constructor throws error for invalid package name', async function (t) {
-//   t.plan(1)
+test('state constructor throws error for invalid app name', async function (t) {
+  t.plan(1)
 
-//   const { teardown } = rig()
-//   t.teardown(teardown)
+  const { teardown } = rig()
+  t.teardown(teardown)
 
-//   const State = require('../state')
-//   const { ERR_INVALID_APP_NAME } = require('../errors')
+  const State = require('../state')
+  const { ERR_INVALID_APP_NAME } = require('../errors')
 
-//   t.exception(() => {
-//     const state = new State({
-//       flags: {},
-//       dir: '/valid/project/dir',
-//       manifest: { name: 'Invalid@Name!' }
-//     })
-//     if (state) { t.fail('state should not be initialized') }
-//   }, ERR_INVALID_APP_NAME())
-// })
+  t.exception(() => {
+    const state = new State({
+      flags: {},
+      dir: './test/fixtures/state-invalid-app-name'
+    })
+    if (state) { t.fail('state should not be initialized') }
+  }, ERR_INVALID_APP_NAME())
+})
