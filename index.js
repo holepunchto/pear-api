@@ -48,15 +48,16 @@ class API {
 
   get worker () {
     console.error('[ DEPRECATED ] Pear.worker is deprecated and will be removed')
+    const api = this
     return new class DeprecatedWorker {
-      pipe = () => {
+      pipe () {
         console.error('[ DEPRECATED ] Pear.worker.pipe() is now Pear.pipe')
-        return this.pipe()
+        return api.pipe
       }
 
-      run = (...args) => {
+      run (...args) {
         console.error('[ DEPRECATED ] Pear.worker.run() is now Pear.run()')
-        return this.run(...args)
+        return api.run(...args)
       }
     }()
   }
