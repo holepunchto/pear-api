@@ -31,18 +31,6 @@ test('state constructor initializes with minimal parameters', async function (t)
   t.not(state.cwd === null, 'cwd should be initialized')
 })
 
-test('state constructor handles missing package.json gracefully', async function (t) {
-  t.plan(1)
-
-  const { teardown } = rig()
-  t.teardown(teardown)
-
-  const State = require('../state')
-  const state = new State({ dir: '/nonexistent/dir', flags: {} })
-
-  t.is(state.manifest, null, 'manifest should be null when package.json is missing')
-})
-
 test('state constructor sets NODE_ENV to production in stage mode', async function (t) {
   t.plan(1)
 
@@ -173,132 +161,6 @@ test('state configFrom extracts correct properties from state', async function (
   t.ok(config.env !== undefined, 'configFrom should extract env property from state')
 })
 
-test('injestPackage initializes state with package data', async function (t) {
-  t.plan(6)
-
-  const { teardown } = rig()
-  t.teardown(teardown)
-
-  const State = require('../state')
-
-  const state = {}
-
-  const pkg = {
-    main: 'app.js',
-    pear: {
-      name: 'test-app',
-      links: { key1: 'value1' },
-      gui: true,
-      stage: { entrypoints: ['/entry1', '/entry2'] },
-      routes: { '/old': '/new' },
-      unrouted: ['/unrouted/path']
-    },
-    dependencies: { dep1: '1.0.0' },
-    devDependencies: { devDep1: '1.0.0' },
-    peerDependencies: { peerDep1: '1.0.0' },
-    optionalDependencies: { optDep1: '1.0.0' },
-    bundleDependencies: ['bundleDep1']
-  }
-
-  State.injestPackage(state, pkg)
-
-  t.is(state.main, 'app.js', 'main should be set correctly')
-  t.is(state.name, 'test-app', 'name should be set correctly')
-  t.is(state.links.key1, 'value1', 'links should be set correctly')
-  t.ok(state.entrypoints.has('/entry1'), 'entrypoints should be set correctly')
-  t.ok(state.entrypoints.has('/entry2'), 'entrypoints should be set correctly')
-  t.is(state.routes['/old'], '/new', 'routes should be set correctly')
-})
-
-test('injestPackage merges overrides into state', async function (t) {
-  t.plan(3)
-
-  const { teardown } = rig()
-  t.teardown(teardown)
-
-  const State = require('../state')
-
-  const state = {}
-
-  const pkg = {
-    pear: {
-      links: { key1: 'value1' }
-    }
-  }
-
-  const overrides = {
-    links: 'key2=value2,key3=value3'
-  }
-
-  State.injestPackage(state, pkg, overrides)
-
-  t.is(state.links.key1, 'value1', 'overrides should be merged into links')
-  t.is(state.links.key2, 'value2', 'overrides should be merged into links')
-  t.is(state.links.key3, 'value3', 'overrides should be merged into links')
-})
-
-test('injestPackage sets default values when package fields are missing', async function (t) {
-  t.plan(3)
-
-  const { teardown } = rig()
-  t.teardown(teardown)
-
-  const State = require('../state')
-
-  const state = {}
-
-  const pkg = {}
-
-  State.injestPackage(state, pkg)
-
-  t.is(state.main, 'index.html', 'main should default to index.html')
-  t.is(state.name, null, 'name should default to null')
-  t.is(state.entrypoints.size, 0, 'entrypoints should default to an empty set')
-})
-
-test('injestPackage adds default unrouted paths', async function (t) {
-  t.plan(2)
-
-  const { teardown } = rig()
-  t.teardown(teardown)
-
-  const State = require('../state')
-
-  const state = {}
-
-  const pkg = {
-    pear: {
-      unrouted: ['/custom/unrouted']
-    }
-  }
-
-  State.injestPackage(state, pkg)
-
-  t.is(state.unrouted[0], '/custom/unrouted', 'default unrouted paths should be added')
-  t.is(state.unrouted[1], '/node_modules/.bin/', 'default unrouted paths should be added')
-})
-
-test('injestPackage skips setting entrypoint if not valid', async function (t) {
-  t.plan(1)
-
-  const { teardown } = rig()
-  t.teardown(teardown)
-
-  const State = require('../state')
-
-  const state = {}
-
-  const pkg = {
-    pear: {
-      stage: { entrypoints: ['/invalid'] }
-    }
-  }
-
-  State.injestPackage(state, pkg)
-
-  t.is(state.entrypoint, '/undefined', 'entrypoint should not be set if not valid')
-})
-
 test('state constructor throws error for invalid storage path', async function (t) {
   t.plan(1)
 
@@ -316,22 +178,4 @@ test('state constructor throws error for invalid storage path', async function (
     })
     if (state) { t.fail('state should not be initialized') }
   }, ERR_INVALID_APP_STORAGE())
-})
-
-test('state constructor throws error for invalid app name', async function (t) {
-  t.plan(1)
-
-  const { teardown } = rig()
-  t.teardown(teardown)
-
-  const State = require('../state')
-  const { ERR_INVALID_APP_NAME } = require('../errors')
-
-  t.exception(() => {
-    const state = new State({
-      flags: {},
-      dir: './test/fixtures/state-invalid-app-name'
-    })
-    if (state) { t.fail('state should not be initialized') }
-  }, ERR_INVALID_APP_NAME())
 })

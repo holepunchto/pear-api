@@ -17,12 +17,13 @@ class Worker {
   #unref = null
   static RUNTIME = RUNTIME
   static RUNTIME_ARGV = []
-  constructor ({ ref = noop, unref = noop } = {}) {
-    this.#ref = ref
-    this.#unref = unref
+  constructor ({ ref, unref } = {}) {
+    this.#ref = ref ?? noop
+    this.#unref = unref ?? noop
   }
 
   #args (link) {
+    if (Array.isArray(link)) return ['run', '--trusted', ...link]
     const parser = command('pear', command('run', ...rundef))
     const argv = ['run', ...global.Bare.argv.slice(2)]
     const cmd = parser.parse(argv, { sync: true })

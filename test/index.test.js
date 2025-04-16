@@ -286,9 +286,8 @@ test('Pear.run should receive args from the parent', async function (t) {
   const args = ['hello', 'world']
   const pipe = Pear.run(dir, args)
 
-  const result = await Helper.untilResult(pipe)
-
-  t.is(result, JSON.stringify(args), 'run should receive args from the parent')
+  const result = JSON.parse(await Helper.untilResult(pipe))
+  t.alike(result, args, 'run should receive args from the parent')
 
   await Helper.untilClose(pipe)
 })

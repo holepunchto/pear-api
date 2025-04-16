@@ -1,7 +1,6 @@
 'use strict'
 const { isBare, isWindows } = require('which-runtime')
 const os = isBare ? require('bare-os') : require('os')
-const fs = isBare ? require('bare-fs') : require('fs')
 const path = isBare ? require('bare-path') : require('path')
 const { pathToFileURL } = require('url-file-url')
 const hypercoreid = require('hypercore-id-encoding')
@@ -11,13 +10,7 @@ const { PLATFORM_DIR, SWAP, RUNTIME } = require('./constants')
 const CWD = isBare ? os.cwd() : process.cwd()
 const ENV = isBare ? require('bare-env') : process.env
 const parseLink = require('./parse-link')
-const { ERR_INVALID_APP_NAME, ERR_INVALID_APP_STORAGE } = require('./errors')
-const readPkg = (pkgPath) => {
-  let pkg = null
-  try { pkg = fs.readFileSync(path.resolve(pkgPath)) } catch { /* ignore */ }
-  if (pkg) pkg = JSON.parse(pkg) // important to know if this throws, so no try/catch
-  return pkg
-}
+const { ERR_INVALID_APP_STORAGE } = require('./errors')
 
 module.exports = class State {
   env = null
@@ -30,47 +23,13 @@ module.exports = class State {
   type = null
   error = null
   entrypoints = null
+  entrypoint = null
   applink = null
   dht = null
   route = null
   routes = null
   unrouted = null
-  entrypoint = null
-
-  static injestPackage (state, pkg, overrides = {}) {
-    state.manifest = pkg
-    state.main = pkg?.main || 'index.html'
-    state.options = pkg?.pear || {}
-    state.name = pkg?.pear?.name || pkg?.name || null
-    state.links = pkg?.pear?.links || null
-    state.gui = pkg?.pear?.gui || null
-    if (overrides.links) {
-      const links = overrides.links.split(',').reduce((links, kv) => {
-        const [key, value] = kv.split('=')
-        links[key] = value
-        return links
-      }, {})
-      state.links = { ...(state.links || {}), ...links }
-    }
-    state.dependencies = [
-      ...(pkg?.dependencies ? Object.keys(pkg.dependencies) : []),
-      ...(pkg?.devDependencies ? Object.keys(pkg.devDependencies) : []),
-      ...(pkg?.peerDependencies ? Object.keys(pkg.peerDependencies) : []),
-      ...(pkg?.optionalDependencies ? Object.keys(pkg.optionalDependencies) : []),
-      ...(pkg?.bundleDependencies || []),
-      ...(pkg?.bundledDependencies || [])
-    ]
-    state.entrypoints = new Set(pkg?.pear?.stage?.entrypoints || [])
-    state.routes = pkg?.pear?.routes || null
-    state.route = '/' + state.linkData
-    const unrouted = new Set(Array.isArray(pkg?.pear?.unrouted) ? pkg?.pear?.unrouted : [])
-    unrouted.add('/node_modules/.bin/')
-    state.unrouted = Array.from(unrouted)
-    let entrypoint = this.route(state.route, state.routes, state.unrouted)
-    if (entrypoint.startsWith('/') === false) entrypoint = '/' + entrypoint
-    else if (entrypoint.startsWith('./')) entrypoint = entrypoint.slice(1)
-    state.entrypoint = entrypoint
-  }
+  via = null
 
   static route (pathname, routes, unrouted) {
     if (!routes) return pathname
@@ -89,10 +48,10 @@ module.exports = class State {
   }
 
   static configFrom (state) {
-    const { id, startId, key, links, alias, env, gui, options, checkpoint, checkout, flags, dev, tier, stage, storage, name, main, dependencies, args, channel, release, applink, fragment, link, linkData, entrypoint, route, routes, dir, dht } = state
+    const { id, startId, key, links, alias, env, gui, options, checkpoint, checkout, flags, dev, stage, storage, name, main, args, channel, release, applink, fragment, link, linkData, entrypoint, route, routes, dir, dht } = state
     const pearDir = PLATFORM_DIR
     const swapDir = SWAP
-    return { id, startId, key, links, alias, env, gui, options, checkpoint, checkout, flags, dev, tier, stage, storage, name, main, dependencies, args, channel, release, applink, fragment, link, linkData, entrypoint, route, routes, dir, dht, pearDir, swapDir }
+    return { id, startId, key, links, alias, env, gui, options, checkpoint, checkout, flags, dev, stage, storage, name, main, args, channel, release, applink, fragment, link, linkData, entrypoint, route, routes, dir, dht, pearDir, swapDir }
   }
 
   update (state) {
@@ -103,14 +62,12 @@ module.exports = class State {
   constructor (params = {}) {
     const { dht, link, startId = null, id = null, args = null, env = ENV, cwd = CWD, dir = cwd, cmdArgs, onupdate = () => {}, flags, run, storage = null } = params
     const {
-      appling, channel, devtools, checkout, links,
+      appling, channel, devtools, checkout, links = '',
       dev = false, stage, updates, updatesDiff, followSymlinks,
       unsafeClearAppStorage, chromeWebrtcInternals
     } = flags
-    const { drive: { alias = null, key = null }, pathname: route, protocol, hash } = link ? parseLink(link) : { drive: {} }
+    const { drive: { alias = null, key = null }, pathname: route = '', protocol, hash } = link ? parseLink(link) : { drive: {} }
     const pathname = protocol === 'file:' ? (isWindows ? route.slice(1).slice(dir.length) : route.slice(dir.length)) : route
-    const pkgPath = path.join(dir, 'package.json')
-    const pkg = key === null ? readPkg(pkgPath) : null
     const store = flags.tmpStore ? path.join(os.tmpdir(), crypto.randomBytes(16).toString('hex')) : flags.store
     this.#onupdate = onupdate
     this.startId = startId
@@ -132,13 +89,11 @@ module.exports = class State {
     this.stage = stage
     this.fragment = hash ? hash.slice(1) : null
     this.linkData = pathname?.startsWith('/') ? pathname.slice(1) : pathname
-    this.link = link ? (link.startsWith(protocol) ? link : pearLink.normalize(pathToFileURL(link).toString())) : null
     this.key = key
-    this.applink = key ? this.link.slice(0, -(~~(pathname?.length) + ~~(hash?.length))) : null
+    this.link = link ? (link.startsWith(protocol) ? link : pearLink.normalize(pathToFileURL(link).toString())) : null
+    this.applink = key ? this.link.slice(0, -(~~(pathname?.length) + ~~(hash?.length))) : pathToFileURL(this.dir).href
     this.alias = alias
-    this.manifest = pkg
     this.cmdArgs = cmdArgs
-    this.pkgPath = pkgPath
     this.id = id
     this.followSymlinks = followSymlinks
     this.rti = flags.rti ? JSON.parse(flags.rti) : null // important to know if this throws, so no try/catch
@@ -148,11 +103,13 @@ module.exports = class State {
     if (this.stage || (this.run && this.dev === false)) {
       this.env.NODE_ENV = this.env.NODE_ENV || 'production'
     }
-    this.constructor.injestPackage(this, pkg, { links })
+    this.links = links.split(',').reduce((links, kv) => {
+      const [key, value] = kv.split('=')
+      links[key] = value
+      return links
+    }, {})
     const invalidStorage = this.key === null && this.storage !== null &&
       this.storage.startsWith(this.dir) && this.storage.includes(path.sep + 'pear' + path.sep + 'pear' + path.sep) === false
     if (invalidStorage) throw ERR_INVALID_APP_STORAGE('Application Storage may not be inside the project directory. --store "' + this.storage + '" is invalid')
-    const invalidName = /^[@/a-z0-9-_]+$/.test(this.name) === false
-    if (invalidName) throw ERR_INVALID_APP_NAME('The package.json name / pear.name field must be lowercase and one word, and may contain letters, numbers, hyphens (-), underscores (_), forward slashes (/) and asperands (@).')
   }
 }
