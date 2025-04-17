@@ -60,33 +60,19 @@ module.exports = class State {
   }
 
   constructor (params = {}) {
-    const { dht, link, startId = null, id = null, args = null, env = ENV, cwd = CWD, dir = cwd, cmdArgs, onupdate = () => {}, flags, run, storage = null } = params
-    const {
-      appling, channel, devtools, checkout, links = '',
-      dev = false, stage, updates, updatesDiff, followSymlinks,
-      unsafeClearAppStorage, chromeWebrtcInternals
-    } = flags
+    const { dht, link, startId = null, id = null, args = null, env = ENV, cwd = CWD, dir = cwd, cmdArgs, onupdate = () => {}, flags, run, storage = null, indices = {} } = params
     const { drive: { alias = null, key = null }, pathname: route = '', protocol, hash } = link ? parseLink(link) : { drive: {} }
     const pathname = protocol === 'file:' ? (isWindows ? route.slice(1).slice(dir.length) : route.slice(dir.length)) : route
-    const store = flags.tmpStore ? path.join(os.tmpdir(), crypto.randomBytes(16).toString('hex')) : flags.store
     this.#onupdate = onupdate
+    this.setFlags(flags)
     this.startId = startId
     this.dht = dht
-    this.store = store
     this.args = args
-    this.appling = appling
-    this.channel = channel || null
-    this.checkout = checkout
     this.dir = dir
     this.cwd = cwd
     this.run = run ?? flags.run
     this.storage = storage
     this.flags = flags
-    this.dev = dev
-    this.devtools = this.dev || devtools
-    this.updatesDiff = this.dev || updatesDiff
-    this.updates = updates
-    this.stage = stage
     this.fragment = hash ? hash.slice(1) : null
     this.linkData = pathname?.startsWith('/') ? pathname.slice(1) : pathname
     this.key = key
@@ -94,15 +80,14 @@ module.exports = class State {
     this.applink = key ? this.link.slice(0, -(~~(pathname?.length) + ~~(hash?.length))) : pathToFileURL(this.dir).href
     this.alias = alias
     this.cmdArgs = cmdArgs
+    this.indices = indices
     this.id = id
-    this.followSymlinks = followSymlinks
     this.rti = flags.rti ? JSON.parse(flags.rti) : null // important to know if this throws, so no try/catch
-    this.clearAppStorage = unsafeClearAppStorage
-    this.chromeWebrtcInternals = chromeWebrtcInternals
     this.env = { ...env }
     if (this.stage || (this.run && this.dev === false)) {
       this.env.NODE_ENV = this.env.NODE_ENV || 'production'
     }
+    const links = flags.link || ''
     this.links = links.split(',').reduce((links, kv) => {
       const [key, value] = kv.split('=')
       links[key] = value
@@ -111,5 +96,34 @@ module.exports = class State {
     const invalidStorage = this.key === null && this.storage !== null &&
       this.storage.startsWith(this.dir) && this.storage.includes(path.sep + 'pear' + path.sep + 'pear' + path.sep) === false
     if (invalidStorage) throw ERR_INVALID_APP_STORAGE('Application Storage may not be inside the project directory. --store "' + this.storage + '" is invalid')
+  }
+
+  setFlags (flags) {
+    const {
+      appling, channel, devtools, checkout, links,
+      dev = false, stage, updates, updatesDiff,
+      unsafeClearAppStorage, chromeWebrtcInternals, followSymlinks
+    } = flags
+    const store = flags.tmpStore ? path.join(os.tmpdir(), crypto.randomBytes(16).toString('hex')) : flags.store
+    this.store = store
+    this.appling = appling
+    this.channel = channel || null
+    this.checkout = checkout
+    this.dev = dev
+    this.devtools = this.dev || devtools
+    this.updatesDiff = this.dev || updatesDiff
+    this.updates = updates
+    this.stage = stage
+    this.clearAppStorage = unsafeClearAppStorage
+    this.chromeWebrtcInternals = chromeWebrtcInternals
+    this.followSymlinks = followSymlinks
+    if (links) {
+      const overrides = links.split(',').reduce((links, kv) => {
+        const [key, value] = kv.split('=')
+        links[key] = value
+        return links
+      }, {})
+      this.links = { ...(this.links || {}), ...overrides }
+    }
   }
 }
