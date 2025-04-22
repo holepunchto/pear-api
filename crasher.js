@@ -3,7 +3,6 @@ const { isBare, platform, arch } = require('which-runtime')
 const fs = isBare ? require('bare-fs') : require('fs')
 const path = isBare ? require('bare-path') : require('path')
 const { CHECKOUT } = require('./constants')
-const os = isBare ? require('bare-os') : require('os')
 const pid = isBare ? global.Bare.pid : global.process.pid
 
 let hasLoggedUnhandledRejection = false
@@ -38,12 +37,8 @@ function logAndExit (enableLog, logPath, errorInfo, stack, err) {
     printCrash(errorInfo, stack, err)
   }
 
-  if (isBare) {
-    os.kill(pid)
-  } else {
-    const runContext = global.process.versions.electron ? require('electron').app : global.process
-    runContext.exit(1)
-  }
+  const program = isBare ? global.Bare : (global.process.versions.electron ? require('electron').app : global.process)
+  program.exit(1)
 }
 
 function setupCrashHandlers (processName, swap, enableLog) {
