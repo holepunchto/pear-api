@@ -108,6 +108,7 @@ module.exports = class State {
       links[key] = value
       return links
     }, {})
+    this.storage = this.store ? (path.isAbsolute(this.store) ? this.store : path.resolve(this.cwd, this.store)) : this.storage
     const invalidStorage = this.key === null && this.storage !== null &&
       this.storage.startsWith(this.dir) && this.storage.includes(path.sep + 'pear' + path.sep + 'pear' + path.sep) === false
     if (invalidStorage) throw ERR_INVALID_APP_STORAGE('Application Storage may not be inside the project directory. --store "' + this.storage + '" is invalid')

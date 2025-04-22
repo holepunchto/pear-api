@@ -179,3 +179,39 @@ test('state constructor throws error for invalid storage path', async function (
     if (state) { t.fail('state should not be initialized') }
   }, ERR_INVALID_APP_STORAGE())
 })
+
+
+test('store flag change state storage', async function (t) {
+  t.plan(1)
+
+  const { teardown } = rig()
+  t.teardown(teardown)
+
+  const State = require('../state')
+  const state = new State({ flags: { store: '/path/to/store' } })
+
+  t.is(state.storage, '/path/to/store')
+})
+
+test('invalid storage when its inside project dir', async function (t) {
+  t.plan(1)
+
+  const { teardown } = rig()
+  t.teardown(teardown)
+
+  const State = require('../state')
+  t.exception(() => new State({ flags: { store: './store' } }))
+})
+
+test('temporary storage', async function (t) {
+  t.plan(2)
+
+  const { teardown } = rig()
+  t.teardown(teardown)
+
+  const State = require('../state')
+  const state = new State({ flags: { tmpStore: true } })
+
+  t.not(state.storage.includes('by-dkey'))
+  t.not(state.storage.includes('by-random'))
+})
