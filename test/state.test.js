@@ -180,7 +180,6 @@ test('state constructor throws error for invalid storage path', async function (
   }, ERR_INVALID_APP_STORAGE())
 })
 
-
 test('store flag change state storage', async function (t) {
   t.plan(1)
 
