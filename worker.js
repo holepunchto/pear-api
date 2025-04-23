@@ -9,6 +9,7 @@ const Pipe = isBare
 const teardown = isBare ? require('./teardown') : (fn) => fn()
 const { RUNTIME } = require('./constants')
 const rundef = require('./cmd/run')
+const peardef = require('./cmd')
 const noop = Function.prototype
 
 class Worker {
@@ -24,8 +25,9 @@ class Worker {
 
   #args (link) {
     if (Array.isArray(link)) return ['run', '--trusted', ...link]
+    const { rest } = peardef().parse(global.Bare.argv.slice(1))
+    const argv = ['run', ...rest]
     const parser = command('pear', command('run', ...rundef))
-    const argv = ['run', ...global.Bare.argv.slice(2)]
     const cmd = parser.parse(argv, { sync: true })
     const args = argv.map((arg) => arg === cmd.args.link ? link : arg)
     if (cmd.indices.rest > 0) args.splice(cmd.indices.rest)
