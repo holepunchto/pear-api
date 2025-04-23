@@ -205,9 +205,11 @@ const outputter = (cmd, taggers = {}) => (opts, stream, info = {}, ipc) => {
   if (typeof opts === 'boolean') opts = { json: opts }
   const { json = false, log } = opts
   return new Promise((resolve, reject) => {
+    let final = null
     stream.once('error', reject)
-    stream.on('end', resolve)
+    stream.on('end', () => { resolve(final) })
     stream.on('data', ({ tag, data }) => {
+      if (tag === 'final') final = data
       if (json) {
         const str = JSON.stringify({ cmd, tag, data })
         if (log) log(str)
