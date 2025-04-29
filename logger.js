@@ -2,7 +2,7 @@
 const { isBare } = require('which-runtime')
 const { formatWithOptions } = require('bare-format')
 const hrtime = isBare ? require('bare-hrtime') : process.hrtime
-const pear = require('./cmd')(global.Bare.argv.slice(1))
+const pear = require('./cmd')(isBare ? global.Bare.argv.slice(1) : process.argv.slice(1))
 const switches = {
   log: pear?.flags.log ?? false,
   level: pear?.flags.logLevel ?? (pear?.flags.log ? 2 : 0),
