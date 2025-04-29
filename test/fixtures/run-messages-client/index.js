@@ -1,9 +1,11 @@
 const Helper = require('../../helper')
+const { isBare } = require('which-runtime')
+const { isBare } = require('which-runtime')
 
 const main = async () => {
   const ipc = await Helper.startIpcClient()
 
-  Helper.rig({ ipc, state: { config: { args: Bare.argv.slice(4) } } })
+  Helper.rig({ ipc, state: { config: { args: isBare ? Bare.argv.slice(4) : process.argv.slice(4) } } })
 
   const pipe = Pear.pipe
 

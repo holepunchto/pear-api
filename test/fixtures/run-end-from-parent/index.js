@@ -1,10 +1,11 @@
 const Helper = require('../../helper')
+const { isBare } = require('which-runtime')
 
-const teardown = Helper.rig({ state: { config: { args: Bare.argv.slice(4) } } })
+const teardown = Helper.rig({ state: { config: { args: isBare ? Bare.argv.slice(4) : process.argv.slice(4) } } })
 const [entry] = Pear.config.args
 teardown()
 
-Helper.rig({ state: { config: { args: Bare.argv.slice(4) } }, runtimeArgv: [entry] })
+Helper.rig({ state: { config: { args: isBare ? Bare.argv.slice(4) : process.argv.slice(4) } }, runtimeArgv: [entry] })
 
 const main = async () => {
   const pipeIn = Pear.pipe

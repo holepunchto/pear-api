@@ -1,5 +1,6 @@
 const Helper = require('../../helper')
-Helper.rig({ state: { config: { args: Bare.argv.slice(4) } } })
+const { isBare } = require('which-runtime')
+Helper.rig({ state: { config: { args: isBare ? Bare.argv.slice(4) : process.argv.slice(4) } } })
 
 const pipe = Pear.pipe
 pipe.on('data', () => {

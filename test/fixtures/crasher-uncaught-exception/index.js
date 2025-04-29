@@ -1,6 +1,8 @@
 const Helper = require('../../helper')
+const { isBare } = require('which-runtime')
+const { isBare } = require('which-runtime')
 
-Helper.rig({ state: { config: { args: Bare.argv.slice(4) } } })
+Helper.rig({ state: { config: { args: isBare ? Bare.argv.slice(4) : process.argv.slice(4) } } })
 const [swap] = Pear.config.args
 
 const setupCrashHandlers = require('../../../crasher')
@@ -8,7 +10,7 @@ setupCrashHandlers('testProcess', swap, true)
 
 const main = async () => {
   const pipe = Pear.pipe
-  pipe.write(`${Bare.pid}\n`)
+  pipe.write(`${isBare ? Bare.pid : process.pid}\n`)
 
   await new Promise((resolve) => setTimeout(resolve, 1000))
   throw new Error('Test uncaught exception')

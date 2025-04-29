@@ -3,8 +3,9 @@ const { pathToFileURL } = require('url-file-url')
 const CHILD_PROCESS_URL = pathToFileURL(require.resolve('child_process'))
 
 const Helper = require('../../helper')
+const { isBare } = require('which-runtime')
 
-Helper.rig({ state: { config: { args: Bare.argv.slice(4) } } })
+Helper.rig({ state: { config: { args: isBare ? Bare.argv.slice(4) : process.argv.slice(4) } } })
 
 let resolve = () => {}
 const spawnCalled = new Promise((_resolve) => {
