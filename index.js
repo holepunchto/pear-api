@@ -4,19 +4,6 @@ const onteardown = global.Bare ? require('./teardown') : noop
 const program = global.Bare || global.process
 const kIPC = Symbol('ipc')
 
-class Identity {
-  #reftrack = null
-  #ipc = null
-  constructor ({ reftrack = noop, ipc = null } = {}) {
-    this.#reftrack = reftrack
-    this.#ipc = ipc
-  }
-
-  request = (publicKey) => this.#reftrack(this.#ipc.requestIdentity({ publicKey }))
-  share = (identity) => this.#reftrack(this.#ipc.shareIdentity(identity))
-  clear = () => this.#reftrack(this.#ipc.clearIdentity())
-}
-
 class API {
   #ipc = null
   #state = null
@@ -39,7 +26,6 @@ class API {
     this.#teardowns = new Promise((resolve) => { this.#unloading = resolve })
     this.key = this.#state.key ? (this.#state.key.type === 'Buffer' ? Buffer.from(this.#state.key.data) : this.#state.key) : null
     this.config = state.config
-    this.identity = new Identity({ reftrack: (promise) => this.#reftrack(promise), ipc: this.#ipc })
     teardown(() => this.#unload())
     this.#ipc.unref()
   }
@@ -168,6 +154,48 @@ class API {
   }
 
   exit = (code) => program.exit(code)
+
+  asset = (link, opts = {}) => {
+    this.#ref()
+    const stream = this.#ipc.asset({ ...opts, link })
+    stream.on('close', () => this.#unref())
+    return stream
+  }
+
+  dump = (link, opts = {}) => {
+    this.#ref()
+    const stream = this.#ipc.dump({ ...opts, link })
+    stream.on('close', () => this.#unref())
+    return stream
+  }
+
+  stage = (link, opts = {}) => {
+    this.#ref()
+    const stream = this.#ipc.stage({ ...opts, link })
+    stream.on('close', () => this.#unref())
+    return stream
+  }
+
+  release = (link, opts = {}) => {
+    this.#ref()
+    const stream = this.#ipc.release({ ...opts, link })
+    stream.on('close', () => this.#unref())
+    return stream
+  }
+
+  info = (link, opts = {}) => {
+    this.#ref()
+    const stream = this.#ipc.info({ ...opts, link })
+    stream.on('close', () => this.#unref())
+    return stream
+  }
+
+  seed = (link, opts = {}) => {
+    this.#ref()
+    const stream = this.#ipc.seed({ ...opts, link })
+    stream.on('close', () => { this.#unref() })
+    return stream
+  }
 }
 
 function noop () {}

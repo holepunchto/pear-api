@@ -2,6 +2,7 @@
 
 const { test } = require('brittle')
 const { isWindows } = require('which-runtime')
+const { Readable } = require('streamx')
 const path = require('bare-path')
 const os = require('bare-os')
 const Iambus = require('iambus')
@@ -729,4 +730,172 @@ test('Pear.exit', async function (t) {
 
   const exitedRes = await exited
   t.is(exitedRes, true, 'Pear.exit ok')
+})
+
+//
+// ops
+//
+
+test('Pear.asset', async function (t) {
+  t.plan(4)
+  const link = 'pear://0.123.testing'
+  const statuses = [
+    { tag: 'begin', data: { n: 3, link } },
+    { tag: 'middle', data: { n: 2 } },
+    { tag: 'final', data: { n: 1 } }
+  ]
+  const expected = structuredClone(statuses)
+
+  await Helper.startIpcServer({
+    handlers: {
+      asset: (opts) => {
+        t.is(opts.link, link)
+        return Readable.from(statuses)
+      }
+    },
+    teardown: t.teardown
+  })
+  t.teardown(Helper.rig({ ipc: await Helper.startIpcClient() }))
+
+  const stream = Pear.asset(link)
+  stream.on('data', (status) => {
+    t.alike(status, expected.shift())
+  })
+})
+
+test('Pear.stage', async function (t) {
+  t.plan(4)
+  const link = 'pear://0.123.testing'
+  const statuses = [
+    { tag: 'begin', data: { n: 3, link } },
+    { tag: 'middle', data: { n: 2 } },
+    { tag: 'final', data: { n: 1 } }
+  ]
+  const expected = structuredClone(statuses)
+
+  await Helper.startIpcServer({
+    handlers: {
+      stage: (opts) => {
+        t.is(opts.link, link)
+        return Readable.from(statuses)
+      }
+    },
+    teardown: t.teardown
+  })
+  t.teardown(Helper.rig({ ipc: await Helper.startIpcClient() }))
+
+  const stream = Pear.stage(link)
+  stream.on('data', (status) => {
+    t.alike(status, expected.shift())
+  })
+})
+
+test('Pear.dump', async function (t) {
+  t.plan(4)
+  const link = 'pear://0.123.testing'
+  const statuses = [
+    { tag: 'begin', data: { n: 3, link } },
+    { tag: 'middle', data: { n: 2 } },
+    { tag: 'final', data: { n: 1 } }
+  ]
+  const expected = structuredClone(statuses)
+
+  await Helper.startIpcServer({
+    handlers: {
+      dump: (opts) => {
+        t.is(opts.link, link)
+        return Readable.from(statuses)
+      }
+    },
+    teardown: t.teardown
+  })
+  t.teardown(Helper.rig({ ipc: await Helper.startIpcClient() }))
+
+  const stream = Pear.dump(link)
+  stream.on('data', (status) => {
+    t.alike(status, expected.shift())
+  })
+})
+
+test('Pear.info', async function (t) {
+  t.plan(4)
+  const link = 'pear://0.123.testing'
+  const statuses = [
+    { tag: 'begin', data: { n: 3, link } },
+    { tag: 'middle', data: { n: 2 } },
+    { tag: 'final', data: { n: 1 } }
+  ]
+  const expected = structuredClone(statuses)
+
+  await Helper.startIpcServer({
+    handlers: {
+      info: (opts) => {
+        t.is(opts.link, link)
+        return Readable.from(statuses)
+      }
+    },
+    teardown: t.teardown
+  })
+  t.teardown(Helper.rig({ ipc: await Helper.startIpcClient() }))
+
+  const stream = Pear.info(link)
+  stream.on('data', (status) => {
+    t.alike(status, expected.shift())
+  })
+})
+
+test('Pear.release', async function (t) {
+  t.plan(4)
+  const link = 'pear://0.123.testing'
+  const statuses = [
+    { tag: 'begin', data: { n: 3, link } },
+    { tag: 'middle', data: { n: 2 } },
+    { tag: 'final', data: { n: 1 } }
+  ]
+  const expected = structuredClone(statuses)
+
+  await Helper.startIpcServer({
+    handlers: {
+      release: (opts) => {
+        t.is(opts.link, link)
+        return Readable.from(statuses)
+      }
+    },
+    teardown: t.teardown
+  })
+  t.teardown(Helper.rig({ ipc: await Helper.startIpcClient() }))
+
+  const stream = Pear.release(link)
+  stream.on('data', (status) => {
+    t.alike(status, expected.shift())
+  })
+})
+
+test('Pear.seed', async function (t) {
+  t.plan(2)
+  const link = 'pear://0.123.testing'
+  const statuses = [
+    { tag: 'begin', data: { n: 3, link } }
+  ]
+  const expected = structuredClone(statuses)
+
+  await Helper.startIpcServer({
+    handlers: {
+      seed: (opts) => {
+        t.is(opts.link, link)
+        const stream = new Readable({ objectMode: true })
+        setImmediate(() => { for (const status of statuses) stream.push(status) })
+        return stream
+      }
+    },
+    teardown: t.teardown
+  })
+  t.teardown(Helper.rig({ ipc: await Helper.startIpcClient() }))
+
+  const stream = Pear.seed(link)
+
+  stream.on('data', (status) => {
+    t.alike(status, expected.shift())
+    if (expected.length === 0) stream.destroy()
+  })
 })

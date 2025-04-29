@@ -138,18 +138,13 @@ class Helper {
   }
 
   static async startIpcClient () {
-    const client = new IPC.Client({
-      socketPath
-    })
+    const client = new IPC.Client({ socketPath })
     await client.ready()
     return client
   }
 
   static async startIpcServer ({ handlers, teardown }) {
-    const server = new IPC.Server({
-      socketPath,
-      handlers
-    })
+    const server = new IPC.Server({ socketPath, handlers })
     teardown(() => server.close())
     await server.ready()
     return server

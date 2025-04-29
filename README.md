@@ -88,9 +88,13 @@ Platform gunk - glue-state for native and protocol integration.
 
 Attempt to boot the sidecar. Useful when establishing a `pear-ipc` connection from an interface-runtime to Pear Sidecar, pass it as the `connect` option.
 
-### `pear-api/worker`
+### `pear-api/opwait`
 
-Internal class, pass this (or a subclass of it) to the `pear-api` `API` constructor for `Pear.run` to use.
+`opwait(stream, onstatus) -> Promise`. An op is an operation executed by pear sidecar represented by a status stream, commands such as dump, stage, seed, release & info are ops. The `opwait` function returns a promise that waits for the stream to finish and resolves with the `final` tagged object. The `onstatus` function is called for each `data` event on the stream.
+
+### `pear-api/worker` (`class`)
+
+Internal class, pass this (or a subclass of it) to the `pear-api` `API` constructor for `Pear.run` to use. Not needed for general use - instead use `Pear.run`.
 
 ### `pear-api/parse-link`
 

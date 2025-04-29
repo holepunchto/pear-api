@@ -10,6 +10,7 @@ const byteSize = require('tiny-byte-size')
 const { isWindows } = require('which-runtime')
 const { CHECKOUT } = require('./constants')
 const teardown = require('./teardown')
+const opwait = require('./opwait')
 const isTTY = tty.isTTY(0)
 
 const pt = (arg) => arg
@@ -204,49 +205,42 @@ const outputter = (cmd, taggers = {}) => (opts, stream, info = {}, ipc) => {
     : null
   if (typeof opts === 'boolean') opts = { json: opts }
   const { json = false, log } = opts
-  return new Promise((resolve, reject) => {
-    let final = null
-    stream.once('error', reject)
-    stream.on('end', () => { resolve(final) })
-    stream.on('data', ({ tag, data }) => {
-      if (tag === 'final') final = data
-      if (json) {
-        const str = JSON.stringify({ cmd, tag, data })
-        if (log) log(str)
-        else print(str)
+  const promise = opwait(stream, ({ tag, data }) => {
+    if (json) {
+      const str = JSON.stringify({ cmd, tag, data })
+      if (log) log(str)
+      else print(str)
+      return
+    }
+    const transform = Promise.resolve(typeof taggers[tag] === 'function' ? taggers[tag](data, info, ipc) : taggers[tag] || false)
+    transform.then((result) => {
+      if (result === undefined) return
+      if (typeof result === 'string') result = { output: 'print', message: result }
+      if (result === false) {
+        if (tag === 'final') result = { output: 'print', message: data.success ? 'Success' : 'Failure' }
+        else result = {}
+      }
+      result.success = result.success ?? data?.success
+      const { output, message, success = data?.success } = result
+      if (log) {
+        const logOpts = { output, ...(typeof success === 'boolean' ? { success } : {}) }
+        if (Array.isArray(message) === false) log(message, logOpts)
+        else for (const msg of message) log(msg, logOpts)
         return
       }
-      const transform = Promise.resolve(typeof taggers[tag] === 'function' ? taggers[tag](data, info, ipc) : taggers[tag] || false)
-      transform.then((result) => {
-        if (result === undefined) return
-        if (typeof result === 'string') result = { output: 'print', message: result }
-        if (result === false) {
-          if (tag === 'final') result = { output: 'print', message: data.success ? 'Success' : 'Failure' }
-          else result = {}
-        }
-        result.success = result.success ?? data?.success
-        const { output, message, success = data?.success } = result
-        if (log) {
-          const logOpts = { output, ...(typeof success === 'boolean' ? { success } : {}) }
-          if (Array.isArray(message) === false) log(message, logOpts)
-          else for (const msg of message) log(msg, logOpts)
-          return
-        }
-        if (tag === 'byte-diff') {
-          byteDiff(data)
-          return
-        }
-        let msg = Array.isArray(message) ? message.join('\n') : message
-        if (tag === 'final') msg += '\n'
-        if (output === 'print') print(msg, success)
-        if (output === 'status') status(msg, success)
-      }, reject)
-    })
-  }).finally(() => {
-    if (!isTTY) return
-    stdio.out.write(ansi.showCursor())
-    dereg()
+      let msg = Array.isArray(message) ? message.join('\n') : message
+      if (tag === 'final') msg += '\n'
+      if (output === 'print') print(msg, success)
+      if (output === 'status') status(msg, success)
+    }, (err) => stream.destroy(err))
   })
+
+  return !isTTY
+    ? promise
+    : promise.finally(() => {
+      stdio.out.write(ansi.showCursor())
+      dereg()
+    })
 }
 
 const banner = `${ansi.bold('Pear')} ~ ${ansi.dim('Welcome to the Internet of Peers')}`
@@ -382,4 +376,4 @@ async function confirm (dialog, ask, delim, validation, msg) {
   await interact.run()
 }
 
-module.exports = { usage, permit, stdio, ansi, indicator, status, print, outputter, isTTY, confirm, byteSize }
+module.exports = { usage, permit, stdio, ansi, indicator, status, print, outputter, isTTY, confirm, byteSize, byteDiff }
