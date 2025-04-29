@@ -9,7 +9,7 @@ Helper.rig({ state: { config: { args: isBare ? Bare.argv.slice(4) : process.argv
 
 const main = async () => {
   const pipeIn = Pear.pipe
-  pipeIn.write(`${Bare.pid}\n`)
+  pipeIn.write(`${isBare ? Bare.pid : process.pid}\n`)
 
   const pipe = Pear.run(entry)
 

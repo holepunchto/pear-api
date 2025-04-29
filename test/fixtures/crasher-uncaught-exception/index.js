@@ -1,6 +1,5 @@
 const Helper = require('../../helper')
 const { isBare } = require('which-runtime')
-const { isBare } = require('which-runtime')
 
 Helper.rig({ state: { config: { args: isBare ? Bare.argv.slice(4) : process.argv.slice(4) } } })
 const [swap] = Pear.config.args

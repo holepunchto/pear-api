@@ -8,4 +8,4 @@ pipe.on('error', (err) => {
   if (err.code === 'ENOTCONN') return // when the other side destroys the pipe
   throw err
 })
-pipe.write(`${Bare.pid}\n`)
+pipe.write(`${isBare ? Bare.pid : process.pid}\n`)

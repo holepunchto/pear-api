@@ -9,7 +9,7 @@ setupCrashHandlers('testProcess', swap, true)
 
 const main = async () => {
   const pipe = Pear.pipe
-  pipe.write(`${Bare.pid}\n`)
+  pipe.write(`${isBare ? Bare.pid : process.pid}\n`)
 
   await new Promise((resolve) => setTimeout(resolve, 1000))
   await new Promise((resolve, reject) => reject(new Error('Test unhandled rejection')))
