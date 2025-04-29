@@ -1,3 +1,5 @@
+const { isBare } = require('which-runtime')
+
 const dirname = __dirname
 global.Pear = null
 
@@ -31,6 +33,6 @@ pipe.on('data', (data) => {
   }
   if (str === 'exit') {
     clearInterval(interval)
-    Bare.exit()
+    isBare ? Bare.exit() : process.exit()
   }
 })
