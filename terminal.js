@@ -7,7 +7,7 @@ const { Writable, Readable } = require('streamx')
 const { once } = require('bare-events')
 const hypercoreid = require('hypercore-id-encoding')
 const byteSize = require('tiny-byte-size')
-const { isWindows } = require('which-runtime')
+const { isWindows, isBare } = require('which-runtime')
 const { CHECKOUT } = require('./constants')
 const teardown = require('./teardown')
 const opwait = require('./opwait')
@@ -111,7 +111,7 @@ class Interact {
     this._rl.input?.setMode(tty.constants.MODE_RAW)
     this._rl.on('close', () => {
       console.log() // new line
-      Bare.exit()
+      isBare ? Bare.exit() : process.exit()
     })
   }
 
@@ -304,7 +304,7 @@ async function trust (ipc, key, cmd) {
   print('\n' + ansi.tick + ' pear://' + z32 + ' is now trusted\n')
   print(act[cmd] + '\n')
   await ipc.close()
-  Bare.exit()
+  isBare ? Bare.exit() : process.exit()
 }
 
 async function password (ipc, key, cmd) {
@@ -354,7 +354,7 @@ async function password (ipc, key, cmd) {
   await ipc.permit({ key, password: fields.value })
   print('\n' + ansi.tick + ' ' + message[cmd] + '\n')
   await ipc.close()
-  Bare.exit()
+  isBare ? Bare.exit() : process.exit()
 }
 
 function permit (ipc, info, cmd) {

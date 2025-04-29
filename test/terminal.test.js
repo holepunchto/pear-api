@@ -199,9 +199,15 @@ test('permit function with unencrypted key', async function (t) {
   require.cache[BARE_READLINE_URL].exports.createInterface = mockCreateInterface
   t.teardown(() => { require.cache[BARE_READLINE_URL].exports.createInterface = originalCreateInterface })
 
-  const originalBareExit = Bare.exit
-  const exited = new Promise((resolve) => { Bare.exit = () => resolve(true) })
-  t.teardown(() => { Bare.exit = originalBareExit })
+  const originalExit = isBare ? Bare.exit : process.exit
+  const exited = new Promise((resolve) => {
+    if (isBare) Bare.exit = () => resolve(true)
+    else process.exit = () => resolve(true)
+  })
+  t.teardown(() => {
+    if (isBare) Bare.exit = originalExit
+    else process.exit = originalExit
+  })
 
   let output = ''
   const originalConsoleLog = console.log
@@ -253,9 +259,15 @@ test('permit function with encrypted key', async function (t) {
   require.cache[BARE_READLINE_URL].exports.createInterface = mockCreateInterface
   t.teardown(() => { require.cache[BARE_READLINE_URL].exports.createInterface = originalCreateInterface })
 
-  const originalBareExit = Bare.exit
-  const exited = new Promise((resolve) => { Bare.exit = () => resolve(true) })
-  t.teardown(() => { Bare.exit = originalBareExit })
+  const originalExit = isBare ? Bare.exit : process.exit
+  const exited = new Promise((resolve) => {
+    if (isBare) Bare.exit = () => resolve(true)
+    else process.exit = () => resolve(true)
+  })
+  t.teardown(() => {
+    if (isBare) Bare.exit = originalExit
+    else process.exit = originalExit
+  })
 
   let output = ''
   const originalConsoleLog = console.log
