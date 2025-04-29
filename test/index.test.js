@@ -1,10 +1,10 @@
 'use strict'
 
 const { test } = require('brittle')
-const { isWindows } = require('which-runtime')
+const { isWindows, isBare } = require('which-runtime')
 const { Readable } = require('streamx')
-const path = require('bare-path')
-const os = require('bare-os')
+const path = require(isBare ? 'bare-path' : 'path')
+const os = require(isBare ? 'bare-os' : 'os')
 const Iambus = require('iambus')
 
 const Helper = require('./helper')

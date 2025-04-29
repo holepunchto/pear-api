@@ -3,11 +3,12 @@
 const { test } = require('brittle')
 const { pathToFileURL } = require('url-file-url')
 const hypercoreid = require('hypercore-id-encoding')
+const { isBare } = require('which-runtime')
 
 const dirname = __dirname
 global.Pear = null
 
-const BARE_READLINE_URL = pathToFileURL(require.resolve('bare-readline'))
+const BARE_READLINE_URL = pathToFileURL(require.resolve(isBare ? 'bare-readline' : 'readline'))
 const TERMINAL_URL = pathToFileURL(require.resolve('../terminal'))
 
 const rig = () => {

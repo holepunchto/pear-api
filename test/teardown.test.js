@@ -1,8 +1,8 @@
 'use strict'
 
 const { test } = require('brittle')
-const { isWindows } = require('which-runtime')
-const path = require('bare-path')
+const { isWindows, isBare } = require('which-runtime')
+const path = require(isBare ? 'bare-path' : 'path')
 
 const Helper = require('./helper')
 

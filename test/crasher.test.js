@@ -1,9 +1,10 @@
 'use strict'
 
 const { test } = require('brittle')
-const path = require('bare-path')
-const fs = require('bare-fs')
-const os = require('bare-os')
+const { isBare } = require('which-runtime')
+const path = require(isBare ? 'bare-path' : 'path')
+const fs = require(isBare ? 'bare-fs' : 'fs')
+const os = require(isBare ? 'bare-os' : 'os')
 
 const Helper = require('./helper')
 

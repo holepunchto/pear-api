@@ -1,7 +1,8 @@
 'use strict'
 
 const { test } = require('brittle')
-const path = require('bare-path')
+const { isBare } = require('which-runtime')
+const path = require(isBare ? 'bare-path' : 'path')
 
 const dirname = __dirname
 global.Pear = null
@@ -16,7 +17,7 @@ const rig = ({ runtimeArgv } = {}) => {
 
   const Worker = require('../worker')
   class TestWorker extends Worker {
-    static RUNTIME = Bare.argv[0]
+    static RUNTIME = isBare ? Bare.argv[0] : process.argv[0]
     static RUNTIME_ARGV = runtimeArgv
   }
   const worker = new TestWorker()

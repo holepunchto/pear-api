@@ -1,9 +1,9 @@
 'use strict'
 global.Pear = null
 
-const { isWindows } = require('which-runtime')
+const { isWindows, isBare } = require('which-runtime')
 const IPC = require('pear-ipc')
-const fs = require('bare-fs')
+const fs = require(isBare ? 'bare-fs' : 'fs')
 const { pathToFileURL } = require('url-file-url')
 
 const dirname = __dirname
@@ -28,7 +28,7 @@ class Helper {
 
     const Worker = require('../worker')
     class TestWorker extends Worker {
-      static RUNTIME = Bare.argv[0]
+      static RUNTIME = isBare ? Bare.argv[0] : process.argv[0]
       static RUNTIME_ARGV = runtimeArgv
     }
 
