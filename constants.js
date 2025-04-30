@@ -1,10 +1,9 @@
 'use strict'
 const hypercoreid = require('hypercore-id-encoding')
 const { platform, arch, isWindows, isLinux, isBare } = require('which-runtime')
-const { fileURLToPath } = require('url-file-url')
+const { fileURLToPath, pathToFileURL } = require('url-file-url')
 const sodium = require('sodium-native')
 const b4a = require('b4a')
-const path = require(isBare ? 'bare-path' : 'path')
 const CHECKOUT = global.Pear?.constructor.RTI.checkout
 const MOUNT = global.Pear?.constructor.RTI.mount
 const BIN = 'by-arch/' + platform + '-' + arch + '/bin/'
@@ -12,7 +11,7 @@ const BIN = 'by-arch/' + platform + '-' + arch + '/bin/'
 let mount = MOUNT ? toURL(MOUNT + '/', 'file:') : null
 if (!mount) {
   let url = require.main?.url
-  if (!isBare) url = new URL(`file://${require.main?.filename ?? path.resolve(process.argv[1]) }`)
+  if (!isBare) url = pathToFileURL(require?.main?.filename ?? process.argv[1])
   if (url?.href.endsWith('/boot.bundle')) url.href += '/'
   else url = new URL('.', url)
   if (url && url.protocol === 'pear:') url = toURL(global.Pear.config.swapDir + '/', 'file:')
