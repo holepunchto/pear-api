@@ -76,7 +76,7 @@
     "script-linker": "^2.5.4"
   },
   "devDependencies": {
-    "brittle": "^3.16.0",
+    "brittle": "^3.16.1",
     "hypercore-crypto": "^3.5.0",
     "iambus": "^1.0.3",
     "pear-ipc": "^6.1.0",
