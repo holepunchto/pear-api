@@ -3,7 +3,12 @@
 runTests()
 
 // Cleanup args when running using brittle-node or brittle-bare
-if (process.argv?.[1] && /brittle-(node|bare)$/.test(process.argv[1])) process.argv = [process.argv[0], import.meta.url.replace(/^file:\/\//, '')]
+const argv = (global?.Bare?.argv ?? global?.process.argv)
+if (argv?.[1] && /brittle-(node|bare)$/.test(argv[1])) {
+  const scriptPath = import.meta.url.replace(/^file:\/\//, '')
+  if (global?.Bare) Bare.argv = [argv[0], scriptPath]
+  else process.argv = [argv[0], scriptPath]
+}
 
 async function runTests () {
   const test = (await import('brittle')).default
