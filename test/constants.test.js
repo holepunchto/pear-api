@@ -3,6 +3,7 @@
 const { test } = require('brittle')
 const { isWindows, isBare } = require('which-runtime')
 const { pathToFileURL } = require('url-file-url')
+const path = require(isBare ? 'bare-path' : 'path')
 
 const dirname = __dirname
 global.Pear = null
@@ -43,8 +44,10 @@ test('constants with default MOUNT', async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
+  const main = isBare ? require.main.url : pathToFileURL(require?.main?.filename ?? process.argv[1])
+
   const constants = require('../constants')
-  t.is(constants.MOUNT, pathToFileURL(dirname).href)
+  t.is(constants.MOUNT, path.dirname(main.href))
 })
 
 test('constants with MOUNT starting with c:/', async function (t) {
