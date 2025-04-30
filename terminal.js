@@ -1,17 +1,19 @@
 'use strict'
 /* global Bare */
-const Pipe = require('bare-pipe')
-const readline = require('bare-readline')
-const tty = require('bare-tty')
+const { isWindows, isBare } = require('which-runtime')
+const Pipe = isBare ? require('bare-pipe') : undefined
+const readline = require(isBare ? 'bare-readline' : 'readline')
+const tty = require(isBare ? 'bare-tty' : 'tty')
+const fs = require(isBare ? 'bare-fs' : 'fs')
 const { Writable, Readable } = require('streamx')
-const { once } = require('bare-events')
+const { once } = require(isBare ? 'bare-events' : 'events')
 const hypercoreid = require('hypercore-id-encoding')
 const byteSize = require('tiny-byte-size')
-const { isWindows, isBare } = require('which-runtime')
 const { CHECKOUT } = require('./constants')
-const teardown = require('./teardown')
+const teardown = isBare ? require('./teardown') : () => {}
 const opwait = require('./opwait')
-const isTTY = tty.isTTY(0)
+const checkTTY = (fd) => isBare ? tty.isTTY(fd) : tty.isatty(fd)
+const isTTY = checkTTY(0)
 
 const pt = (arg) => arg
 const es = () => ''
@@ -56,19 +58,19 @@ const stdio = new class Stdio {
 
   get in () {
     if (this._in === null) {
-      this._in = tty.isTTY(0) ? new tty.ReadStream(0) : new Pipe(0)
+      this._in = checkTTY(0) ? new tty.ReadStream(0) : (isBare ? new Pipe(0) : fs.createReadStream('/dev/stdin', { fd: 0 }))
       this._in.once('close', () => { this._in = null })
     }
     return this._in
   }
 
   get out () {
-    if (this._out === null) this._out = tty.isTTY(1) ? new tty.WriteStream(1) : new Pipe(1)
+    if (this._out === null) this._out = checkTTY(1) ? new tty.WriteStream(1) : (isBare ? new Pipe(1) : fs.createWriteStream('/dev/stdout', { fd: 1 }))
     return this._out
   }
 
   get err () {
-    if (this._err === null) this._err = tty.isTTY(2) ? new tty.WriteStream(2) : new Pipe(2)
+    if (this._err === null) this._err = checkTTY(2) ? new tty.WriteStream(2) : (isBare ? new Pipe(2) : fs.createWriteStream('/dev/stderr', { fd: 2 }))
     return this._err
   }
 
@@ -108,7 +110,7 @@ class Interact {
       output: opts.masked ? new Writable({ write: mask }) : stdio.out
     })
 
-    this._rl.input?.setMode(tty.constants.MODE_RAW)
+    this._rl.input?.setMode(tty.constants?.MODE_RAW)
     this._rl.on('close', () => {
       console.log() // new line
       isBare ? Bare.exit() : process.exit()
