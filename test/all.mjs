@@ -2,6 +2,8 @@
 
 runTests()
 
+if (process.argv?.[1] && /brittle-(node|bare)$/.test(process.argv[1])) process.argv.splice(1, 1)
+
 async function runTests () {
   const test = (await import('brittle')).default
 
