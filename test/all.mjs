@@ -2,8 +2,8 @@
 
 runTests()
 
-// Remove bin script from args when running using brittle-node or brittle-bare
-if (process.argv?.[1] && /brittle-(node|bare)$/.test(process.argv[1])) process.argv.splice(1, 1)
+// Cleanup args when running using brittle-node or brittle-bare
+if (process.argv?.[1] && /brittle-(node|bare)$/.test(process.argv[1])) process.argv = [process.argv[0], import.meta.url.replace(/^file:\/\//, '')]
 
 async function runTests () {
   const test = (await import('brittle')).default
