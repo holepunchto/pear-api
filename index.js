@@ -11,6 +11,7 @@ class API {
   #teardowns = null
   #refs = 0
   #worker = null
+  #exitCode = 0
   config = null
   argv = program.argv
   pid = program.pid
@@ -154,6 +155,8 @@ class API {
   }
 
   exit = (code) => program.exit(code)
+  set exitCode (code) { this.#exitCode = code }
+  get exitCode () { return this.#exitCode }
 
   asset = (link, opts = {}) => {
     this.#ref()
