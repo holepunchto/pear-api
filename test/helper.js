@@ -42,7 +42,7 @@ class Helper {
 
     return () => {
       if (clearRequireCache) {
-        delete require.cache[pathToFileURL(require.resolve(clearRequireCache))]
+        delete require.cache[isBare ? pathToFileURL(require.resolve(clearRequireCache)) : require.resolve(clearRequireCache)]
       }
       global.Pear = null
     }

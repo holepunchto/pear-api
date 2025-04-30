@@ -1,13 +1,13 @@
 'use strict'
 
 const { test } = require('brittle')
-const { isWindows } = require('which-runtime')
+const { isWindows, isBare } = require('which-runtime')
 const { pathToFileURL } = require('url-file-url')
 
 const dirname = __dirname
 global.Pear = null
 
-const CONSTANTS_URL = pathToFileURL(require.resolve('../constants'))
+const CONSTANTS_URL = isBare ? pathToFileURL(require.resolve('../constants')) : require.resolve('../constants')
 
 const rig = ({ mount } = {}) => {
   if (global.Pear !== null) throw Error(`Prior Pear global not cleaned up: ${global.Pear}`)
