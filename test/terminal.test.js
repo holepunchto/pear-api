@@ -4,12 +4,12 @@ const { test } = require('brittle')
 const { pathToFileURL } = require('url-file-url')
 const hypercoreid = require('hypercore-id-encoding')
 const { isBare } = require('which-runtime')
+const readline = require('readline')
 
 const dirname = __dirname
 global.Pear = null
 
-const BARE_READLINE_URL = pathToFileURL(require.resolve(isBare ? 'bare-readline' : 'readline'))
-const TERMINAL_URL = pathToFileURL(require.resolve('../terminal'))
+const TERMINAL_URL = isBare ? pathToFileURL(require.resolve('../terminal')) : require.resolve('../terminal')
 
 const rig = () => {
   if (global.Pear !== null) throw Error(`Prior Pear global not cleaned up: ${global.Pear}`)
@@ -111,9 +111,9 @@ test('confirm function with valid input', async function (t) {
     input: { setMode: () => {} },
     close: () => {}
   })
-  const originalCreateInterface = require.cache[BARE_READLINE_URL].exports.createInterface
-  require.cache[BARE_READLINE_URL].exports.createInterface = mockCreateInterface
-  t.teardown(() => { require.cache[BARE_READLINE_URL].exports.createInterface = originalCreateInterface })
+  const originalCreateInterface = readline.createInterface
+  readline.createInterface = mockCreateInterface
+  t.teardown(() => { readline.createInterface = originalCreateInterface })
 
   let output = ''
   const originalWrite = stdio.out.write
@@ -150,9 +150,9 @@ test('confirm function with invalid input', async function (t) {
     input: { setMode: () => {} },
     close: () => {}
   })
-  const originalCreateInterface = require.cache[BARE_READLINE_URL].exports.createInterface
-  require.cache[BARE_READLINE_URL].exports.createInterface = mockCreateInterface
-  t.teardown(() => { require.cache[BARE_READLINE_URL].exports.createInterface = originalCreateInterface })
+  const originalCreateInterface = readline.createInterface
+  readline.createInterface = mockCreateInterface
+  t.teardown(() => { readline.createInterface = originalCreateInterface })
 
   let output = ''
   const originalWrite = stdio.out.write
@@ -195,9 +195,9 @@ test('permit function with unencrypted key', async function (t) {
     input: { setMode: () => {} },
     close: () => {}
   })
-  const originalCreateInterface = require.cache[BARE_READLINE_URL].exports.createInterface
-  require.cache[BARE_READLINE_URL].exports.createInterface = mockCreateInterface
-  t.teardown(() => { require.cache[BARE_READLINE_URL].exports.createInterface = originalCreateInterface })
+  const originalCreateInterface = readline.createInterface
+  readline.createInterface = mockCreateInterface
+  t.teardown(() => { readline.createInterface = originalCreateInterface })
 
   const originalExit = isBare ? Bare.exit : process.exit
   const exited = new Promise((resolve) => {
@@ -255,9 +255,9 @@ test('permit function with encrypted key', async function (t) {
     input: { setMode: () => {} },
     close: () => {}
   })
-  const originalCreateInterface = require.cache[BARE_READLINE_URL].exports.createInterface
-  require.cache[BARE_READLINE_URL].exports.createInterface = mockCreateInterface
-  t.teardown(() => { require.cache[BARE_READLINE_URL].exports.createInterface = originalCreateInterface })
+  const originalCreateInterface = readline.createInterface
+  readline.createInterface = mockCreateInterface
+  t.teardown(() => { readline.createInterface = originalCreateInterface })
 
   const originalExit = isBare ? Bare.exit : process.exit
   const exited = new Promise((resolve) => {
