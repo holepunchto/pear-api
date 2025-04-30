@@ -1,4 +1,4 @@
-name: CI
+name: Test with Node
 on:
   push:
     branches:
