@@ -2,6 +2,7 @@
 
 runTests()
 
+// Remove bin script from args when running using brittle-node or brittle-bare
 if (process.argv?.[1] && /brittle-(node|bare)$/.test(process.argv[1])) process.argv.splice(1, 1)
 
 async function runTests () {
