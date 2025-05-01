@@ -376,4 +376,4 @@ async function confirm (dialog, ask, delim, validation, msg) {
   await interact.run()
 }
 
-module.exports = { usage, permit, stdio, ansi, indicator, status, print, outputter, isTTY, confirm, byteSize, byteDiff }
+module.exports = { usage, permit, stdio, ansi, indicator, status, print, outputter, isTTY, confirm, byteSize, byteDiff, Interact }
