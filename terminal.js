@@ -108,7 +108,7 @@ class Interact {
       output: opts.masked ? new Writable({ write: mask }) : stdio.out
     })
 
-    this._rl.input?.setMode(tty.constants.MODE_RAW)
+    if ('setMode' in this._rl.input) this._rl.input.setMode(tty.constants.MODE_RAW)
     this._rl.on('close', () => {
       console.log() // new line
       Bare.exit()
