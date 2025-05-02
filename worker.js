@@ -54,7 +54,7 @@ class Worker {
     }
 
     _final (cb) {
-      this.outgoing.end()
+      this._outgoing.end()
       cb(null)
     }
 
@@ -122,7 +122,7 @@ class Worker {
     if (this.#pipe) return this.#pipe
     try {
       const stat = fs.fstatSync(3)
-      const hasPipe = stat.isFIFO() ?? stat.isSocket()
+      const hasPipe = stat.isFIFO() || stat.isSocket()
       if (hasPipe === false) return null
     } catch {
       return null
