@@ -21,8 +21,8 @@ class Worker {
     constructor (io, opts) {
       if (Array.isArray(io) === false) return new BarePipe(io, opts)
       super()
-      this._incoming = isBare ? new BarePipe(io[0]) : fs.createReadStream(null, { fd: io[0] })
-      this._outgoing = isBare ? new BarePipe(io[1]) : fs.createWriteStream(null, { fd: io[1] })
+      this._incoming = io[0]
+      this._outgoing = io[1]
 
       this._pendingWrite = null
 
@@ -127,7 +127,10 @@ class Worker {
     } catch {
       return null
     }
-    const pipe = new this.constructor.Pipe(isBare ? 3 : [4, 3])
+    const pipe = new this.constructor.Pipe(isBare
+      ? 3
+      : [fs.createReadStream(null, { fd: 4 }), fs.createWriteStream(null, { fd: 3 })]
+    )
     pipe.on('end', () => {
       teardown(() => pipe.end(), Number.MAX_SAFE_INTEGER)
     })
