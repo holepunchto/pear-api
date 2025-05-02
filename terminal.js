@@ -108,7 +108,7 @@ class Interact {
       output: opts.masked ? new Writable({ write: mask }) : stdio.out
     })
 
-    this._rl.input?.setMode(tty.constants.MODE_RAW)
+    if ('setMode' in this._rl.input) this._rl.input.setMode(tty.constants.MODE_RAW)
     this._rl.on('close', () => {
       console.log() // new line
       Bare.exit()
@@ -147,12 +147,20 @@ class Interact {
     return fields
   }
 
-  #autosubmit () {
+  async #autosubmit () {
     const fields = {}
     const defaults = this._defaults
     while (this._params.length) {
       const param = this._params.shift()
-      fields[param.name] = defaults[param.name] ?? param.default
+      let answer = defaults[param.name] ?? param.default
+      const valid = !param.validation || await param.validation(answer)
+      if (valid) {
+        if (typeof answer === 'string') answer = answer.replace(this.constructor.rx, '')
+        fields[param.name] = answer
+      } else if (param.validation) {
+        stdio.err.write(`Validating '${param.name}' parameter default failed: ${param.msg}\n`)
+        throw Error(`Validating '${param.name}' parameter default failed: ${param.msg}\n`)
+      }
     }
     return fields
   }

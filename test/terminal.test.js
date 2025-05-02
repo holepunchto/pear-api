@@ -287,3 +287,75 @@ test('permit function with encrypted key', async function (t) {
   const exitedRes = await exited
   t.is(exitedRes, true, 'Pear.exit ok')
 })
+
+test('interact - run - autosubmit validation fails', async function (t) {
+  t.plan(1)
+
+  const { teardown } = rig()
+  t.teardown(teardown)
+
+  const { Interact, stdio } = require('../terminal')
+
+  let output = ''
+  const originalWrite = stdio.err.write
+  stdio.err.write = (str) => { output += str }
+  t.teardown(() => { stdio.err.write = originalWrite })
+
+  const prompt = new Interact('', [{
+    name: 'foo',
+    validation: () => false, // always fail
+    default: 'biz',
+    msg: 'must be a square circle'
+  }])
+
+  try {
+    await prompt.run({ autosubmit: true })
+  } catch (e) {
+    t.is(output, "Validating 'foo' parameter default failed: must be a square circle\n", 'got error for param')
+  }
+
+  t.end()
+})
+
+test('interact - run - autosubmit validation passes', async function (t) {
+  t.plan(2)
+
+  const { teardown } = rig()
+  t.teardown(teardown)
+
+  const { Interact, stdio } = require('../terminal')
+
+  let output = ''
+  const originalWrite = stdio.err.write
+  stdio.err.write = (str) => { output += str }
+  t.teardown(() => { stdio.err.write = originalWrite })
+
+  const prompt = new Interact('', [
+    {
+      name: 'foo',
+      validation: () => true, // always passes
+      default: 'bar',
+      msg: 'anything or nothing is good'
+    },
+    {
+      name: 'biz',
+      default: 'baz',
+      msg: 'vibing'
+    }
+  ])
+
+  let locals
+  try {
+    locals = await prompt.run({ autosubmit: true })
+  } catch (e) {
+    t.fail('Shouldnt fail validation')
+  }
+
+  t.is(output, '', 'output stdio is silent')
+  t.alike(locals, {
+    foo: 'bar',
+    biz: 'baz'
+  }, 'has defaults as output')
+
+  t.end()
+})
