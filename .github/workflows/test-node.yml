@@ -32,5 +32,11 @@ jobs:
       - name: Test
         run: npm run test:node
 
+      - name : Upload coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+
       - name: Lint
         run: npm run lint
