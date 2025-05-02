@@ -288,7 +288,7 @@ test('permit function with encrypted key', async function (t) {
   t.is(exitedRes, true, 'Pear.exit ok')
 })
 
-test('interace - run - autosubmit validation fails', async function (t) {
+test('interact - run - autosubmit validation fails', async function (t) {
   t.plan(1)
 
   const { teardown } = rig()
@@ -317,7 +317,7 @@ test('interace - run - autosubmit validation fails', async function (t) {
   t.end()
 })
 
-test('interace - run - autosubmit validation passes', async function (t) {
+test('interact - run - autosubmit validation passes', async function (t) {
   t.plan(2)
 
   const { teardown } = rig()
