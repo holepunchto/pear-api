@@ -1,10 +1,11 @@
 'use strict'
 const fs = require('fs')
 const { spawn } = require('child_process')
-const { Duplex } = require('streamx')
-const { isBare } = require('which-runtime')
+const { isWindows, isBare } = require('which-runtime')
 const { command } = require('paparam')
-const BarePipe = isBare ? require('bare-pipe') : null
+const Pipe = isBare
+  ? require('bare-pipe')
+  : class Pipe extends require('net').Socket { constructor (fd) { super({ fd }) } }
 const teardown = isBare ? require('./teardown') : (fn) => fn()
 const { RUNTIME } = require('./constants')
 const rundef = require('./cmd/run')
@@ -17,68 +18,6 @@ class Worker {
   #unref = null
   static RUNTIME = RUNTIME
   static RUNTIME_ARGV = []
-  static Pipe = class Pipe extends Duplex {
-    constructor (io, opts) {
-      if (Array.isArray(io) === false) return new BarePipe(io, opts)
-      super()
-      this._incoming = io[0]
-      this._outgoing = io[1]
-
-      this._pendingWrite = null
-
-      this._incoming
-        .on('data', this._ondata.bind(this))
-        .on('end', this._onend.bind(this))
-        .pause()
-
-      this._outgoing.on('drain', this._ondrain.bind(this))
-    }
-
-    ref () {
-      this._incoming.ref()
-      this._outgoing.ref()
-    }
-
-    unref () {
-      this._incoming.unref()
-      this._outgoing.unref()
-    }
-
-    _read () {
-      this._incoming.resume()
-    }
-
-    _write (chunk, cb) {
-      if (this._outgoing.write(chunk)) cb(null)
-      else this._pendingWrite = cb
-    }
-
-    _final (cb) {
-      this._outgoing.end()
-      cb(null)
-    }
-
-    _predestroy () {
-      this._incoming.destroy()
-      this._outgoing.destroy()
-    }
-
-    _ondata (data) {
-      if (this.push(data) === false) this._incoming.pause()
-    }
-
-    _onend () {
-      this.push(null)
-    }
-
-    _ondrain () {
-      if (this._pendingWrite === null) return
-      const cb = this._pendingWrite
-      this._pendingWrite = null
-      cb(null)
-    }
-  }
-
   constructor ({ ref, unref } = {}) {
     this.#ref = ref ?? noop
     this.#unref = unref ?? noop
@@ -120,17 +59,14 @@ class Worker {
 
   pipe () {
     if (this.#pipe) return this.#pipe
+    const fd = 3
     try {
-      const stat = fs.fstatSync(3)
-      const hasPipe = stat.isFIFO() || stat.isSocket()
+      const hasPipe = isWindows ? fs.fstatSync(fd).isFIFO() : fs.fstatSync(fd).isSocket()
       if (hasPipe === false) return null
     } catch {
       return null
     }
-    const pipe = new this.constructor.Pipe(isBare
-      ? 3
-      : [fs.createReadStream(null, { fd: 4 }), fs.createWriteStream(null, { fd: 3 })]
-    )
+    const pipe = new Pipe(fd)
     pipe.on('end', () => {
       teardown(() => pipe.end(), Number.MAX_SAFE_INTEGER)
     })
