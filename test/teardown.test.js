@@ -8,7 +8,7 @@ const Helper = require('./helper')
 
 const dirname = __dirname
 
-test('teardown default', { skip: isWindows }, async function (t) {
+test('teardown default', { skip: !isBare || isWindows }, async function (t) {
   t.plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'teardown-default')
@@ -22,7 +22,7 @@ test('teardown default', { skip: isWindows }, async function (t) {
   t.is(td, 'teardown', 'teardown executed')
 })
 
-test('teardown with position', { skip: isWindows }, async function (t) {
+test('teardown with position', { skip: !isBare || isWindows }, async function (t) {
   t.plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'teardown-with-position')
