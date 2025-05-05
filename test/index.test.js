@@ -615,7 +615,7 @@ test('Pear.wakeups trigger', async function (t) {
 // teardown
 //
 
-test('Pear.teardown on pipe end', { skip: isWindows }, async function (t) {
+test('Pear.teardown on pipe end', { skip: !isBare || isWindows }, async function (t) {
   t.plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'run-teardown')
@@ -629,7 +629,7 @@ test('Pear.teardown on pipe end', { skip: isWindows }, async function (t) {
   t.is(td, 'teardown', 'teardown executed')
 })
 
-test('Pear.teardown on os kill', { skip: isWindows }, async function (t) {
+test('Pear.teardown on os kill', { skip: !isBare || isWindows }, async function (t) {
   t.plan(2)
 
   const dir = path.join(dirname, 'fixtures', 'run-teardown-os-kill')
@@ -651,7 +651,7 @@ test('Pear.teardown on os kill', { skip: isWindows }, async function (t) {
   t.is(td, 'teardown', 'teardown executed')
 })
 
-test('Pear.teardown on os kill with exit code', { skip: isWindows }, async function (t) {
+test('Pear.teardown on os kill with exit code', { skip: !isBare || isWindows }, async function (t) {
   t.plan(3)
 
   const dir = path.join(dirname, 'fixtures', 'run-teardown-exit-code')
@@ -684,7 +684,7 @@ test('Pear.teardown on os kill with exit code', { skip: isWindows }, async funct
   t.is(exitCode, 124, 'exit code matches')
 })
 
-test('Pear.teardown run wait', { skip: isWindows }, async function (t) {
+test('Pear.teardown run wait', { skip: !isBare || isWindows }, async function (t) {
   t.plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'run-teardown-wait')
@@ -698,7 +698,7 @@ test('Pear.teardown run wait', { skip: isWindows }, async function (t) {
   t.is(td, 'teardown', 'teardown executed')
 })
 
-test('Pear.teardown throw error', { skip: isWindows }, async function (t) {
+test('Pear.teardown throw error', { skip: !isBare || isWindows }, async function (t) {
   t.plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'run-teardown-error')
