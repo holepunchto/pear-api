@@ -19,7 +19,7 @@ async function runTests () {
   await import('./crasher.test.js')
   await import('./errors.test.js')
   await import('./gunk.test.js')
-  // await import('./index.test.js')
+  await import('./index.test.js')
   await import('./logger.test.js')
   await import('./opwait.test.js')
   await import('./parse-link.test.js')
