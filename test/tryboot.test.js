@@ -2,7 +2,7 @@
 
 const { test } = require('brittle')
 const { isBare } = require('which-runtime')
-const path = require(isBare ? 'bare-path' : 'path')
+const path = require('path')
 const { pathToFileURL } = require('url-file-url')
 
 const Logger = require('../logger')

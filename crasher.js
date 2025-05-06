@@ -1,7 +1,7 @@
 'use strict'
 const { isBare, platform, arch } = require('which-runtime')
-const fs = isBare ? require('bare-fs') : require('fs')
-const path = isBare ? require('bare-path') : require('path')
+const fs = require('fs')
+const path = require('path')
 const { CHECKOUT } = require('./constants')
 const pid = isBare ? global.Bare.pid : global.process.pid
 

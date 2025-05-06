@@ -3,7 +3,7 @@
 const { test } = require('brittle')
 const { isWindows, isBare } = require('which-runtime')
 const { pathToFileURL } = require('url-file-url')
-const path = require(isBare ? 'bare-path' : 'path')
+const path = require('path')
 
 const dirname = __dirname
 global.Pear = null

@@ -3,8 +3,8 @@
 const { test } = require('brittle')
 const { isWindows, isBare } = require('which-runtime')
 const { Readable } = require('streamx')
-const path = require(isBare ? 'bare-path' : 'path')
-const os = require(isBare ? 'bare-os' : 'os')
+const path = require('path')
+const os = require('os')
 const Iambus = require('iambus')
 
 const Helper = require('./helper')

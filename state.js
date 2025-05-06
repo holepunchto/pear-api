@@ -1,7 +1,7 @@
 'use strict'
 const { isBare, isWindows } = require('which-runtime')
-const os = isBare ? require('bare-os') : require('os')
-const path = isBare ? require('bare-path') : require('path')
+const os = require('os')
+const path = require('path')
 const { pathToFileURL } = require('url-file-url')
 const hypercoreid = require('hypercore-id-encoding')
 const pearLink = require('pear-link')

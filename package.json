@@ -46,6 +46,29 @@
       "Bare"
     ]
   },
+  "imports": {
+    "child_process": {
+      "bare": "bare-subprocess"
+    },
+    "fs": {
+      "bare": "bare-fs"
+    },
+    "path": {
+      "bare": "bare-path"
+    },
+    "os": {
+      "bare": "bare-os"
+    },
+    "readline": {
+      "bare": "bare-readline"
+    },
+    "events": {
+      "bare": "bare-events"
+    },
+    "tty": {
+      "bare": "bare-tty"
+    }
+  },
   "dependencies": {
     "b4a": "^1.6.7",
     "bare-format": "^1.0.1",

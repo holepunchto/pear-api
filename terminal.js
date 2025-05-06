@@ -2,11 +2,11 @@
 /* global Bare */
 const { isWindows, isBare } = require('which-runtime')
 const Pipe = isBare ? require('bare-pipe') : undefined
-const readline = require(isBare ? 'bare-readline' : 'readline')
-const tty = require(isBare ? 'bare-tty' : 'tty')
-const fs = require(isBare ? 'bare-fs' : 'fs')
+const readline = require('readline')
+const tty = require('tty')
+const fs = require('fs')
 const { Writable, Readable } = require('streamx')
-const { once } = require(isBare ? 'bare-events' : 'events')
+const { once } = require('events')
 const hypercoreid = require('hypercore-id-encoding')
 const byteSize = require('tiny-byte-size')
 const { CHECKOUT } = require('./constants')

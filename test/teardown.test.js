@@ -2,7 +2,7 @@
 
 const { test } = require('brittle')
 const { isWindows, isBare } = require('which-runtime')
-const path = require(isBare ? 'bare-path' : 'path')
+const path = require('path')
 
 const Helper = require('./helper')
 

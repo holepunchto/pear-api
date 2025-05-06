@@ -3,7 +3,7 @@ global.Pear = null
 
 const { isWindows, isBare } = require('which-runtime')
 const IPC = require('pear-ipc')
-const fs = require(isBare ? 'bare-fs' : 'fs')
+const fs = require('fs')
 const { pathToFileURL } = require('url-file-url')
 
 const dirname = __dirname

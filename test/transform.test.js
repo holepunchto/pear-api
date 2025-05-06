@@ -1,9 +1,8 @@
 'use strict'
 
 const { test } = require('brittle')
-const { isBare } = require('which-runtime')
-const fs = require(isBare ? 'bare-fs' : 'fs')
-const path = require(isBare ? 'bare-path' : 'path')
+const fs = require('fs')
+const path = require('path')
 
 const transform = require('../transform')
 
