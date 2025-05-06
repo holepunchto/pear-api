@@ -8,7 +8,7 @@
     "lint:fix": "standard --fix",
     "test:gen": "brittle -r test/all.mjs test/*.test.js",
     "test": "bare test/all.mjs",
-    "test:node": "brittle-node --coverage test/all.mjs"
+    "test:node": "brittle-node test/all.mjs"
   },
   "files": [
     "CHANGELOG.md",
