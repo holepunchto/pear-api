@@ -7,6 +7,8 @@ const { isBare } = require('which-runtime')
 const readline = require('readline')
 const process = require('process')
 
+const testOptions = { skip: !isBare }
+
 const dirname = __dirname
 global.Pear = null
 
@@ -25,7 +27,7 @@ const rig = () => {
   }
 }
 
-test('indicator function', async function (t) {
+test('indicator function', testOptions, async function (t) {
   t.plan(6)
 
   const { teardown } = rig()
@@ -41,7 +43,7 @@ test('indicator function', async function (t) {
   t.is(indicator(0), ansi.gray('- '), 'indicator should return gray dash for zero')
 })
 
-test('status function', async function (t) {
+test('status function', testOptions, async function (t) {
   t.plan(3)
 
   const { teardown } = rig()
@@ -67,7 +69,7 @@ test('status function', async function (t) {
   stdio.out.write = originalWrite
 })
 
-test('print function', async function (t) {
+test('print function', testOptions, async function (t) {
   t.plan(3)
 
   const { teardown } = rig()
@@ -92,7 +94,7 @@ test('print function', async function (t) {
   t.ok(output.includes('Test message'), 'print should print message without success indicator')
 })
 
-test('confirm function with valid input', async function (t) {
+test('confirm function with valid input', testOptions, async function (t) {
   t.plan(1)
 
   const { teardown } = rig()
@@ -131,7 +133,7 @@ test('confirm function with valid input', async function (t) {
   t.ok(output.includes('YES'), 'confirm should accept valid input')
 })
 
-test('confirm function with invalid input', async function (t) {
+test('confirm function with invalid input', testOptions, async function (t) {
   t.plan(1)
 
   const { teardown } = rig()
@@ -176,7 +178,7 @@ test('confirm function with invalid input', async function (t) {
   }
 })
 
-test('permit function with unencrypted key', async function (t) {
+test('permit function with unencrypted key', testOptions, async function (t) {
   t.plan(4)
 
   const { teardown } = rig()
@@ -234,7 +236,7 @@ test('permit function with unencrypted key', async function (t) {
   t.is(exitedRes, true, 'Pear.exit ok')
 })
 
-test('permit function with encrypted key', async function (t) {
+test('permit function with encrypted key', testOptions, async function (t) {
   t.plan(5)
 
   const { teardown } = rig()
