@@ -33,12 +33,5 @@ jobs:
         run: npm run test:node
         continue-on-error: true
 
-      - name : Upload coverage artifacts
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: coverage
-          path: coverage/
-
       - name: Lint
         run: npm run lint
