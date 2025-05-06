@@ -1,7 +1,7 @@
 'use strict'
 
 const { test } = require('brittle')
-const { isBare } = require('which-runtime')
+const process = require('process')
 const path = require('path')
 
 const dirname = __dirname
@@ -17,7 +17,7 @@ const rig = ({ runtimeArgv } = {}) => {
 
   const Worker = require('../worker')
   class TestWorker extends Worker {
-    static RUNTIME = isBare ? Bare.argv[0] : process.argv[0]
+    static RUNTIME = process.argv[0]
     static RUNTIME_ARGV = runtimeArgv
   }
   const worker = new TestWorker()

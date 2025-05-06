@@ -5,6 +5,7 @@ const { isWindows, isBare } = require('which-runtime')
 const IPC = require('pear-ipc')
 const fs = require('fs')
 const { pathToFileURL } = require('url-file-url')
+const process = require('process')
 
 const dirname = __dirname
 const socketPath = isWindows ? '\\\\.\\pipe\\pear-api-test-ipc' : 'test.sock'
@@ -28,7 +29,7 @@ class Helper {
 
     const Worker = require('../worker')
     class TestWorker extends Worker {
-      static RUNTIME = isBare ? Bare.argv[0] : process.argv[0]
+      static RUNTIME = process.argv[0]
       static RUNTIME_ARGV = runtimeArgv
     }
 

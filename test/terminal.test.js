@@ -5,6 +5,7 @@ const { pathToFileURL } = require('url-file-url')
 const hypercoreid = require('hypercore-id-encoding')
 const { isBare } = require('which-runtime')
 const readline = require('readline')
+const process = require('process')
 
 const dirname = __dirname
 global.Pear = null
@@ -199,7 +200,7 @@ test('permit function with unencrypted key', async function (t) {
   readline.createInterface = mockCreateInterface
   t.teardown(() => { readline.createInterface = originalCreateInterface })
 
-  const originalExit = isBare ? Bare.exit : process.exit
+  const originalExit = process.exit
   const exited = new Promise((resolve) => {
     if (isBare) Bare.exit = () => resolve(true)
     else process.exit = () => resolve(true)
@@ -259,7 +260,7 @@ test('permit function with encrypted key', async function (t) {
   readline.createInterface = mockCreateInterface
   t.teardown(() => { readline.createInterface = originalCreateInterface })
 
-  const originalExit = isBare ? Bare.exit : process.exit
+  const originalExit = process.exit
   const exited = new Promise((resolve) => {
     if (isBare) Bare.exit = () => resolve(true)
     else process.exit = () => resolve(true)

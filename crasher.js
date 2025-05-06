@@ -2,8 +2,9 @@
 const { isBare, platform, arch } = require('which-runtime')
 const fs = require('fs')
 const path = require('path')
+const process = require('process')
 const { CHECKOUT } = require('./constants')
-const pid = isBare ? global.Bare.pid : global.process.pid
+const pid = process.pid
 
 let hasLoggedUnhandledRejection = false
 let hasLoggedUncaughtException = false

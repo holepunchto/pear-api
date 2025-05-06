@@ -50,6 +50,9 @@
     "child_process": {
       "bare": "bare-subprocess"
     },
+    "process": {
+      "bare": "bare-process"
+    },
     "fs": {
       "bare": "bare-fs"
     },
