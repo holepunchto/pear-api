@@ -1,5 +1,4 @@
 'use strict'
-/* global Bare */
 const { isWindows, isBare } = require('which-runtime')
 const Pipe = isBare ? require('bare-pipe') : undefined
 const readline = require('readline')

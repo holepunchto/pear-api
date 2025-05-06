@@ -1,5 +1,5 @@
 'use strict'
-const { isBare, isWindows } = require('which-runtime')
+const { isWindows } = require('which-runtime')
 const os = require('os')
 const path = require('path')
 const { pathToFileURL } = require('url-file-url')
