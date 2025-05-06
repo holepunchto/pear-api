@@ -11,6 +11,7 @@ const { RUNTIME } = require('./constants')
 const rundef = require('./cmd/run')
 const peardef = require('./cmd')
 const noop = Function.prototype
+const program = global.Bare || global.process
 
 class Worker {
   #pipe = null
@@ -25,7 +26,7 @@ class Worker {
 
   #args (link) {
     if (Array.isArray(link)) return ['run', '--trusted', ...link]
-    const { rest } = peardef().parse(global.Bare.argv.slice(1))
+    const { rest } = peardef().parse(program.argv.slice(1))
     const argv = ['run', ...rest]
     const parser = command('pear', command('run', ...rundef))
     const cmd = parser.parse(argv, { sync: true })
@@ -72,7 +73,7 @@ class Worker {
     })
     this.#pipe = pipe
     pipe.once('close', () => {
-      teardown(() => global.Bare.exit(), Number.MAX_SAFE_INTEGER)
+      teardown(() => program.exit(), Number.MAX_SAFE_INTEGER)
     })
     return pipe
   }
