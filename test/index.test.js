@@ -723,7 +723,7 @@ test('Pear.exit', async function (t) {
   const teardown = Helper.rig()
   t.teardown(teardown)
 
-  const originalExit = process.exit
+  const originalExit = isBare ? Bare.exit : process.exit
   const exited = new Promise((resolve) => {
     if (isBare) Bare.exit = () => resolve(true)
     else process.exit = () => resolve(true)

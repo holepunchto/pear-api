@@ -202,7 +202,7 @@ test('permit function with unencrypted key', testOptions, async function (t) {
   readline.createInterface = mockCreateInterface
   t.teardown(() => { readline.createInterface = originalCreateInterface })
 
-  const originalExit = process.exit
+  const originalExit = isBare ? Bare.exit : process.exit
   const exited = new Promise((resolve) => {
     if (isBare) Bare.exit = () => resolve(true)
     else process.exit = () => resolve(true)
@@ -262,7 +262,7 @@ test('permit function with encrypted key', testOptions, async function (t) {
   readline.createInterface = mockCreateInterface
   t.teardown(() => { readline.createInterface = originalCreateInterface })
 
-  const originalExit = process.exit
+  const originalExit = isBare ? Bare.exit : process.exit
   const exited = new Promise((resolve) => {
     if (isBare) Bare.exit = () => resolve(true)
     else process.exit = () => resolve(true)
