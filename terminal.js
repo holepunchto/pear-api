@@ -126,7 +126,8 @@ class Interact {
   async #run (opts = {}) {
     if (opts.autosubmit) return this.#autosubmit()
     stdio.out.write(this._header)
-    const fields = {}
+    const locals = {}
+    const shave = {}
     const defaults = this._defaults
     while (this._params.length) {
       const param = this._params.shift()
@@ -137,24 +138,28 @@ class Interact {
         if (answer.length === 0) answer = defaults[param.name] ?? deflt
         if (!param.validation || await param.validation(answer)) {
           if (typeof answer === 'string') answer = answer.replace(this.constructor.rx, '')
-          fields[param.name] = answer
+          locals[param.name] = answer
+          if (Array.isArray(param.shave) && params.shave.every((ix) => typeof ix === 'number')) shave[params.name] = param.shave
           break
         } else {
           stdio.out.write(param.msg + '\n')
         }
       }
     }
-    return fields
+    return { locals, shave }
   }
 
   #autosubmit () {
-    const fields = {}
+    const locals = {}
+    const shave = {}
     const defaults = this._defaults
     while (this._params.length) {
       const param = this._params.shift()
-      fields[param.name] = defaults[param.name] ?? param.default
+      locals[param.name] = defaults[param.name] ?? param.default
+      if (Array.isArray(param.shave) && params.shave.every((ix) => typeof ix === 'number')) shave[params.name] = param.shave
+
     }
-    return fields
+    return { locals, shave }
   }
 
   async #input (prompt) {
