@@ -139,7 +139,7 @@ class Interact {
         if (!param.validation || await param.validation(answer)) {
           if (typeof answer === 'string') answer = answer.replace(this.constructor.rx, '')
           locals[param.name] = answer
-          if (Array.isArray(param.shave) && params.shave.every((ix) => typeof ix === 'number')) shave[params.name] = param.shave
+          if (Array.isArray(param.shave) && param.shave.every((ix) => typeof ix === 'number')) shave[param.name] = param.shave
           break
         } else {
           stdio.out.write(param.msg + '\n')
@@ -156,7 +156,7 @@ class Interact {
     while (this._params.length) {
       const param = this._params.shift()
       locals[param.name] = defaults[param.name] ?? param.default
-      if (Array.isArray(param.shave) && params.shave.every((ix) => typeof ix === 'number')) shave[params.name] = param.shave
+      if (Array.isArray(param.shave) && param.shave.every((ix) => typeof ix === 'number')) shave[param.name] = param.shave
 
     }
     return { locals, shave }
@@ -169,6 +169,7 @@ class Interact {
     return answer.trim() // remove return char
   }
 }
+
 
 let statusFrag = ''
 
