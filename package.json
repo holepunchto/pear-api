@@ -73,7 +73,7 @@
     "script-linker": "^2.5.4"
   },
   "devDependencies": {
-    "brittle": "^3.10.0",
+    "brittle": "github:holepunchto/brittle#commandless-cov",
     "hypercore-crypto": "^3.5.0",
     "iambus": "^1.0.3",
     "pear-ipc": "^6.1.0",

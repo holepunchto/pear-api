@@ -5,6 +5,8 @@ runTests()
 async function runTests () {
   const test = (await import('brittle')).default
 
+  test.configure({ coverage: true })
+
   test.pause()
 
   await import('./constants.test.js')
