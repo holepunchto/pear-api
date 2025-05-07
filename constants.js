@@ -37,7 +37,7 @@ const WAKEUP_EXEC = isWindows
     : 'Pear.app/Contents/MacOS/Pear'
 
 const ALIASES = {
-  pear: hypercoreid.decode('dhpc5npmqkansx38uh18h3uwpdp6g9ukozrqyc4irbhwriedyeho'),
+  pear: hypercoreid.decode(LOCALDEV ? 'dhpc5npmqkansx38uh18h3uwpdp6g9ukozrqyc4irbhwriedyeho' : CHECKOUT.key),
   keet: hypercoreid.decode('8kwmb7myncf56o8bpxfcgtwysgsukbydjef1zy86bye7msc4mooo'),
   runtime: hypercoreid.decode('jgt6kkwanq98x85d74xeaihxdmg8m95714kwc7g7ycdgirda6ojy'),
   doctor: hypercoreid.decode('ouenymy889n4ri9g74jm5bcr46wc6hqnxadqhfmbc4xbskerehby'),
