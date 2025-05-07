@@ -37,13 +37,14 @@ const WAKEUP_EXEC = isWindows
     : 'Pear.app/Contents/MacOS/Pear'
 
 const ALIASES = {
-  keet: hypercoreid.decode('oeeoz3w6fjjt7bym3ndpa6hhicm8f8naxyk11z4iypeoupn6jzpo'),
-  runtime: hypercoreid.decode('nkw138nybdx6mtf98z497czxogzwje5yzu585c66ofba854gw3ro'),
-  doctor: hypercoreid.decode('3ih5k1t15xb9hrnz1mkd4jhamefis7ni4nwuus8f1w3j94yu831y')
+  keet: hypercoreid.decode('8kwmb7myncf56o8bpxfcgtwysgsukbydjef1zy86bye7msc4mooo'),
+  runtime: hypercoreid.decode('jgt6kkwanq98x85d74xeaihxdmg8m95714kwc7g7ycdgirda6ojy'),
+  doctor: hypercoreid.decode('ouenymy889n4ri9g74jm5bcr46wc6hqnxadqhfmbc4xbskerehby'),
+  electron: hypercoreid.decode('yceb7sjhgfzsnza7oc38hy3oxu9dhnywi3mzxdm9ubc48kjnxqgo')
 }
 
 const EOLS = {
-  keet: hypercoreid.decode('jc38t9nr7fasay4nqfxwfaawywfd3y14krnsitj67ymoubiezqdy')
+  keet: [hypercoreid.decode('jc38t9nr7fasay4nqfxwfaawywfd3y14krnsitj67ymoubiezqdy'), hypercoreid.decode('oeeoz3w6fjjt7bym3ndpa6hhicm8f8naxyk11z4iypeoupn6jzpo')]
 }
 
 exports.LOCALDEV = LOCALDEV
