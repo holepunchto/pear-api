@@ -11,7 +11,7 @@ const BIN = 'by-arch/' + platform + '-' + arch + '/bin/'
 let mount = MOUNT ? toURL(MOUNT + '/', 'file:') : null
 if (!mount) {
   let url = require.main?.url
-  if (!isBare) url = pathToFileURL(require?.main?.filename ?? process.argv[1])
+  if (!url && !isBare) url = pathToFileURL(require?.main?.filename ?? process.argv[1])
   if (url?.href.endsWith('/boot.bundle')) url.href += '/'
   else url = new URL('.', url)
   if (url && url.protocol === 'pear:') url = toURL(global.Pear.config.swapDir + '/', 'file:')
