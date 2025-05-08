@@ -1,5 +1,6 @@
 'use strict'
 const { isBare } = require('which-runtime')
+const { formatWithOptions } = require('bare-format')
 const hrtime = isBare ? require('bare-hrtime') : process.hrtime
 const pear = require('./cmd')(global.Bare.argv.slice(1))
 const switches = {
@@ -16,7 +17,11 @@ class Logger {
   static ERR = 1
   static INF = 2
   static TRC = 3
-
+  static [0] = 'OFF'
+  static [1] = 'ERR'
+  static [2] = 'INF'
+  static [3] = 'TRC'
+  name = '' // for stacks
   constructor ({ labels = '', fields, stacks, level, pretty } = {}) {
     this._fields = this._parseFields(fields)
     labels = this._parseLabels(labels)
@@ -32,6 +37,7 @@ class Logger {
     }
     this.stack = ''
     this.LEVEL = this._parseLevel(level ?? this.constructor.switches.level)
+    this._tty = null
   }
 
   get OFF () { return this.LEVEL === this.constructor.OFF }
@@ -104,14 +110,43 @@ class Logger {
     }
   }
 
+  format (level, label, ...args) {
+    if (this._tty === null) this._tty = require('bare-tty').isTTY(0) // lazy
+    if (Object.hasOwn(this.constructor, level) === false) return ''
+    if (typeof level === 'number') level = this.constructor[level]
+    if (this.LEVEL < this.constructor[level]) return ''
+    if (Array.isArray(label)) {
+      return label.map((lbl) => this.format(level, lbl, ...args).join('\n'))
+    }
+    if (!this._labels.has(label)) return ''
+    Error.captureStackTrace(this, this.format)
+    args = this._args(level, label, ...args)
+    if (this._stacks) {
+      const output = formatWithOptions({ colors: this._tty }, ...args, this.stack).replace(/\u0000/g, '') // eslint-disable-line no-control-regex
+      this.stack = ''
+      return output
+    } else {
+      return formatWithOptions({ colors: this._tty }, ...args).replace(/\u0000/g, '') // eslint-disable-line no-control-regex
+    }
+  }
+
   _parseLevel (level) {
     if (typeof level === 'number') return level
     if (typeof level === 'string') level = level.toUpperCase()
-    if (level === 'OFF' || level === '0') return 0
-    if (level === 'ERR' || level === 'ERROR' || level === '1') return 1
-    if (level === 'INF' || level === 'INFO' || level === '2') return 2
-    if (level === 'TRC' || level === 'TRACE' || level === 'TRA' || level === '3') return 3
-    return 2
+    switch (true) {
+       case (level === 'OFF'): return this.constructor.OFF
+       case (level === 'ERR'): return this.constructor.ERR
+       case (level === 'INF'): return this.constructor.INF
+       case (level === 'TRC'): return this.constructor.TRC
+       case (level === '0'): return this.constructor.OFF
+       case (level === '1'): return this.constructor.ERR
+       case (level === '2'): return this.constructor.INF
+       case (level === '3'): return this.constructor.TRC
+       case (level === 'ERROR'): return this.constructor.ERR
+       case (level === 'INFO'): return this.constructor.INF
+       case (level === 'TRACE'): return this.constructor.TRC
+       default: return this.constructor.INF
+    }
   }
 
   _parseFields (fields = '') {

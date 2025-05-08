@@ -126,7 +126,7 @@ class Interact {
   async #run (opts = {}) {
     if (opts.autosubmit) return this.#autosubmit()
     stdio.out.write(this._header)
-    const locals = {}
+    const fields = {}
     const shave = {}
     const defaults = this._defaults
     while (this._params.length) {
@@ -138,7 +138,7 @@ class Interact {
         if (answer.length === 0) answer = defaults[param.name] ?? deflt
         if (!param.validation || await param.validation(answer)) {
           if (typeof answer === 'string') answer = answer.replace(this.constructor.rx, '')
-          locals[param.name] = answer
+          fields[param.name] = answer
           if (Array.isArray(param.shave) && param.shave.every((ix) => typeof ix === 'number')) shave[param.name] = param.shave
           break
         } else {
@@ -146,20 +146,19 @@ class Interact {
         }
       }
     }
-    return { locals, shave }
+    return { fields, shave }
   }
 
   #autosubmit () {
-    const locals = {}
+    const fields = {}
     const shave = {}
     const defaults = this._defaults
     while (this._params.length) {
       const param = this._params.shift()
-      locals[param.name] = defaults[param.name] ?? param.default
+      fields[param.name] = defaults[param.name] ?? param.default
       if (Array.isArray(param.shave) && param.shave.every((ix) => typeof ix === 'number')) shave[param.name] = param.shave
-
     }
-    return { locals, shave }
+    return { fields, shave }
   }
 
   async #input (prompt) {
@@ -169,7 +168,6 @@ class Interact {
     return answer.trim() // remove return char
   }
 }
-
 
 let statusFrag = ''
 
@@ -351,9 +349,9 @@ async function password (ipc, key, cmd) {
       msg
     }
   ], { masked: true })
-  const result = await interact.run()
+  const { fields } = await interact.run()
   print(`\n${ansi.key} Hashing password...`)
-  await ipc.permit({ key, password: result.value })
+  await ipc.permit({ key, password: fields.value })
   print('\n' + ansi.tick + ' ' + message[cmd] + '\n')
   await ipc.close()
   Bare.exit()

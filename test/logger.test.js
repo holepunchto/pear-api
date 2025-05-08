@@ -248,3 +248,22 @@ test('Logger constructor with custom switches', async function (t) {
   t.is(consoleLogCount, 0, 'console.log not called')
   t.is(consoleErrorCount, 1, 'console.error called once')
 })
+
+test('logger format', async function (t) {
+  t.plan(3)
+  const Logger = require('../logger')
+  const logger = new Logger({ labels: ['label-test'], level: Logger.INF })
+  t.ok(/ERR \[ label-test \] error/.test(logger.format('ERR', 'label-test', 'error')))
+  t.ok(/INF \[ label-test \] info/.test(logger.format('INF', 'label-test', 'info')))
+  t.is(logger.format('TRC', 'label-test', 'trace'), '')
+})
+
+test('logger format stacks: true', async function (t) {
+  t.plan(3)
+  const Logger = require('../logger')
+  const logger = new Logger({ labels: ['label-test'], level: Logger.INF, stacks: true  })
+
+  t.ok(/(\n^ {4}at .+$)+/m.test(logger.format('ERR', 'label-test', 'error')))
+  t.ok(/(\n^ {4}at .+$)+/m.test(logger.format('ERR', 'label-test', 'error')))
+  t.is(logger.format('TRC', 'label-test', 'trace'), '')
+})
