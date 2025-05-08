@@ -261,7 +261,7 @@ test('logger format', async function (t) {
 test('logger format stacks: true', async function (t) {
   t.plan(3)
   const Logger = require('../logger')
-  const logger = new Logger({ labels: ['label-test'], level: Logger.INF, stacks: true  })
+  const logger = new Logger({ labels: ['label-test'], level: Logger.INF, stacks: true })
 
   t.ok(/(\n^ {4}at .+$)+/m.test(logger.format('ERR', 'label-test', 'error')))
   t.ok(/(\n^ {4}at .+$)+/m.test(logger.format('ERR', 'label-test', 'error')))

@@ -134,18 +134,18 @@ class Logger {
     if (typeof level === 'number') return level
     if (typeof level === 'string') level = level.toUpperCase()
     switch (true) {
-       case (level === 'OFF'): return this.constructor.OFF
-       case (level === 'ERR'): return this.constructor.ERR
-       case (level === 'INF'): return this.constructor.INF
-       case (level === 'TRC'): return this.constructor.TRC
-       case (level === '0'): return this.constructor.OFF
-       case (level === '1'): return this.constructor.ERR
-       case (level === '2'): return this.constructor.INF
-       case (level === '3'): return this.constructor.TRC
-       case (level === 'ERROR'): return this.constructor.ERR
-       case (level === 'INFO'): return this.constructor.INF
-       case (level === 'TRACE'): return this.constructor.TRC
-       default: return this.constructor.INF
+      case (level === 'OFF'): return this.constructor.OFF
+      case (level === 'ERR'): return this.constructor.ERR
+      case (level === 'INF'): return this.constructor.INF
+      case (level === 'TRC'): return this.constructor.TRC
+      case (level === '0'): return this.constructor.OFF
+      case (level === '1'): return this.constructor.ERR
+      case (level === '2'): return this.constructor.INF
+      case (level === '3'): return this.constructor.TRC
+      case (level === 'ERROR'): return this.constructor.ERR
+      case (level === 'INFO'): return this.constructor.INF
+      case (level === 'TRACE'): return this.constructor.TRC
+      default: return this.constructor.INF
     }
   }
 
