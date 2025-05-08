@@ -10,6 +10,7 @@
     "test": "bare test/all.mjs"
   },
   "files": [
+    "CHANGELOG.md",
     "cmd/",
     "constants.js",
     "crasher.js",
