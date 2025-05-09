@@ -1,6 +1,6 @@
 'use strict'
 const hypercoreid = require('hypercore-id-encoding')
-const { platform, arch, isWindows, isLinux, isBare } = require('which-runtime')
+const { platform, arch, isWindows, isLinux } = require('which-runtime')
 const { fileURLToPath } = require('url-file-url')
 const sodium = require('sodium-native')
 const b4a = require('b4a')
