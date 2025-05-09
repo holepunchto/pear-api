@@ -1,8 +1,8 @@
 'use strict'
 const { isBare } = require('which-runtime')
 const { formatWithOptions } = require(isBare ? 'bare-format' : 'util')
-const hrtime = isBare ? require('bare-hrtime') : process.hrtime
-const pear = require('./cmd')(isBare ? global.Bare.argv.slice(1) : process.argv.slice(1))
+const process = require('process')
+const pear = require('./cmd')(process.argv.slice(1))
 const switches = {
   log: pear?.flags.log ?? false,
   level: pear?.flags.logLevel ?? (pear?.flags.log ? 2 : 0),
@@ -46,7 +46,7 @@ class Logger {
   get TRC () { return this.LEVEL >= this.constructor.TRC }
 
   _args (level, label, ...args) {
-    const now = hrtime.bigint()
+    const now = process.hrtime.bigint()
     const ms = Number(now) / 1e6
     const delta = this._times[label] ? ms - Number(this._times[label]) / 1e6 : 0
     this._times[label] = now
