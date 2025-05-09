@@ -102,6 +102,7 @@
     "script-linker": "^2.5.4"
   },
   "devDependencies": {
+    "bare-process": "^4.2.1",
     "brittle": "^3.16.2",
     "hypercore-crypto": "^3.5.0",
     "iambus": "^1.0.3",
