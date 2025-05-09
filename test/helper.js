@@ -20,6 +20,7 @@ class Helper {
     runtimeArgv,
     clearRequireCache
   } = {}) {
+    if (!require.main.url) require.main.url = pathToFileURL(__filename)
     if (global.Pear !== null) throw Error(`Prior Pear global not cleaned up: ${global.Pear}`)
 
     class RigAPI {
