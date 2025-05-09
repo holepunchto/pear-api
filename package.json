@@ -6,9 +6,9 @@
   "scripts": {
     "lint": "standard",
     "lint:fix": "standard --fix",
-    "test:gen": "brittle -r test/all.mjs test/*.test.js",
-    "test": "bare test/all.mjs",
-    "test:node": "brittle-node test/all.mjs"
+    "test:gen": "brittle -r test/all.cjs test/*.test.cjs",
+    "test": "bare test/all.cjs",
+    "test:node": "brittle-node test/all.cjs"
   },
   "files": [
     "CHANGELOG.md",
