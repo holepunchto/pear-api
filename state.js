@@ -1,5 +1,5 @@
 'use strict'
-const { isWindows } = require('which-runtime')
+const { isWindows, isBare } = require('which-runtime')
 const os = require('os')
 const path = require('path')
 const { pathToFileURL } = require('url-file-url')
@@ -7,9 +7,8 @@ const hypercoreid = require('hypercore-id-encoding')
 const pearLink = require('pear-link')
 const crypto = require('hypercore-crypto')
 const { PLATFORM_DIR, SWAP, RUNTIME } = require('./constants')
-const process = require('process')
-const CWD = process.cwd()
-const ENV = process.env
+const CWD = isBare ? os.cwd() : process.cwd()
+const ENV = isBare ? require('bare-env') : process.env
 const parseLink = require('./parse-link')
 const { ERR_INVALID_APP_STORAGE } = require('./errors')
 
