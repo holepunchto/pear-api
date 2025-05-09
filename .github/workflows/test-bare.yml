@@ -1,4 +1,4 @@
-name: CI
+name: Test with Bare
 on:
   push:
     branches:

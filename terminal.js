@@ -1,10 +1,10 @@
 'use strict'
 /* global Bare */
 const Pipe = require('bare-pipe')
-const readline = require('bare-readline')
-const tty = require('bare-tty')
+const readline = require('readline')
+const tty = require('tty')
 const { Writable, Readable } = require('streamx')
-const { once } = require('bare-events')
+const { once } = require('events')
 const hypercoreid = require('hypercore-id-encoding')
 const byteSize = require('tiny-byte-size')
 const { isWindows } = require('which-runtime')

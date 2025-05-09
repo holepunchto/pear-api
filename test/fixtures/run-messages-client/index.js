@@ -1,9 +1,10 @@
 const Helper = require('../../helper')
+const process = require('process')
 
 const main = async () => {
   const ipc = await Helper.startIpcClient()
 
-  Helper.rig({ ipc, state: { config: { args: Bare.argv.slice(4) } } })
+  Helper.rig({ ipc, state: { config: { args: process.argv.slice(4) } } })
 
   const pipe = Pear.pipe
 

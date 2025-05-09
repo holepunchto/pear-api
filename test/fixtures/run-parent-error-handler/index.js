@@ -1,14 +1,15 @@
 const Helper = require('../../helper')
+const process = require('process')
 
-const teardown = Helper.rig({ state: { config: { args: Bare.argv.slice(4) } } })
+const teardown = Helper.rig({ state: { config: { args: process.argv.slice(4) } } })
 const [entry] = Pear.config.args
 teardown()
 
-Helper.rig({ state: { config: { args: Bare.argv.slice(4) } }, runtimeArgv: [entry] })
+Helper.rig({ state: { config: { args: process.argv.slice(4) } }, runtimeArgv: [entry] })
 
 const main = async () => {
   const pipeIn = Pear.pipe
-  pipeIn.write(`${Bare.pid}\n`)
+  pipeIn.write(`${process.pid}\n`)
 
   const pipe = Pear.run(entry)
 

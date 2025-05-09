@@ -1,9 +1,9 @@
 'use strict'
 
 const { test } = require('brittle')
-const path = require('bare-path')
-const fs = require('bare-fs')
-const os = require('bare-os')
+const path = require('path')
+const fs = require('fs')
+const os = require('os')
 
 const Helper = require('./helper')
 

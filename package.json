@@ -6,8 +6,9 @@
   "scripts": {
     "lint": "standard",
     "lint:fix": "standard --fix",
-    "test:gen": "brittle -r test/all.mjs test/*.test.js",
-    "test": "bare test/all.mjs"
+    "test:gen": "brittle -r test/all.js test/*.test.js",
+    "test": "bare test/all.js",
+    "test:node": "brittle-node test/all.js"
   },
   "files": [
     "CHANGELOG.md",
@@ -45,8 +46,35 @@
       "Bare"
     ]
   },
+  "imports": {
+    "child_process": {
+      "bare": "bare-subprocess"
+    },
+    "process": {
+      "bare": "bare-process"
+    },
+    "fs": {
+      "bare": "bare-fs"
+    },
+    "path": {
+      "bare": "bare-path"
+    },
+    "os": {
+      "bare": "bare-os"
+    },
+    "readline": {
+      "bare": "bare-readline"
+    },
+    "events": {
+      "bare": "bare-events"
+    },
+    "tty": {
+      "bare": "bare-tty"
+    }
+  },
   "dependencies": {
     "b4a": "^1.6.7",
+    "bare-env": "^3.0.0",
     "bare-format": "^1.0.1",
     "bare-hrtime": "^2.0.10",
     "bare-os": "^3.4.0",
@@ -75,7 +103,8 @@
     "script-linker": "^2.5.4"
   },
   "devDependencies": {
-    "brittle": "^3.10.0",
+    "bare-process": "^4.2.1",
+    "brittle": "^3.16.2",
     "hypercore-crypto": "^3.5.0",
     "iambus": "^1.0.3",
     "pear-ipc": "^6.1.0",

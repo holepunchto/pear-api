@@ -1,10 +1,11 @@
 'use strict'
 global.Pear = null
 
-const { isWindows } = require('which-runtime')
+const { isWindows, isBare } = require('which-runtime')
 const IPC = require('pear-ipc')
-const fs = require('bare-fs')
+const fs = require('fs')
 const { pathToFileURL } = require('url-file-url')
+const process = require('process')
 
 const dirname = __dirname
 const socketPath = isWindows ? '\\\\.\\pipe\\pear-api-test-ipc' : 'test.sock'
@@ -19,6 +20,7 @@ class Helper {
     runtimeArgv,
     clearRequireCache
   } = {}) {
+    if (!require.main.url) require.main.url = pathToFileURL(__filename)
     if (global.Pear !== null) throw Error(`Prior Pear global not cleaned up: ${global.Pear}`)
 
     class RigAPI {
@@ -28,7 +30,7 @@ class Helper {
 
     const Worker = require('../worker')
     class TestWorker extends Worker {
-      static RUNTIME = Bare.argv[0]
+      static RUNTIME = process.argv[0]
       static RUNTIME_ARGV = runtimeArgv
     }
 
@@ -42,7 +44,7 @@ class Helper {
 
     return () => {
       if (clearRequireCache) {
-        delete require.cache[pathToFileURL(require.resolve(clearRequireCache))]
+        delete require.cache[isBare ? pathToFileURL(require.resolve(clearRequireCache)) : require.resolve(clearRequireCache)]
       }
       global.Pear = null
     }

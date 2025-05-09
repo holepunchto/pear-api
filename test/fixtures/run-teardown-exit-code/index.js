@@ -1,9 +1,10 @@
 const Helper = require('../../helper')
+const process = require('process')
 
-Helper.rig({ state: { config: { args: Bare.argv.slice(4) } } })
+Helper.rig({ state: { config: { args: process.argv.slice(4) } } })
 
 const pipe = Pear.pipe
-pipe.on('data', () => pipe.write(`${Bare.pid}\n`))
+pipe.on('data', () => pipe.write(`${process.pid}\n`))
 
 Pear.teardown(async () => {
   await new Promise((resolve) => {
