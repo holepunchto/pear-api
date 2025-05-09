@@ -1,6 +1,6 @@
 'use strict'
 const { isBare } = require('which-runtime')
-const { formatWithOptions } = require('bare-format')
+const { formatWithOptions } = require(isBare ? 'bare-format' : 'util')
 const hrtime = isBare ? require('bare-hrtime') : process.hrtime
 const pear = require('./cmd')(isBare ? global.Bare.argv.slice(1) : process.argv.slice(1))
 const switches = {
@@ -111,7 +111,7 @@ class Logger {
   }
 
   format (level, label, ...args) {
-    if (this._tty === null) this._tty = require('bare-tty').isTTY(0) // lazy
+    if (this._tty === null) this._tty = isBare ? require('bare-tty').isTTY(0) : require('tty').isatty(0) // lazy
     if (Object.hasOwn(this.constructor, level) === false) return ''
     if (typeof level === 'number') level = this.constructor[level]
     if (this.LEVEL < this.constructor[level]) return ''
