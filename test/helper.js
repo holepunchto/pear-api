@@ -10,6 +10,7 @@ const process = require('process')
 const dirname = __dirname
 const socketPath = isWindows ? '\\\\.\\pipe\\pear-api-test-ipc' : 'test.sock'
 const STOP_CHAR = '\n'
+const BUILTINS = new Set(require('module').builtinModules)
 
 const noop = () => undefined
 
@@ -150,6 +151,23 @@ class Helper {
     teardown(() => server.close())
     await server.ready()
     return server
+  }
+
+  static override (moduleName, override) {
+    const modulePath = isBare ? pathToFileURL(require.resolve(moduleName)) : require.resolve(moduleName)
+    if (BUILTINS.has(moduleName)) {
+      require.cache[modulePath] = { exports: typeof override === 'function' ? override : { ...require(moduleName), ...override } }
+      return () => { delete require.cache[moduleName] }
+    }
+
+    const original = require.cache[modulePath].exports
+    require.cache[modulePath].exports = typeof override === 'function' ? override : { ...original, ...override }
+    return () => { if (require.cache[modulePath]) require.cache[modulePath].exports = original }
+  }
+
+  static forget (moduleName) {
+    const modulePath = isBare ? pathToFileURL(require.resolve(moduleName)) : require.resolve(moduleName)
+    delete require.cache[modulePath]
   }
 }
 
