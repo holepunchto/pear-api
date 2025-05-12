@@ -167,7 +167,7 @@ class Helper {
 
   static forget (moduleName) {
     const modulePath = isBare ? pathToFileURL(require.resolve(moduleName)) : require.resolve(moduleName)
-    delete require.cache[modulePath]
+    if (require.cache[modulePath]) delete require.cache[modulePath]
   }
 }
 
