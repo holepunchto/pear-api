@@ -47,12 +47,11 @@ test('status function', testOptions, async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
-  const { status, stdio, ansi } = require('../terminal')
-  t.teardown(() => { Helper.forget('../terminal') })
-
-  const originalWrite = stdio.out.write
   let output = ''
-  stdio.out.write = (str) => { output += str }
+  t.teardown(Helper.override('tty', { WriteStream: class { write = (str) => { output += str } } }))
+
+  const { status, ansi } = require('../terminal')
+  t.teardown(() => { Helper.forget('../terminal') })
 
   status('Test message', true)
   t.ok(output.includes(ansi.tick + ' Test message'), 'status should print success message correctly')
@@ -64,8 +63,6 @@ test('status function', testOptions, async function (t) {
   output = ''
   status('Test message')
   t.ok(output.includes('Test message'), 'status should print message without success indicator')
-
-  stdio.out.write = originalWrite
 })
 
 test('print function', testOptions, async function (t) {
@@ -114,13 +111,11 @@ test('confirm function with valid input', testOptions, async function (t) {
   })
   t.teardown(Helper.override('readline', { createInterface: mockCreateInterface }))
 
-  const { stdio, ansi, confirm } = require('../terminal')
-  t.teardown(() => { Helper.forget('../terminal') })
-
   let output = ''
-  const originalWrite = stdio.out.write
-  stdio.out.write = (str) => { output += str }
-  t.teardown(() => { stdio.out.write = originalWrite })
+  t.teardown(Helper.override('tty', { WriteStream: class { write = (str) => { output += str } } }))
+
+  const { ansi, confirm } = require('../terminal')
+  t.teardown(() => { Helper.forget('../terminal') })
 
   const dialog = `${ansi.warning} Are you sure you want to proceed?`
   const ask = 'Type YES to confirm'
@@ -152,16 +147,18 @@ test('confirm function with invalid input', testOptions, async function (t) {
   })
   t.teardown(Helper.override('readline', { createInterface: mockCreateInterface }))
 
-  const { stdio, ansi, confirm } = require('../terminal')
-  t.teardown(() => { Helper.forget('../terminal') })
-
   let output = ''
-  const originalWrite = stdio.out.write
-  stdio.out.write = (str) => {
-    output += str
-    if (str.includes('Invalid input')) throw Error('Invalid input')
-  }
-  t.teardown(() => { stdio.out.write = originalWrite })
+  t.teardown(Helper.override('tty', {
+    WriteStream: class {
+      write = (str) => {
+        output += str
+        if (str.includes('Invalid input')) throw Error('Invalid input')
+      }
+    }
+  }))
+
+  const { ansi, confirm } = require('../terminal')
+  t.teardown(() => { Helper.forget('../terminal') })
 
   const dialog = `${ansi.warning} Are you sure you want to proceed?`
   const ask = 'Type YES to confirm'
