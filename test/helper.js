@@ -160,6 +160,7 @@ class Helper {
       return () => { delete require.cache[moduleName] }
     }
 
+    if (!require.cache[modulePath]) require(moduleName)
     const original = require.cache[modulePath].exports
     require.cache[modulePath].exports = typeof override === 'function' ? override : { ...original, ...override }
     return () => { if (require.cache[modulePath]) require.cache[modulePath].exports = original }
