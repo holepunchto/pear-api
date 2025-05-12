@@ -7,12 +7,13 @@ let resolve = () => {}
 const spawnCalled = new Promise((_resolve) => {
   resolve = _resolve
 })
-Pear.teardown(Helper.override('child_process', {
+const teardown = Helper.override('child_process', {
   spawn: (cmd, args, options) => {
     resolve({ cmd, args, options })
     return { unref: () => {} }
   }
-}))
+})
+Pear.teardown(teardown)
 
 const tryboot = require('../../../tryboot')
 tryboot()
