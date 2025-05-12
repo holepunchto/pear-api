@@ -1,18 +1,16 @@
 'use strict'
 
 const { test } = require('brittle')
-const { pathToFileURL } = require('url-file-url')
 const hypercoreid = require('hypercore-id-encoding')
 const { isBare } = require('which-runtime')
-const readline = require('readline')
 const process = require('process')
+const Helper = require('./helper')
+const { Readable } = require('streamx')
 
 const testOptions = { skip: !isBare }
 
 const dirname = __dirname
 global.Pear = null
-
-const TERMINAL_URL = isBare ? pathToFileURL(require.resolve('../terminal')) : require.resolve('../terminal')
 
 const rig = () => {
   if (global.Pear !== null) throw Error(`Prior Pear global not cleaned up: ${global.Pear}`)
@@ -34,6 +32,7 @@ test('indicator function', testOptions, async function (t) {
   t.teardown(teardown)
 
   const { indicator, ansi } = require('../terminal')
+  t.teardown(() => { Helper.forget('../terminal') })
 
   t.is(indicator(true), ansi.tick + ' ', 'indicator should return tick for true')
   t.is(indicator(false), ansi.cross + ' ', 'indicator should return cross for false')
@@ -49,11 +48,16 @@ test('status function', testOptions, async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
-  const { status, stdio, ansi } = require('../terminal')
-
-  const originalWrite = stdio.out.write
   let output = ''
-  stdio.out.write = (str) => { output += str }
+  const restoreTTY = Helper.override('tty', {
+    isTTY: () => true,
+    WriteStream: class { write = (str) => { output += str } },
+    ReadStream: class extends Readable { setMode = () => {} }
+  })
+  t.teardown(restoreTTY)
+
+  const { status, ansi } = require('../terminal')
+  t.teardown(() => { Helper.forget('../terminal') })
 
   status('Test message', true)
   t.ok(output.includes(ansi.tick + ' Test message'), 'status should print success message correctly')
@@ -65,8 +69,6 @@ test('status function', testOptions, async function (t) {
   output = ''
   status('Test message')
   t.ok(output.includes('Test message'), 'status should print message without success indicator')
-
-  stdio.out.write = originalWrite
 })
 
 test('print function', testOptions, async function (t) {
@@ -76,6 +78,7 @@ test('print function', testOptions, async function (t) {
   t.teardown(teardown)
 
   const { print, ansi } = require('../terminal')
+  t.teardown(() => { Helper.forget('../terminal') })
 
   const originalConsoleLog = console.log
   let output = ''
@@ -100,8 +103,6 @@ test('confirm function with valid input', testOptions, async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
-  const { stdio, ansi, confirm } = require('../terminal')
-
   const mockCreateInterface = () => ({
     _prompt: '',
     once: (event, callback) => {
@@ -114,14 +115,19 @@ test('confirm function with valid input', testOptions, async function (t) {
     input: { setMode: () => {} },
     close: () => {}
   })
-  const originalCreateInterface = readline.createInterface
-  readline.createInterface = mockCreateInterface
-  t.teardown(() => { readline.createInterface = originalCreateInterface })
+  const restoreReadLine = Helper.override('readline', { createInterface: mockCreateInterface })
+  t.teardown(restoreReadLine)
 
   let output = ''
-  const originalWrite = stdio.out.write
-  stdio.out.write = (str) => { output += str }
-  t.teardown(() => { stdio.out.write = originalWrite })
+  const restoreTTY = Helper.override('tty', {
+    isTTY: () => true,
+    WriteStream: class { write = (str) => { output += str } },
+    ReadStream: class extends Readable { setMode = () => {} }
+  })
+  t.teardown(restoreTTY)
+
+  const { ansi, confirm } = require('../terminal')
+  t.teardown(() => { Helper.forget('../terminal') })
 
   const dialog = `${ansi.warning} Are you sure you want to proceed?`
   const ask = 'Type YES to confirm'
@@ -139,8 +145,6 @@ test('confirm function with invalid input', testOptions, async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
-  const { stdio, ansi, confirm } = require('../terminal')
-
   const mockCreateInterface = () => ({
     _prompt: '',
     once: (event, callback) => {
@@ -153,17 +157,24 @@ test('confirm function with invalid input', testOptions, async function (t) {
     input: { setMode: () => {} },
     close: () => {}
   })
-  const originalCreateInterface = readline.createInterface
-  readline.createInterface = mockCreateInterface
-  t.teardown(() => { readline.createInterface = originalCreateInterface })
+  const restoreReadLine = Helper.override('readline', { createInterface: mockCreateInterface })
+  t.teardown(restoreReadLine)
 
   let output = ''
-  const originalWrite = stdio.out.write
-  stdio.out.write = (str) => {
-    output += str
-    if (str.includes('Invalid input')) throw Error('Invalid input')
-  }
-  t.teardown(() => { stdio.out.write = originalWrite })
+  const restoreTTY = Helper.override('tty', {
+    isTTY: () => true,
+    WriteStream: class {
+      write = (str) => {
+        output += str
+        if (str.includes('Invalid input')) throw Error('Invalid input')
+      }
+    },
+    ReadStream: class extends Readable { setMode = () => {} }
+  })
+  t.teardown(restoreTTY)
+
+  const { ansi, confirm } = require('../terminal')
+  t.teardown(() => { Helper.forget('../terminal') })
 
   const dialog = `${ansi.warning} Are you sure you want to proceed?`
   const ask = 'Type YES to confirm'
@@ -184,8 +195,6 @@ test('permit function with unencrypted key', testOptions, async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
-  const { ansi, permit } = require('../terminal')
-
   const mockCreateInterface = () => ({
     _prompt: '',
     once: (event, callback) => {
@@ -198,9 +207,11 @@ test('permit function with unencrypted key', testOptions, async function (t) {
     input: { setMode: () => {} },
     close: () => {}
   })
-  const originalCreateInterface = readline.createInterface
-  readline.createInterface = mockCreateInterface
-  t.teardown(() => { readline.createInterface = originalCreateInterface })
+  const restoreReadLine = Helper.override('readline', { createInterface: mockCreateInterface })
+  t.teardown(restoreReadLine)
+
+  const { ansi, permit } = require('../terminal')
+  t.teardown(() => { Helper.forget('../terminal') })
 
   const originalExit = isBare ? Bare.exit : process.exit
   const exited = new Promise((resolve) => {
@@ -242,8 +253,6 @@ test('permit function with encrypted key', testOptions, async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
-  const { ansi, permit } = require('../terminal')
-
   const mockPassword = 'MYPASSWORD'
 
   const mockCreateInterface = () => ({
@@ -258,9 +267,11 @@ test('permit function with encrypted key', testOptions, async function (t) {
     input: { setMode: () => {} },
     close: () => {}
   })
-  const originalCreateInterface = readline.createInterface
-  readline.createInterface = mockCreateInterface
-  t.teardown(() => { readline.createInterface = originalCreateInterface })
+  const restoreReadLine = Helper.override('readline', { createInterface: mockCreateInterface })
+  t.teardown(restoreReadLine)
+
+  const { ansi, permit } = require('../terminal')
+  t.teardown(() => { Helper.forget('../terminal') })
 
   const originalExit = isBare ? Bare.exit : process.exit
   const exited = new Promise((resolve) => {
@@ -293,9 +304,8 @@ test('permit function with encrypted key', testOptions, async function (t) {
     run: async () => ({ value: mockPassword })
   }
 
-  const originalInteract = require.cache[TERMINAL_URL].exports.Interact
-  require.cache[TERMINAL_URL].exports.Interact = function () { return mockInteract }
-  t.teardown(() => { require.cache[TERMINAL_URL].exports.Interact = originalInteract })
+  const restoreTerminal = Helper.override('../terminal', { Interact: () => mockInteract })
+  t.teardown(restoreTerminal)
 
   await permit(mockIpc, mockInfo, mockCmd)
   t.ok(output.includes(`${ansi.tick} Added encryption key for pear://${hypercoreid.encode(mockKey)}`), 'permit should print encryption confirmation message')

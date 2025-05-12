@@ -70,6 +70,9 @@
     },
     "tty": {
       "bare": "bare-tty"
+    },
+    "module": {
+      "bare": "bare-module"
     }
   },
   "dependencies": {
@@ -103,6 +106,7 @@
     "script-linker": "^2.5.4"
   },
   "devDependencies": {
+    "bare-module": "^4.8.5",
     "bare-process": "^4.2.1",
     "brittle": "^3.16.2",
     "hypercore-crypto": "^3.5.0",
