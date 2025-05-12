@@ -5,6 +5,7 @@ const hypercoreid = require('hypercore-id-encoding')
 const { isBare } = require('which-runtime')
 const process = require('process')
 const Helper = require('./helper')
+const { Readable } = require('streamx')
 
 const testOptions = { skip: !isBare }
 
@@ -48,7 +49,11 @@ test('status function', testOptions, async function (t) {
   t.teardown(teardown)
 
   let output = ''
-  t.teardown(Helper.override('tty', { isTTY: () => true, WriteStream: class { write = (str) => { output += str } } }))
+  t.teardown(Helper.override('tty', {
+    isTTY: () => true,
+    WriteStream: class { write = (str) => { output += str } },
+    ReadStream: class extends Readable { setMode = () => {} }
+  }))
 
   const { status, ansi } = require('../terminal')
   t.teardown(() => { Helper.forget('../terminal') })
@@ -112,7 +117,11 @@ test('confirm function with valid input', testOptions, async function (t) {
   t.teardown(Helper.override('readline', { createInterface: mockCreateInterface }))
 
   let output = ''
-  t.teardown(Helper.override('tty', { isTTY: () => true, WriteStream: class { write = (str) => { output += str } } }))
+  t.teardown(Helper.override('tty', {
+    isTTY: () => true,
+    WriteStream: class { write = (str) => { output += str } },
+    ReadStream: class extends Readable { setMode = () => {} }
+  }))
 
   const { ansi, confirm } = require('../terminal')
   t.teardown(() => { Helper.forget('../terminal') })
@@ -155,7 +164,8 @@ test('confirm function with invalid input', testOptions, async function (t) {
         output += str
         if (str.includes('Invalid input')) throw Error('Invalid input')
       }
-    }
+    },
+    ReadStream: class extends Readable { setMode = () => {} }
   }))
 
   const { ansi, confirm } = require('../terminal')
