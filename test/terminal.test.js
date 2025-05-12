@@ -48,7 +48,7 @@ test('status function', testOptions, async function (t) {
   t.teardown(teardown)
 
   let output = ''
-  t.teardown(Helper.override('tty', { WriteStream: class { write = (str) => { output += str } } }))
+  t.teardown(Helper.override('tty', { isTTY: () => true, WriteStream: class { write = (str) => { output += str } } }))
 
   const { status, ansi } = require('../terminal')
   t.teardown(() => { Helper.forget('../terminal') })
@@ -112,7 +112,7 @@ test('confirm function with valid input', testOptions, async function (t) {
   t.teardown(Helper.override('readline', { createInterface: mockCreateInterface }))
 
   let output = ''
-  t.teardown(Helper.override('tty', { WriteStream: class { write = (str) => { output += str } } }))
+  t.teardown(Helper.override('tty', { isTTY: () => true, WriteStream: class { write = (str) => { output += str } } }))
 
   const { ansi, confirm } = require('../terminal')
   t.teardown(() => { Helper.forget('../terminal') })
@@ -149,6 +149,7 @@ test('confirm function with invalid input', testOptions, async function (t) {
 
   let output = ''
   t.teardown(Helper.override('tty', {
+    isTTY: () => true,
     WriteStream: class {
       write = (str) => {
         output += str
