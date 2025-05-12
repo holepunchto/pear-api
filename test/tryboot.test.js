@@ -19,13 +19,13 @@ test('tryboot default', async function (t) {
     resolve = _resolve
   })
 
-  const teardownChildProcess = Helper.override('child_process', {
+  const restoreChildProcess = Helper.override('child_process', {
     spawn: (cmd, args, options) => {
       resolve({ cmd, args, options })
       return { unref: () => {} }
     }
   })
-  t.teardown(teardownChildProcess)
+  t.teardown(restoreChildProcess)
 
   const tryboot = require('../tryboot')
   tryboot()
@@ -72,16 +72,16 @@ test('tryboot with --log flag', async function (t) {
   const spawnCalled = new Promise((_resolve) => {
     resolve = _resolve
   })
-  const teardownChildProcess = Helper.override('child_process', {
+  const restoreChildProcess = Helper.override('child_process', {
     spawn: (cmd, args, options) => {
       resolve({ cmd, args, options })
       return { unref: () => {} }
     }
   })
-  t.teardown(teardownChildProcess)
+  t.teardown(restoreChildProcess)
 
-  const teardownCmd = Helper.override('../cmd', () => ({ flags: { log: true } }))
-  t.teardown(teardownCmd)
+  const restoreCmd = Helper.override('../cmd', () => ({ flags: { log: true } }))
+  t.teardown(restoreCmd)
 
   const tryboot = require('../tryboot')
   tryboot()
@@ -107,16 +107,16 @@ test('tryboot with --log-level and --log-fields flags', async function (t) {
   const spawnCalled = new Promise((_resolve) => {
     resolve = _resolve
   })
-  const teardownChildProcess = Helper.override('child_process', {
+  const restoreChildProcess = Helper.override('child_process', {
     spawn: (cmd, args, options) => {
       resolve({ cmd, args, options })
       return { unref: () => {} }
     }
   })
-  t.teardown(teardownChildProcess)
+  t.teardown(restoreChildProcess)
 
-  const teardownCmd = Helper.override('../cmd', () => ({ flags: { logLevel: Logger.ERR, logFields: 'field1,field2' } }))
-  t.teardown(teardownCmd)
+  const restoreCmd = Helper.override('../cmd', () => ({ flags: { logLevel: Logger.ERR, logFields: 'field1,field2' } }))
+  t.teardown(restoreCmd)
 
   const tryboot = require('../tryboot')
   tryboot()
@@ -142,16 +142,16 @@ test('tryboot with --log-labels flag', async function (t) {
   const spawnCalled = new Promise((_resolve) => {
     resolve = _resolve
   })
-  const teardownChildProcess = Helper.override('child_process', {
+  const restoreChildProcess = Helper.override('child_process', {
     spawn: (cmd, args, options) => {
       resolve({ cmd, args, options })
       return { unref: () => {} }
     }
   })
-  t.teardown(teardownChildProcess)
+  t.teardown(restoreChildProcess)
 
-  const teardownCmd = Helper.override('../cmd', () => ({ flags: { logLabels: 'label1,label2' } }))
-  t.teardown(teardownCmd)
+  const restoreCmd = Helper.override('../cmd', () => ({ flags: { logLabels: 'label1,label2' } }))
+  t.teardown(restoreCmd)
 
   const tryboot = require('../tryboot')
   tryboot()
@@ -177,16 +177,16 @@ test('tryboot with --log-stacks flag', async function (t) {
   const spawnCalled = new Promise((_resolve) => {
     resolve = _resolve
   })
-  const teardownChildProcess = Helper.override('child_process', {
+  const restoreChildProcess = Helper.override('child_process', {
     spawn: (cmd, args, options) => {
       resolve({ cmd, args, options })
       return { unref: () => {} }
     }
   })
-  t.teardown(teardownChildProcess)
+  t.teardown(restoreChildProcess)
 
-  const teardownCmd = Helper.override('../cmd', () => ({ flags: { logStacks: true } }))
-  t.teardown(teardownCmd)
+  const restoreCmd = Helper.override('../cmd', () => ({ flags: { logStacks: true } }))
+  t.teardown(restoreCmd)
 
   const tryboot = require('../tryboot')
   tryboot()
