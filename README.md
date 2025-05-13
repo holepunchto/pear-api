@@ -96,9 +96,9 @@ Attempt to boot the sidecar. Useful when establishing a `pear-ipc` connection fr
 
 Internal class, pass this (or a subclass of it) to the `pear-api` `API` constructor for `Pear.run` to use. Not needed for general use - instead use `Pear.run`.
 
-### `pear-api/parse-link`
+### `pear-api/link`
 
-Parse `pear://` links per [`pear-link`](https://github.com/holepunchto/pear-link).
+Link parsing & normalizing of  `pear://` links using a [`pear-link`](https://github.com/holepunchto/pear-link) instance.
 
 ### `pear-api/teardown`
 

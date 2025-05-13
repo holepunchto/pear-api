@@ -23,7 +23,7 @@ async function runTests () {
   await import('./index.test.js')
   await import('./logger.test.js')
   await import('./opwait.test.js')
-  await import('./parse-link.test.js')
+  await import('./link.test.js')
   await import('./state.test.js')
   await import('./teardown.test.js')
   await import('./terminal.test.js')

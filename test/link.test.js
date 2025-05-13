@@ -25,9 +25,9 @@ test('parse-link ./some/path/to/a/file.js', async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
-  const parseLink = require('../parse-link')
+  const plink = require('../link')
 
-  const res = parseLink('./some/path/to/a/file.js')
+  const res = plink.parse('./some/path/to/a/file.js')
   t.is(res.protocol, 'file:')
   t.is(res.pathname, pathToFileURL('./some/path/to/a/file.js').pathname)
   t.is(res.hash, '')
@@ -43,9 +43,9 @@ test('parse-link file:///some/path/to/a/file.js', async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
-  const parseLink = require('../parse-link')
+  const plink = require('../link')
 
-  const res = parseLink('file:///some/path/to/a/file.js')
+  const res = plink.parse('file:///some/path/to/a/file.js')
   t.is(res.protocol, 'file:')
   t.is(res.pathname, '/some/path/to/a/file.js')
   t.is(res.hash, '')
@@ -61,10 +61,10 @@ test('parse-link pear://key', async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
-  const parseLink = require('../parse-link')
+  const plink = require('../link')
 
   const key = 'd47c1dfecec0f74a067985d2f8d7d9ad15f9ae5ff648f7bc6ca28e41d70ed221'
-  const res = parseLink(`pear://${key}`)
+  const res = plink.parse(`pear://${key}`)
   t.is(res.protocol, 'pear:')
   t.is(res.pathname, '')
   t.is(res.hash, '')
@@ -81,12 +81,12 @@ test('parse-link alias pear://alias', async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
-  const parseLink = require('../parse-link')
+  const plink = require('../link')
   const constants = require('../constants')
 
   const aliases = ['keet', 'runtime', 'doctor']
   for (const alias of aliases) {
-    const res = parseLink(`pear://${alias}`)
+    const res = plink.parse(`pear://${alias}`)
     t.is(res.protocol, 'pear:')
     t.is(res.pathname, '')
     t.is(res.hash, '')
@@ -104,10 +104,10 @@ test('parse-link pear://fork.length.key', async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
-  const parseLink = require('../parse-link')
+  const plink = require('../link')
 
   const key = 'd47c1dfecec0f74a067985d2f8d7d9ad15f9ae5ff648f7bc6ca28e41d70ed221'
-  const res = parseLink(`pear://123.456.${key}`)
+  const res = plink.parse(`pear://123.456.${key}`)
   t.is(res.protocol, 'pear:')
   t.is(res.pathname, '')
   t.is(res.hash, '')
@@ -124,12 +124,12 @@ test('parse-link alias pear://fork.length.alias', async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
-  const parseLink = require('../parse-link')
+  const plink = require('../link')
   const constants = require('../constants')
 
   const aliases = ['keet', 'runtime', 'doctor']
   for (const alias of aliases) {
-    const res = parseLink(`pear://123.456.${alias}`)
+    const res = plink.parse(`pear://123.456.${alias}`)
     t.is(res.protocol, 'pear:')
     t.is(res.pathname, '')
     t.is(res.hash, '')
@@ -147,11 +147,11 @@ test('parse-link pear://fork.length.key.dhash', async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
-  const parseLink = require('../parse-link')
+  const plink = require('../link')
 
   const key = 'd47c1dfecec0f74a067985d2f8d7d9ad15f9ae5ff648f7bc6ca28e41d70ed221'
   const dhash = '38d8296e972167f4ad37803999fbcac17025271162f44dcdce1188d4bc5bac1d'
-  const res = parseLink(`pear://123.456.${key}.${dhash}`)
+  const res = plink.parse(`pear://123.456.${key}.${dhash}`)
   t.is(res.protocol, 'pear:')
   t.is(res.pathname, '')
   t.is(res.hash, '')
@@ -168,17 +168,17 @@ test('parse-link invalid link', async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
-  const parseLink = require('../parse-link')
+  const plink = require('../link')
   const { ERR_INVALID_LINK } = require('../errors')
 
-  t.exception(() => parseLink(), ERR_INVALID_LINK())
-  t.exception(() => parseLink(''), ERR_INVALID_LINK())
-  t.exception(() => parseLink('pear://invalid-key'))
-  t.exception(() => parseLink('pear://a.b.c.d.e'))
-  t.exception(() => parseLink('pear://123.456'), ERR_INVALID_LINK())
-  t.exception(() => parseLink('pear://123.nan.d47c1dfecec0f74a067985d2f8d7d9ad15f9ae5ff648f7bc6ca28e41d70ed221'), ERR_INVALID_LINK())
-  t.exception(() => parseLink('pear://nan.123.keet'), ERR_INVALID_LINK())
-  t.exception(() => parseLink('pear://123.nan.d47c1dfecec0f74a067985d2f8d7d9ad15f9ae5ff648f7bc6ca28e41d70ed221.38d8296e972167f4ad37803999fbcac17025271162f44dcdce1188d4bc5bac1d'), ERR_INVALID_LINK())
-  t.exception(() => parseLink('pear://nan.123.keet.38d8296e972167f4ad37803999fbcac17025271162f44dcdce1188d4bc5bac1d'), ERR_INVALID_LINK())
-  t.exception(() => parseLink('unsupport://abc'), ERR_INVALID_LINK())
+  t.exception(() => plink.parse(), ERR_INVALID_LINK())
+  t.exception(() => plink.parse(''), ERR_INVALID_LINK())
+  t.exception(() => plink.parse('pear://invalid-key'))
+  t.exception(() => plink.parse('pear://a.b.c.d.e'))
+  t.exception(() => plink.parse('pear://123.456'), ERR_INVALID_LINK())
+  t.exception(() => plink.parse('pear://123.nan.d47c1dfecec0f74a067985d2f8d7d9ad15f9ae5ff648f7bc6ca28e41d70ed221'), ERR_INVALID_LINK())
+  t.exception(() => plink.parse('pear://nan.123.keet'), ERR_INVALID_LINK())
+  t.exception(() => plink.parse('pear://123.nan.d47c1dfecec0f74a067985d2f8d7d9ad15f9ae5ff648f7bc6ca28e41d70ed221.38d8296e972167f4ad37803999fbcac17025271162f44dcdce1188d4bc5bac1d'), ERR_INVALID_LINK())
+  t.exception(() => plink.parse('pear://nan.123.keet.38d8296e972167f4ad37803999fbcac17025271162f44dcdce1188d4bc5bac1d'), ERR_INVALID_LINK())
+  t.exception(() => plink.parse('unsupport://abc'), ERR_INVALID_LINK())
 })

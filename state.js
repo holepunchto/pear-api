@@ -4,12 +4,12 @@ const os = require('os')
 const path = require('path')
 const { pathToFileURL } = require('url-file-url')
 const hypercoreid = require('hypercore-id-encoding')
-const pearLink = require('pear-link')
+const PearLink = require('pear-link')
 const crypto = require('hypercore-crypto')
 const { PLATFORM_DIR, SWAP, RUNTIME } = require('./constants')
 const CWD = isBare ? os.cwd() : process.cwd()
 const ENV = isBare ? require('bare-env') : process.env
-const parseLink = require('./parse-link')
+const plink = require('./link')
 const { ERR_INVALID_APP_STORAGE } = require('./errors')
 
 module.exports = class State {
@@ -40,18 +40,18 @@ module.exports = class State {
   }
 
   static storageFromLink (link) {
-    const parsedLink = typeof link === 'string' ? parseLink(link) : link
+    const parsed = typeof link === 'string' ? plink.parse(link) : link
     const appStorage = path.join(PLATFORM_DIR, 'app-storage')
-    return parsedLink.protocol !== 'pear:'
+    return parsed.protocol !== 'pear:'
       ? path.join(appStorage, 'by-random', crypto.randomBytes(16).toString('hex'))
-      : path.join(appStorage, 'by-dkey', crypto.discoveryKey(hypercoreid.decode(parsedLink.drive.key)).toString('hex'))
+      : path.join(appStorage, 'by-dkey', crypto.discoveryKey(hypercoreid.decode(parsed.drive.key)).toString('hex'))
   }
 
   static configFrom (state) {
-    const { id, startId, key, links, alias, env, gui, options, checkpoint, checkout, flags, dev, stage, storage, name, main, args, channel, release, applink, fragment, link, linkData, entrypoint, route, routes, dir, dht } = state
+    const { id, startId, key, links, alias, env, gui, options, checkpoint, checkout, flags, dev, stage, storage, name, main, args, channel, release, applink, query, fragment, link, linkData, entrypoint, route, routes, dir, dht } = state
     const pearDir = PLATFORM_DIR
     const swapDir = SWAP
-    return { id, startId, key, links, alias, env, gui, options, checkpoint, checkout, flags, dev, stage, storage, name, main, args, channel, release, applink, fragment, link, linkData, entrypoint, route, routes, dir, dht, pearDir, swapDir }
+    return { id, startId, key, links, alias, env, gui, options, checkpoint, checkout, flags, dev, stage, storage, name, main, args, channel, release, applink, query, fragment, link, linkData, entrypoint, route, routes, dir, dht, pearDir, swapDir }
   }
 
   update (state) {
@@ -66,7 +66,7 @@ module.exports = class State {
       dev = false, stage, updates, updatesDiff, followSymlinks,
       unsafeClearAppStorage, chromeWebrtcInternals
     } = flags
-    const { drive: { alias = null, key = null }, pathname: route = '', protocol, hash } = link ? parseLink(link) : { drive: {} }
+    const { drive: { alias = null, key = null }, pathname: route = '', protocol, hash, search } = link ? plink.parse(link) : { drive: {} }
     const pathname = protocol === 'file:' ? (isWindows ? route.slice(1).slice(dir.length) : route.slice(dir.length)) : route
     const store = flags.tmpStore ? path.join(os.tmpdir(), crypto.randomBytes(16).toString('hex')) : flags.store
     this.#onupdate = onupdate
@@ -87,10 +87,11 @@ module.exports = class State {
     this.updatesDiff = this.dev || updatesDiff
     this.updates = updates
     this.stage = stage
-    this.fragment = hash ? hash.slice(1) : null
+    this.fragment = hash ? hash.slice(1) : ''
+    this.query = search ? search.slice(1) : ''
     this.linkData = pathname?.startsWith('/') ? pathname.slice(1) : pathname
     this.key = key
-    this.link = link ? (link.startsWith(protocol) ? link : pearLink.normalize(pathToFileURL(link).toString())) : null
+    this.link = link ? (link.startsWith(protocol) ? link : PearLink.normalize(pathToFileURL(link).toString())) : null
     this.applink = key ? this.link.slice(0, -(~~(pathname?.length) + ~~(hash?.length))) : pathToFileURL(this.dir).href
     this.alias = alias
     this.cmdArgs = cmdArgs
