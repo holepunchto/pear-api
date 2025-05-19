@@ -122,6 +122,8 @@ class API {
 
   versions = () => this.#reftrack(this.#ipc.versions())
 
+  updated = () => this.#reftrack(this.#ipc.updated())
+
   run = (link, args) => this.#worker.run(link, args)
 
   get pipe () { return this.#worker.pipe() }
