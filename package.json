@@ -7,7 +7,7 @@
     "lint": "standard",
     "lint:fix": "standard --fix",
     "test:gen": "brittle -r test/all.js test/*.test.js",
-    "test": "bare test/all.js",
+    "test": "brittle-bare test/all.js",
     "test:node": "brittle-node test/all.js"
   },
   "files": [
