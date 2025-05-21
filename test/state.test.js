@@ -1,6 +1,9 @@
 'use strict'
 
 const { test } = require('brittle')
+const fs = require('fs')
+const path = require('path')
+const os = require('os')
 
 const dirname = __dirname
 global.Pear = null
@@ -213,4 +216,88 @@ test('temporary storage', async function (t) {
 
   t.not(state.storage.includes('by-dkey'))
   t.not(state.storage.includes('by-random'))
+})
+
+test('state localPkg returns package.json contents', async function (t) {
+  t.plan(2)
+
+  const { teardown } = rig()
+  t.teardown(teardown)
+
+  const State = require('../state')
+  const dir = path.join(os.tmpdir(), 'pear-test-localpkg-' + Date.now())
+  fs.mkdirSync(dir, { recursive: true })
+  t.teardown(() => fs.rmSync(dir, { recursive: true, force: true }))
+
+  fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({ name: 'testpkg', pear: { name: 'pearname' } }))
+
+  const result = await State.localPkg({ dir })
+  t.is(result.name, 'testpkg', 'localPkg reads package.json')
+  t.is(result.pear.name, 'pearname', 'localPkg reads pear.name')
+})
+
+test('state localPkg recurses to parent if package.json missing', async function (t) {
+  t.plan(1)
+
+  const { teardown } = rig()
+  t.teardown(teardown)
+
+  const State = require('../state')
+  const parentDir = path.join(os.tmpdir(), 'pear-test-parent-' + Date.now())
+  const childDir = path.join(parentDir, 'child')
+  fs.mkdirSync(childDir, { recursive: true })
+  t.teardown(() => fs.rmSync(parentDir, { recursive: true, force: true }))
+
+  fs.writeFileSync(path.join(parentDir, 'package.json'), JSON.stringify({ name: 'parentpkg' }))
+
+  const result = await State.localPkg({ dir: childDir })
+  t.is(result.name, 'parentpkg', 'localPkg finds parent package.json')
+})
+
+test('state localPkg returns null if no package.json found', async function (t) {
+  t.plan(1)
+
+  const { teardown } = rig()
+  t.teardown(teardown)
+
+  const State = require('../state')
+  const dir = path.join(os.tmpdir(), 'pear-test-lone-' + Date.now())
+  fs.mkdirSync(dir, { recursive: true })
+  t.teardown(() => fs.rmSync(dir, { recursive: true, force: true }))
+
+  const result = await State.localPkg({ dir })
+  t.is(result, null, 'localPkg returns null if no package.json found')
+})
+
+test('state appname returns pear.name if present', async function (t) {
+  t.plan(1)
+
+  const { teardown } = rig()
+  t.teardown(teardown)
+
+  const State = require('../state')
+  const result = State.appname({ name: 'foo', pear: { name: 'bar' } })
+  t.is(result, 'bar', 'appname returns pear.name')
+})
+
+test('state appname returns name if pear.name not present', async function (t) {
+  t.plan(1)
+
+  const { teardown } = rig()
+  t.teardown(teardown)
+
+  const State = require('../state')
+  const result = State.appname({ name: 'foo' })
+  t.is(result, 'foo', 'appname returns name')
+})
+
+test('state appname returns null if no name fields', async function (t) {
+  t.plan(1)
+
+  const { teardown } = rig()
+  t.teardown(teardown)
+
+  const State = require('../state')
+  const result = State.appname({})
+  t.is(result, null, 'appname returns null if no name')
 })
