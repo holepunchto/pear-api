@@ -4,6 +4,7 @@ const { test } = require('brittle')
 const fs = require('fs')
 const path = require('path')
 const os = require('os')
+const { isWindows } = require('which-runtime')
 
 const dirname = __dirname
 global.Pear = null
@@ -290,7 +291,8 @@ test('state localPkg throws error for invalid JSON in package.json', async funct
   }
 })
 
-test('state localPkg throws error for inaccessible directory', async function (t) {
+// Disabled on Windows because chmod 000 isn't supported there
+test('state localPkg throws error for inaccessible directory', { skip: isWindows }, async function (t) {
   t.plan(1)
 
   const { teardown } = rig()
