@@ -269,6 +269,50 @@ test('state localPkg returns null if no package.json found', async function (t) 
   t.is(result, null, 'localPkg returns null if no package.json found')
 })
 
+test('state localPkg throws error for invalid JSON in package.json', async function (t) {
+  t.plan(1)
+
+  const { teardown } = rig()
+  t.teardown(teardown)
+
+  const State = require('../state')
+  const dir = path.join(os.tmpdir(), 'pear-test-invalid-json-' + Date.now())
+  fs.mkdirSync(dir, { recursive: true })
+  t.teardown(() => { fs.rmSync(dir, { recursive: true, force: true }) })
+
+  fs.writeFileSync(path.join(dir, 'package.json'), '{ invalid json }')
+
+  try {
+    await State.localPkg({ dir })
+    t.fail('localPkg should throw an error for invalid JSON')
+  } catch (err) {
+    t.ok(err instanceof SyntaxError, 'localPkg throws SyntaxError for invalid JSON')
+  }
+})
+
+test('state localPkg throws error for inaccessible directory', async function (t) {
+  t.plan(1)
+
+  const { teardown } = rig()
+  t.teardown(teardown)
+
+  const State = require('../state')
+  const dir = path.join(os.tmpdir(), 'pear-test-inaccessible-' + Date.now())
+  fs.mkdirSync(dir, { recursive: true })
+  fs.chmodSync(dir, 0o000)
+  t.teardown(() => {
+    fs.chmodSync(dir, 0o755)
+    fs.rmSync(dir, { recursive: true, force: true })
+  })
+
+  try {
+    await State.localPkg({ dir })
+    t.fail('localPkg should throw an error for inaccessible directory')
+  } catch (err) {
+    t.ok(err.code === 'EACCES' || err.code === 'EPERM', 'localPkg throws error for inaccessible directory')
+  }
+})
+
 test('state appname returns pear.name if present', async function (t) {
   t.plan(1)
 
