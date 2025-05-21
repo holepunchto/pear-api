@@ -923,6 +923,6 @@ test('Pear.updated', async function (t) {
 
   const res = await Pear.updated()
   const { time, ...resOthers } = res
-  t.alike(resOthers, { app:false, version: {}, diff: null }, 'updated returned ok')
+  t.alike(resOthers, { app: false, version: {}, diff: null }, 'updated returned ok')
   t.ok(typeof time === 'number' && time <= Date.now(), 'updated has time')
 })
