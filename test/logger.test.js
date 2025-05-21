@@ -3,8 +3,8 @@
 const { test } = require('brittle')
 const Logger = require('../logger')
 
-const consoleLogOrigin = console.log
-const consoleErrorOrigin = console.error
+const consoleLog = console.log
+const consoleError = console.error
 
 test('logger level OFF', async function (t) {
   t.plan(2)
@@ -13,11 +13,11 @@ test('logger level OFF', async function (t) {
 
   let consoleLogCount = 0
   console.log = () => { consoleLogCount += 1 }
-  t.teardown(() => { console.log = consoleLogOrigin })
+  t.teardown(() => { console.log = consoleLog })
 
   let consoleErrorCount = 0
   console.error = () => { consoleErrorCount += 1 }
-  t.teardown(() => { console.error = consoleErrorOrigin })
+  t.teardown(() => { console.error = consoleError })
 
   const logger = new Logger({ labels: ['label-test'], level: Logger.OFF })
   try {
@@ -25,8 +25,8 @@ test('logger level OFF', async function (t) {
     logger.info('label-test', 'info')
     logger.trace('label-test', 'trace')
   } finally {
-    console.log = consoleLogOrigin
-    console.error = consoleErrorOrigin
+    console.log = consoleLog
+    console.error = consoleError
   }
 
   t.is(consoleLogCount, 0, 'console.log not called')
@@ -40,11 +40,11 @@ test('logger level ERR', async function (t) {
 
   let consoleLogCount = 0
   console.log = () => { consoleLogCount += 1 }
-  t.teardown(() => { console.log = consoleLogOrigin })
+  t.teardown(() => { console.log = consoleLog })
 
   let consoleErrorCount = 0
   console.error = () => { consoleErrorCount += 1 }
-  t.teardown(() => { console.error = consoleErrorOrigin })
+  t.teardown(() => { console.error = consoleError })
 
   const logger = new Logger({ labels: ['label-test'], level: Logger.ERR })
   try {
@@ -52,8 +52,8 @@ test('logger level ERR', async function (t) {
     logger.info('label-test', 'info')
     logger.trace('label-test', 'trace')
   } finally {
-    console.log = consoleLogOrigin
-    console.error = consoleErrorOrigin
+    console.log = consoleLog
+    console.error = consoleError
   }
 
   t.is(consoleLogCount, 0, 'console.log not called')
@@ -67,11 +67,11 @@ test('logger level INF', async function (t) {
 
   let consoleLogCount = 0
   console.log = () => { consoleLogCount += 1 }
-  t.teardown(() => { console.log = consoleLogOrigin })
+  t.teardown(() => { console.log = consoleLog })
 
   let consoleErrorCount = 0
   console.error = () => { consoleErrorCount += 1 }
-  t.teardown(() => { console.error = consoleErrorOrigin })
+  t.teardown(() => { console.error = consoleError })
 
   const logger = new Logger({ labels: ['label-test'], level: Logger.INF })
   try {
@@ -79,8 +79,8 @@ test('logger level INF', async function (t) {
     logger.info('label-test', 'info')
     logger.trace('label-test', 'trace')
   } finally {
-    console.log = consoleLogOrigin
-    console.error = consoleErrorOrigin
+    console.log = consoleLog
+    console.error = consoleError
   }
 
   t.is(consoleLogCount, 1, 'console.log called once')
@@ -94,11 +94,11 @@ test('logger level TRC', async function (t) {
 
   let consoleLogCount = 0
   console.log = () => { consoleLogCount += 1 }
-  t.teardown(() => { console.log = consoleLogOrigin })
+  t.teardown(() => { console.log = consoleLog })
 
   let consoleErrorCount = 0
   console.error = () => { consoleErrorCount += 1 }
-  t.teardown(() => { console.error = consoleErrorOrigin })
+  t.teardown(() => { console.error = consoleError })
 
   const logger = new Logger({ labels: ['label-test'], level: Logger.TRC })
   try {
@@ -106,8 +106,8 @@ test('logger level TRC', async function (t) {
     logger.info('label-test', 'info')
     logger.trace('label-test', 'trace')
   } finally {
-    console.log = consoleLogOrigin
-    console.error = consoleErrorOrigin
+    console.log = consoleLog
+    console.error = consoleError
   }
 
   t.is(consoleLogCount, 1, 'console.log called once')
@@ -119,11 +119,11 @@ test('logger with matching label', async function (t) {
 
   let consoleLogCount = 0
   console.log = () => { consoleLogCount += 1 }
-  t.teardown(() => { console.log = consoleLogOrigin })
+  t.teardown(() => { console.log = consoleLog })
 
   let consoleErrorCount = 0
   console.error = () => { consoleErrorCount += 1 }
-  t.teardown(() => { console.error = consoleErrorOrigin })
+  t.teardown(() => { console.error = consoleError })
 
   const logger = new Logger({ labels: ['label-test'], level: Logger.TRC })
   try {
@@ -131,8 +131,8 @@ test('logger with matching label', async function (t) {
     logger.info('label-test', 'info')
     logger.trace('label-test', 'trace')
   } finally {
-    console.log = consoleLogOrigin
-    console.error = consoleErrorOrigin
+    console.log = consoleLog
+    console.error = consoleError
   }
 
   t.is(consoleLogCount, 1, 'console.log called once for matching label')
@@ -144,11 +144,11 @@ test('logger with non-matching label', async function (t) {
 
   let consoleLogCount = 0
   console.log = () => { consoleLogCount += 1 }
-  t.teardown(() => { console.log = consoleLogOrigin })
+  t.teardown(() => { console.log = consoleLog })
 
   let consoleErrorCount = 0
   console.error = () => { consoleErrorCount += 1 }
-  t.teardown(() => { console.error = consoleErrorOrigin })
+  t.teardown(() => { console.error = consoleError })
 
   const logger = new Logger({ labels: ['label-test'], level: Logger.TRC })
   try {
@@ -156,8 +156,8 @@ test('logger with non-matching label', async function (t) {
     logger.info('non-matching-label', 'info')
     logger.trace('non-matching-label', 'trace')
   } finally {
-    console.log = consoleLogOrigin
-    console.error = consoleErrorOrigin
+    console.log = consoleLog
+    console.error = consoleError
   }
 
   t.is(consoleLogCount, 0, 'console.log not called for non-matching label')
@@ -169,11 +169,11 @@ test('logger with multiple labels', async function (t) {
 
   let consoleLogCount = 0
   console.log = () => { consoleLogCount += 1 }
-  t.teardown(() => { console.log = consoleLogOrigin })
+  t.teardown(() => { console.log = consoleLog })
 
   let consoleErrorCount = 0
   console.error = () => { consoleErrorCount += 1 }
-  t.teardown(() => { console.error = consoleErrorOrigin })
+  t.teardown(() => { console.error = consoleError })
 
   const logger = new Logger({ labels: ['label-test', 'label-extra'], level: Logger.TRC })
   try {
@@ -181,8 +181,8 @@ test('logger with multiple labels', async function (t) {
     logger.info('label-extra', 'info')
     logger.trace('non-matching-label', 'trace')
   } finally {
-    console.log = consoleLogOrigin
-    console.error = consoleErrorOrigin
+    console.log = consoleLog
+    console.error = consoleError
   }
 
   t.is(consoleLogCount, 1, 'console.log called once for matching labels')
@@ -196,11 +196,11 @@ test('Logger constructor with default switches', async function (t) {
 
   let consoleLogCount = 0
   console.log = () => { consoleLogCount += 1 }
-  t.teardown(() => { console.log = consoleLogOrigin })
+  t.teardown(() => { console.log = consoleLog })
 
   let consoleErrorCount = 0
   console.error = () => { consoleErrorCount += 1 }
-  t.teardown(() => { console.error = consoleErrorOrigin })
+  t.teardown(() => { console.error = consoleError })
 
   const logger = new Logger()
   try {
@@ -208,8 +208,8 @@ test('Logger constructor with default switches', async function (t) {
     logger.info('label-test', 'info')
     logger.trace('label-test', 'trace')
   } finally {
-    console.log = consoleLogOrigin
-    console.error = consoleErrorOrigin
+    console.log = consoleLog
+    console.error = consoleError
   }
 
   t.is(consoleLogCount, 0, 'console.log not called')
@@ -229,11 +229,11 @@ test('Logger constructor with custom switches', async function (t) {
 
   let consoleLogCount = 0
   console.log = () => { consoleLogCount += 1 }
-  t.teardown(() => { console.log = consoleLogOrigin })
+  t.teardown(() => { console.log = consoleLog })
 
   let consoleErrorCount = 0
   console.error = () => { consoleErrorCount += 1 }
-  t.teardown(() => { console.error = consoleErrorOrigin })
+  t.teardown(() => { console.error = consoleError })
 
   const logger = new Logger()
   try {
@@ -241,8 +241,8 @@ test('Logger constructor with custom switches', async function (t) {
     logger.info('label-test', 'info')
     logger.trace('label-test', 'trace')
   } finally {
-    console.log = consoleLogOrigin
-    console.error = consoleErrorOrigin
+    console.log = consoleLog
+    console.error = consoleError
   }
 
   t.is(consoleLogCount, 0, 'console.log not called')

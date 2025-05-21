@@ -1,6 +1,7 @@
 'use strict'
 const { isWindows, isBare } = require('which-runtime')
 const os = require('os')
+const fsp = require('fs/promises')
 const path = require('path')
 const { pathToFileURL } = require('url-file-url')
 const hypercoreid = require('hypercore-id-encoding')
@@ -28,7 +29,24 @@ module.exports = class State {
   route = null
   routes = null
   unrouted = null
-  via = null
+
+  static async localPkg (state) {
+    let pkg
+    try {
+      pkg = JSON.parse(await fsp.readFile(path.join(state.dir, 'package.json')))
+    } catch (err) {
+      if (err.code !== 'ENOENT' && err.code !== 'EISDIR' && err.code !== 'ENOTDIR') throw err
+      const parent = path.dirname(state.dir)
+      if (parent === state.dir || path.resolve(state.dir) === path.resolve(parent)) return null
+      state.dir = parent
+      return this.localPkg(state)
+    }
+    return pkg
+  }
+
+  static appname (pkg) {
+    return pkg?.pear?.name ?? pkg?.name ?? null
+  }
 
   static route (pathname, routes, unrouted) {
     if (!routes) return pathname

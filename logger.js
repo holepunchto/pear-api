@@ -3,12 +3,17 @@ const { isBare } = require('which-runtime')
 const { formatWithOptions } = isBare ? require('bare-format') : require('util')
 const hrtime = isBare ? require('bare-hrtime') : process.hrtime
 const pear = require('./cmd')(isBare ? global.Bare.argv.slice(1) : process.argv.slice(1))
+const max = pear?.flags.logMax ?? false
+const verbose = pear?.flags.logVerbose || max
+const log = pear?.flags.log || !!pear?.flags.logLabels || verbose || max
 const switches = {
-  log: pear?.flags.log ?? false,
-  level: pear?.flags.logLevel ?? (pear?.flags.log ? 2 : 0),
+  log,
+  level: pear?.flags.logLevel ?? (max ? 3 : (log ? 2 : 0)),
   labels: pear?.flags.logLabels ?? '',
-  fields: pear?.flags.logFields ?? '',
-  stacks: pear?.flags.logStacks ?? false
+  fields: verbose ? 'date,time,level,label,delta' : (pear?.flags.logFields ?? ''),
+  stacks: pear?.flags.logStacks ?? false,
+  verbose,
+  max
 }
 
 class Logger {
@@ -23,15 +28,17 @@ class Logger {
   static [3] = 'TRC'
   name = '' // for stacks
   constructor ({ labels = '', fields, stacks, level, pretty } = {}) {
-    this._fields = this._parseFields(fields)
+    this._fields = this._parseFields(fields + this.constructor.switches.fields)
     labels = this._parseLabels(labels)
       .concat(this._parseLabels(this.constructor.switches.labels))
       .filter(Boolean)
+    this._max = this.constructor.switches.max
+    this._verbose = this.constructor.switches.verbose
     this._labels = new Set(labels)
     this._show = this._fields.show
     this._stacks = stacks ?? this.constructor.switches.stacks
     this._times = {}
-    if (pretty) {
+    if (this._verbose === false && this._max === false && pretty) {
       if (this._fields.seen.has('level') === false) this._show.level = false
       if (this._fields.seen.has('label') === false) this._show.label = this._labels.size > 2
     }
@@ -65,7 +72,7 @@ class Logger {
       for (const lbl of label) this.error(lbl, ...args)
       return
     }
-    if (!this._labels.has(label)) return
+    if (this._max === false && !this._labels.has(label)) return
     if (this._stacks) Error.captureStackTrace(this, this.error)
     args = this._args('ERR', label, ...args)
     if (this._stacks) {
@@ -82,7 +89,7 @@ class Logger {
       for (const lbl of label) this.info(lbl, ...args)
       return
     }
-    if (!this._labels.has(label)) return
+    if (this._max === false && !this._labels.has(label)) return
     if (this._stacks) Error.captureStackTrace(this, this.info)
     args = this._args('INF', label, ...args)
     if (this._stacks) {
@@ -99,7 +106,7 @@ class Logger {
       for (const lbl of label) this.trace(lbl, ...args)
       return
     }
-    if (!this._labels.has(label)) return
+    if (this._max === false && !this._labels.has(label)) return
     if (this._stacks) Error.captureStackTrace(this, this.trace)
     args = this._args('TRC', label, ...args)
     if (this._stacks) {
