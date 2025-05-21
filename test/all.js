@@ -5,8 +5,13 @@ runTests()
 // Cleanup args when running using brittle-node or brittle-bare
 const argv = (global?.Bare?.argv ?? global?.process.argv)
 if (argv?.[1] && /brittle-(node|bare)$/.test(argv[1])) {
-  if (global?.Bare) Bare.argv = [argv[0], __filename]
-  else process.argv = [argv[0], __filename]
+  const execPath = argv[0]
+  if (global.Bare) {
+    global.Bare.argv.length = 0
+    global.Bare.argv.push(execPath, __filename)
+  } else {
+    process.argv = [execPath, __filename]
+  }
 }
 
 if (!require.main.url) require.main.url = require('url-file-url').pathToFileURL(__filename)
