@@ -4,7 +4,7 @@ runTests()
 
 // Cleanup args when running using brittle-node or brittle-bare
 const argv = (global?.Bare?.argv ?? global?.process.argv)
-if (argv?.[1] && /brittle-(node|bare)$/.test(argv[1])) {
+if (!/\/test\/all\.js$/.test(argv?.[1])) {
   const execPath = argv[0]
   if (global.Bare) {
     global.Bare.argv.length = 0
