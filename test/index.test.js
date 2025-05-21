@@ -906,3 +906,23 @@ test('Pear.seed', async function (t) {
     if (expected.length === 0) stream.destroy()
   })
 })
+
+test('Pear.updated', async function (t) {
+  t.plan(2)
+
+  await Helper.startIpcServer({
+    handlers: {
+      updated: () => ({ app: false, version: {}, diff: null, time: Date.now() })
+    },
+    teardown: t.teardown
+  })
+  const ipc = await Helper.startIpcClient()
+
+  const teardown = Helper.rig({ ipc })
+  t.teardown(teardown)
+
+  const res = await Pear.updated()
+  const { time, ...resOthers } = res
+  t.alike(resOthers, { app:false, version: {}, diff: null }, 'updated returned ok')
+  t.ok(typeof time === 'number' && time <= Date.now(), 'updated has time')
+})
