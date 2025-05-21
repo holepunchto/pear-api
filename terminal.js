@@ -200,8 +200,9 @@ function indicator (value, type = 'success') {
 
 const outputter = (cmd, taggers = {}) => (opts, stream, info = {}, ipc) => {
   if (Array.isArray(stream)) stream = Readable.from(stream)
-  if (isTTY) stdio.out.write(ansi.hideCursor())
-  const dereg = isTTY
+  const asTTY = opts.ctrlTTY ?? isTTY
+  if (asTTY) stdio.out.write(ansi.hideCursor())
+  const dereg = asTTY
     ? teardown(() => {
       if (!isWindows) stdio.out.write('\x1B[1K\x1B[G' + statusFrag) // clear ^C
       stdio.out.write(ansi.showCursor())
@@ -216,12 +217,13 @@ const outputter = (cmd, taggers = {}) => (opts, stream, info = {}, ipc) => {
       else print(str)
       return
     }
+
     const transform = Promise.resolve(typeof taggers[tag] === 'function' ? taggers[tag](data, info, ipc) : taggers[tag] || false)
     transform.then((result) => {
       if (result === undefined) return
       if (typeof result === 'string') result = { output: 'print', message: result }
       if (result === false) {
-        if (tag === 'final') result = { output: 'print', message: data.success ? 'Success' : 'Failure' }
+        if (tag === 'final') result = { output: 'print', message: (data.message ?? data.success ? 'Success' : 'Failure') }
         else result = {}
       }
       result.success = result.success ?? data?.success
@@ -239,7 +241,7 @@ const outputter = (cmd, taggers = {}) => (opts, stream, info = {}, ipc) => {
     }, (err) => stream.destroy(err))
   })
 
-  return !isTTY
+  return !asTTY
     ? promise
     : promise.finally(() => {
       stdio.out.write(ansi.showCursor())
