@@ -81,7 +81,7 @@ module.exports = class State {
     const {
       appling, channel, devtools, checkout, links = '',
       dev = false, stage, updates, updatesDiff, followSymlinks,
-      unsafeClearAppStorage, chromeWebrtcInternals
+      parent = null, unsafeClearAppStorage, chromeWebrtcInternals
     } = flags
     const { drive: { alias = null, key = null }, pathname: route = '', protocol, hash, search } = link ? plink.parse(link) : { drive: {} }
     const pathname = protocol === 'file:' ? (isWindows ? route.slice(1).slice(dir.length) : route.slice(dir.length)) : route
@@ -115,6 +115,7 @@ module.exports = class State {
     this.id = id
     this.followSymlinks = followSymlinks
     this.rti = flags.rti ? JSON.parse(flags.rti) : null // important to know if this throws, so no try/catch
+    this.parent = parent
     this.clearAppStorage = unsafeClearAppStorage
     this.chromeWebrtcInternals = chromeWebrtcInternals
     this.env = { ...env }
