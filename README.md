@@ -8,22 +8,7 @@
 
 Supplies the API base for the Pear API (https://docs.pears.com/pear-runtime/api).
 
-Typically for extending from for user-interface-runtime purposes:
-
-```js
-const Worker = require('pear-api/worker')
-
-class API extends require('pear-api') {
-  constructor (ipc, state, { worker, teardown } = {}) {
-    super(ipc, state, { worker, teardown })
-    this[this.constructor.UI] = new UIAPI()
-  }
-}
-const worker = new Worker()
-global.Pear = new API(ipc, state, { worker })
-```
-
-This creates the usual `global.Pear` API with the interface-runtime-specific `UIAPI` stored on a symbolic reference so it can later be exported from interface module entrypoint. The `global.Pear.worker` API can also be customized by extending `pear-api/worker` and passing an instance of the extended worker to `API`.
+Typically for extending from for user-interface-runtime purposes.
 
 ## Integration Libraries
 
@@ -91,10 +76,6 @@ Attempt to boot the sidecar. Useful when establishing a `pear-ipc` connection fr
 ### `pear-api/opwait`
 
 `opwait(stream, onstatus) -> Promise`. An op is an operation executed by pear sidecar represented by a status stream, commands such as dump, stage, seed, release & info are ops. The `opwait` function returns a promise that waits for the stream to finish and resolves with the `final` tagged object. The `onstatus` function is called for each `data` event on the stream.
-
-### `pear-api/worker` (`class`)
-
-Internal class, pass this (or a subclass of it) to the `pear-api` `API` constructor for `Pear.run` to use. Not needed for general use - instead use `Pear.run`.
 
 ### `pear-api/link`
 

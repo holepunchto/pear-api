@@ -26,8 +26,7 @@
     "teardown.js",
     "terminal.js",
     "transform.js",
-    "tryboot.js",
-    "worker.js"
+    "tryboot.js"
   ],
   "keywords": [
     "pear",

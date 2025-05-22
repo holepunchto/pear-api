@@ -344,7 +344,7 @@ test('Pear.run exit when parent calls pipe.end()', async function (t) {
   const runEndFromParent = path.join(dirname, 'fixtures', 'run-end-from-parent')
   const runChild = path.join(dirname, 'fixtures', 'run-child')
 
-  const teardown = Helper.rig({ runtimeArgv: [runEndFromParent], clearRequireCache: '../worker' })
+  const teardown = Helper.rig({ runtimeArgv: [runEndFromParent] })
   t.teardown(teardown)
 
   const pipe = Pear.run(runEndFromParent, [runChild])
@@ -358,7 +358,7 @@ test('Pear.run exit when parent calls pipe.destroy()', async function (t) {
   const runDestroyFromParent = path.join(dirname, 'fixtures', 'run-destroy-from-parent')
   const runChildErrorHandler = path.join(dirname, 'fixtures', 'run-child-error-handler')
 
-  const teardown = Helper.rig({ runtimeArgv: [runDestroyFromParent], clearRequireCache: '../worker' })
+  const teardown = Helper.rig({ runtimeArgv: [runDestroyFromParent] })
   t.teardown(teardown)
 
   const pipe = Pear.run(runDestroyFromParent, [runChildErrorHandler])

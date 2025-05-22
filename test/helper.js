@@ -12,7 +12,7 @@ const socketPath = isWindows ? '\\\\.\\pipe\\pear-api-test-ipc' : 'test.sock'
 const STOP_CHAR = '\n'
 const BUILTINS = new Set(require('module').builtinModules)
 
-const noop = () => undefined
+const noop = () => {}
 
 class Helper {
   static rig ({
@@ -29,19 +29,14 @@ class Helper {
     }
     global.Pear = new RigAPI()
 
-    const Worker = require('../worker')
-    class TestWorker extends Worker {
-      static RUNTIME = process.argv[0]
-      static RUNTIME_ARGV = runtimeArgv
-    }
-
     const API = require('..')
     class TestAPI extends API {
+      static RUNTIME = process.argv[0]
+      static RUNTIME_ARGV = runtimeArgv
       static RTI = RigAPI.RTI
     }
 
-    const worker = new TestWorker(ipc)
-    global.Pear = new TestAPI(ipc, state, { worker })
+    global.Pear = new TestAPI(ipc, state)
 
     return () => {
       if (clearRequireCache) {

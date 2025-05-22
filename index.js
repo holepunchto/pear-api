@@ -1,5 +1,14 @@
 'use strict'
-const Worker = require('./worker')
+const fs = require('fs')
+const { spawn } = require('child_process')
+const { isWindows, isBare } = require('which-runtime')
+const { command } = require('paparam')
+const Pipe = isBare
+  ? require('bare-pipe')
+  : class Pipe extends require('net').Socket { constructor (fd) { super({ fd }) } }
+const { RUNTIME } = require('./constants')
+const rundef = require('./cmd/run')
+const peardef = require('./cmd')
 const onteardown = global.Bare ? require('./teardown') : noop
 const program = global.Bare || global.process
 const kIPC = Symbol('ipc')
@@ -9,25 +18,26 @@ class API {
   #state = null
   #unloading = null
   #teardowns = null
+  #onteardown = null
   #refs = 0
-  #worker = null
   #exitCode = 0
+  #pipe = null
   config = null
   argv = program.argv
   pid = program.pid
   static RTI = global.Pear?.constructor.RTI ?? null
   static IPC = kIPC
-  static get RUNTIME () { return Worker.RUNTIME }
-  static set RUNTIME (runtime) { return (Worker.RUNTIME = runtime) }
-  constructor (ipc, state, { worker = new Worker({ ref: () => this.#ref(), unref: () => this.#unref() }), teardown = onteardown } = {}) {
+  static RUNTIME = RUNTIME
+  static RUNTIME_ARGV = []
+  constructor (ipc, state, { teardown = onteardown } = {}) {
     this.#ipc = ipc
     this.#state = state
     this.#refs = 0
-    this.#worker = worker
     this.#teardowns = new Promise((resolve) => { this.#unloading = resolve })
+    this.#onteardown = teardown
     this.key = this.#state.key ? (this.#state.key.type === 'Buffer' ? Buffer.from(this.#state.key.data) : this.#state.key) : null
     this.config = state.config
-    teardown(() => this.#unload())
+    this.#onteardown(() => this.#unload())
     this.#ipc.unref()
   }
 
@@ -101,6 +111,55 @@ class API {
     }
   }
 
+  get pipe () {
+    if (this.#pipe !== null) return this.#pipe
+    const fd = 3
+    try {
+      const hasPipe = isWindows ? fs.fstatSync(fd).isFIFO() : fs.fstatSync(fd).isSocket()
+      if (hasPipe === false) return null
+    } catch {
+      return null
+    }
+    const pipe = new Pipe(fd)
+    pipe.on('end', () => {
+      this.#onteardown(() => pipe.end(), Number.MAX_SAFE_INTEGER)
+    })
+    this.#pipe = pipe
+    pipe.once('close', () => {
+      this.#onteardown(() => program.exit(), Number.MAX_SAFE_INTEGER)
+    })
+    return pipe
+  }
+
+  run (link, args = []) {
+    const { rest } = peardef().parse(program.argv.slice(1))
+    const argv = ['run', ...rest]
+    const parser = command('pear', command('run', ...rundef))
+    const cmd = parser.parse(argv, { sync: true })
+    const run = argv.map((arg) => arg === cmd.args.link ? link : arg)
+    if (cmd.indices.rest > 0) run.splice(cmd.indices.rest)
+    let linksIndex = cmd.indices.flags.links
+    const linksElements = linksIndex > 0 ? (cmd.flags.links === run[linksIndex]) ? 2 : 1 : 0
+    if (cmd.indices.flags.startId > 0) {
+      run.splice(cmd.indices.flags.startId, 1)
+      if (linksIndex > cmd.indices.flags.startId) linksIndex -= linksElements
+    }
+    if (linksIndex > 0) run.splice(linksIndex, linksElements)
+    if (!cmd.flags.trusted) run.splice(1, 0, '--trusted')
+    const { RUNTIME, RUNTIME_ARGV } = this.constructor
+    const sp = spawn(RUNTIME, [...RUNTIME_ARGV, ...run, ...args], {
+      stdio: ['inherit', 'inherit', 'inherit', 'overlapped'],
+      windowsHide: true
+    })
+    this.#ref()
+    sp.once('exit', (exitCode) => {
+      if (exitCode !== 0) pipe.emit('crash', { exitCode })
+      this.#unref()
+    })
+    const pipe = sp.stdio[3]
+    return pipe
+  }
+
   message = (msg) => this.#reftrack(this.#ipc.message(msg))
 
   messages = (pattern, listener) => {
@@ -123,10 +182,6 @@ class API {
   versions = () => this.#reftrack(this.#ipc.versions())
 
   updated = () => this.#reftrack(this.#ipc.updated())
-
-  run = (link, args) => this.#worker.run(link, args)
-
-  get pipe () { return this.#worker.pipe() }
 
   get = (key, opts = {}) => this.#reftrack(this.#ipc.get({ key, ...opts }))
 
