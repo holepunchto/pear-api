@@ -98,8 +98,8 @@ function ERR_DIR_NONEMPTY (msg) {
   return new PearError(msg, 'ERR_DIR_NONEMPTY', ERR_DIR_NONEMPTY)
 }
 
-function ERR_OPERATION_FAILED (msg) {
-  return new PearError(msg, 'ERR_OPERATION_FAILED', ERR_OPERATION_FAILED)
+function ERR_OPERATION_FAILED (msg, info = {}) {
+  return new PearError(msg, 'ERR_OPERATION_FAILED', ERR_OPERATION_FAILED, info)
 }
 
 function ERR_ASSERTION (msg) {
