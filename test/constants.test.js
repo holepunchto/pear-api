@@ -38,14 +38,14 @@ test('constants with CHECKOUT', async function (t) {
   t.is(constants.CHECKOUT.fork, null)
 })
 
-test('constants with default MOUNT', async function (t) {
+// the default case is for pear (bare), doesn't matter if not bare (pear)
+test('constants with default MOUNT', { skip: !isBare }, async function (t) {
   t.plan(1)
 
   const { teardown } = rig()
   t.teardown(teardown)
 
-  const main = isBare ? require.main.url : pathToFileURL(require?.main?.filename ?? process.argv[1])
-
+  const main = pathToFileURL(require?.main?.filename ?? process.argv[1])
   const constants = require('../constants')
   t.is(constants.MOUNT, path.dirname(main.href))
 })

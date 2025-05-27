@@ -40,14 +40,15 @@ test('known function with no matching prefix', async function (t) {
   t.is(knownErrors.length, 0)
 })
 
-test('captureStackTrace filters out PearError only', async function (t) {
+test('captureStackTrace filters out PearError frame', async function (t) {
   t.plan(2)
 
   const pearErr = PearError.ERR_INVALID_INPUT('invalid input')
-  t.is(pearErr.stack.includes('ERR_INVALID_INPUT'), false)
+
+  t.is(pearErr.stack.includes('PearError'), false)
 
   function ERR_CUSTOM (msg) {
-    return new Error(msg, 'ERR_CUSTOM', ERR_CUSTOM)
+    return new Error(msg, ERR_CUSTOM)
   }
   const customErr = ERR_CUSTOM('custom error')
   t.is(customErr.stack.includes('ERR_CUSTOM'), true)

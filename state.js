@@ -21,7 +21,6 @@ module.exports = class State {
   runtime = RUNTIME
   reloadingSince = 0
   type = null
-  error = null
   entrypoints = null
   entrypoint = null
   applink = null
@@ -65,10 +64,10 @@ module.exports = class State {
   }
 
   static configFrom (state) {
-    const { id, startId, key, links, alias, env, gui, options, checkpoint, checkout, flags, dev, stage, storage, name, main, args, channel, release, applink, query, fragment, link, linkData, entrypoint, route, routes, dir, dht } = state
+    const { id, startId, key, links, alias, env, gui, options, checkpoint, checkout, flags, dev, stage, storage, name, main, args, channel, release, applink, query, fragment, link, linkData, entrypoint, route, routes, dir, dht, prerunning } = state
     const pearDir = PLATFORM_DIR
     const swapDir = SWAP
-    return { id, startId, key, links, alias, env, gui, options, checkpoint, checkout, flags, dev, stage, storage, name, main, args, channel, release, applink, query, fragment, link, linkData, entrypoint, route, routes, dir, dht, pearDir, swapDir }
+    return { id, startId, key, links, alias, env, gui, options, checkpoint, checkout, flags, dev, stage, storage, name, main, args, channel, release, applink, query, fragment, link, linkData, entrypoint, route, routes, dir, dht, prerunning, pearDir, swapDir }
   }
 
   update (state) {
@@ -79,9 +78,9 @@ module.exports = class State {
   constructor (params = {}) {
     const { dht, link, startId = null, id = null, args = null, env = ENV, cwd = CWD, dir = cwd, cmdArgs, onupdate = () => {}, flags, run, storage = null } = params
     const {
-      appling, channel, devtools, checkout, links = '',
-      dev = false, stage, updates, updatesDiff, followSymlinks,
-      parent = null, unsafeClearAppStorage, chromeWebrtcInternals
+      appling, channel, devtools, checkout, stage, updates, updatesDiff,
+      links = '', prerunning = false, dev = false, parent = null,
+      followSymlinks, unsafeClearAppStorage, chromeWebrtcInternals
     } = flags
     const { drive: { alias = null, key = null }, pathname: route = '', protocol, hash, search } = link ? plink.parse(link) : { drive: {} }
     const pathname = protocol === 'file:' ? (isWindows ? route.slice(1).slice(dir.length) : route.slice(dir.length)) : route
@@ -96,7 +95,7 @@ module.exports = class State {
     this.checkout = checkout
     this.dir = dir
     this.cwd = cwd
-    this.run = run ?? flags.run
+    this.run = run
     this.storage = storage
     this.flags = flags
     this.dev = dev
@@ -115,6 +114,7 @@ module.exports = class State {
     this.id = id
     this.followSymlinks = followSymlinks
     this.rti = flags.rti ? JSON.parse(flags.rti) : null // important to know if this throws, so no try/catch
+    this.prerunning = prerunning
     this.parent = parent
     this.clearAppStorage = unsafeClearAppStorage
     this.chromeWebrtcInternals = chromeWebrtcInternals

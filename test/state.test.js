@@ -47,16 +47,16 @@ test('state constructor sets NODE_ENV to production in stage mode', async functi
   t.is(state.env.NODE_ENV, 'production', 'NODE_ENV should be set to production in stage mode')
 })
 
-test('state constructor sets NODE_ENV to production when run flag is true and not in dev mode', async function (t) {
+test('state constructor sets NODE_ENV to production when run param is true and not in dev mode', async function (t) {
   t.plan(1)
 
   const { teardown } = rig()
   t.teardown(teardown)
 
   const State = require('../state')
-  const state = new State({ flags: { run: true, dev: false } })
+  const state = new State({ run: true, flags: { dev: false } })
 
-  t.is(state.env.NODE_ENV, 'production', 'NODE_ENV should be set to production when run flag is true and not in dev mode')
+  t.is(state.env.NODE_ENV, 'production')
 })
 
 test('state constructor handles invalid flags gracefully', async function (t) {

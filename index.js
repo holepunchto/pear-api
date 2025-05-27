@@ -131,7 +131,7 @@ class API {
   }
 
   run (link, args = []) {
-    const argv = program.argv.slice(1) // ['path-to-runtime', 'run' ...args]
+    const argv = program.argv.slice(1)
     const parser = command('pear', command('run', ...rundef))
     const cmd = parser.parse(argv, { sync: true })
     const run = argv.map((arg) => arg === cmd.args.link ? link : arg)
@@ -144,7 +144,8 @@ class API {
     }
     if (linksIndex > 0) run.splice(linksIndex, linksElements)
     if (!cmd.flags.trusted) run.splice(1, 0, '--trusted')
-    const { RUNTIME, RUNTIME_ARGV } = this.constructor
+    const { RUNTIME, RUNTIME_ARGV, RTI } = this.constructor
+    if (RTI.startId) run.splice(1, 0, '--parent', RTI.startId)
     const sp = spawn(RUNTIME, [...RUNTIME_ARGV, ...run, ...args], {
       stdio: ['inherit', 'inherit', 'inherit', 'overlapped'],
       windowsHide: true

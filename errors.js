@@ -21,9 +21,10 @@ class PearError extends Error {
   static ERR_UNKNOWN = ERR_UNKNOWN
   static ERR_LEGACY = ERR_LEGACY
   static known = known
-  constructor (msg, code, fn = PearError, info = null, stackless = false) {
+  constructor (msg, fn = PearError, info = null, stackless = false) {
     super(msg)
-    this.code = code
+    this.code = fn.name
+    this.name = fn.name
     if (this.info !== null) this.info = info
     if (stackless) this.stack = this.message
     else if (Error.captureStackTrace) Error.captureStackTrace(this, fn)
@@ -35,83 +36,83 @@ function known (prefix = 'ERR_', ...prefixes) {
 }
 
 function ERR_INVALID_INPUT (msg) {
-  return new PearError(msg, 'ERR_INVALID_INPUT', ERR_INVALID_INPUT)
+  return new PearError(msg, ERR_INVALID_INPUT)
 }
 
 function ERR_INVALID_LINK (msg) {
-  return new PearError(msg, 'ERR_INVALID_LINK', ERR_INVALID_LINK)
+  return new PearError(msg, ERR_INVALID_LINK)
 }
 
 function ERR_INVALID_APPLING (msg) {
-  return new PearError(msg, 'ERR_INVALID_APPLING', ERR_INVALID_APPLING)
+  return new PearError(msg, ERR_INVALID_APPLING)
 }
 
 function ERR_INVALID_APP_NAME (msg) {
-  return new PearError(msg, 'ERR_INVALID_APP_NAME', ERR_INVALID_APP_NAME)
+  return new PearError(msg, ERR_INVALID_APP_NAME)
 }
 
 function ERR_INVALID_APP_STORAGE (msg) {
-  return new PearError(msg, 'ERR_INVALID_APP_STORAGE', ERR_INVALID_APP_STORAGE)
+  return new PearError(msg, ERR_INVALID_APP_STORAGE)
 }
 
 function ERR_INVALID_PROJECT_DIR (msg) {
-  return new PearError(msg, 'ERR_INVALID_PROJECT_DIR', ERR_INVALID_PROJECT_DIR)
+  return new PearError(msg, ERR_INVALID_PROJECT_DIR)
 }
 
 function ERR_INVALID_GC_RESOURCE (msg) {
-  return new PearError(msg, 'ERR_INVALID_GC_RESOURCE', ERR_INVALID_GC_RESOURCE)
+  return new PearError(msg, ERR_INVALID_GC_RESOURCE)
 }
 
 function ERR_INVALID_CONFIG (msg) {
-  return new PearError(msg, 'ERR_INVALID_CONFIG', ERR_INVALID_CONFIG)
+  return new PearError(msg, ERR_INVALID_CONFIG)
 }
 
 function ERR_INVALID_TEMPLATE (msg) {
-  return new PearError(msg, 'ERR_INVALID_TEMPLATE', ERR_INVALID_TEMPLATE)
+  return new PearError(msg, ERR_INVALID_TEMPLATE)
 }
 
 function ERR_PERMISSION_REQUIRED (msg, info = {}) {
-  return new PearError(msg, 'ERR_PERMISSION_REQUIRED', ERR_PERMISSION_REQUIRED, info)
+  return new PearError(msg, ERR_PERMISSION_REQUIRED, info)
 }
 
 function ERR_SECRET_NOT_FOUND (msg) {
-  return new PearError(msg, 'ERR_SECRET_NOT_FOUND', ERR_SECRET_NOT_FOUND)
+  return new PearError(msg, ERR_SECRET_NOT_FOUND)
 }
 
 function ERR_NOT_FOUND_OR_NOT_CONNECTED (msg) {
-  return new PearError(msg, 'ERR_NOT_FOUND_OR_NOT_CONNECTED', ERR_NOT_FOUND_OR_NOT_CONNECTED)
+  return new PearError(msg, ERR_NOT_FOUND_OR_NOT_CONNECTED)
 }
 
 function ERR_INVALID_MANIFEST (msg) {
-  return new PearError(msg, 'ERR_CONNECTION', ERR_INVALID_MANIFEST)
+  return new PearError(msg, ERR_INVALID_MANIFEST)
 }
 
 function ERR_INTERNAL_ERROR (msg) {
-  return new PearError(msg, 'ERR_INTERNAL_ERROR', ERR_INTERNAL_ERROR)
+  return new PearError(msg, ERR_INTERNAL_ERROR)
 }
 
 function ERR_UNSTAGED (msg) {
-  return new PearError(msg, 'ERR_UNSTAGED', ERR_UNSTAGED)
+  return new PearError(msg, ERR_UNSTAGED)
 }
 
 function ERR_DIR_NONEMPTY (msg) {
-  return new PearError(msg, 'ERR_DIR_NONEMPTY', ERR_DIR_NONEMPTY)
+  return new PearError(msg, ERR_DIR_NONEMPTY)
 }
 
 function ERR_OPERATION_FAILED (msg, info = {}) {
-  return new PearError(msg, 'ERR_OPERATION_FAILED', ERR_OPERATION_FAILED, info)
+  return new PearError(msg, ERR_OPERATION_FAILED, info)
 }
 
 function ERR_ASSERTION (msg) {
-  return new PearError(msg, 'ERR_ASSERTION', ERR_ASSERTION)
+  return new PearError(msg, ERR_ASSERTION)
 }
 
 function ERR_UNKNOWN (msg) {
-  return new PearError(msg, 'ERR_UNKNOWN', ERR_UNKNOWN)
+  return new PearError(msg, ERR_UNKNOWN)
 }
 
 function ERR_LEGACY (msg) {
-  return new PearError(msg, 'ERR_LEGACY', ERR_LEGACY, null, true)
+  return new PearError(msg, ERR_LEGACY, null, true)
 }
 
 module.exports = PearError

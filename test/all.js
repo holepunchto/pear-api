@@ -18,22 +18,21 @@ if (!require.main.url) require.main.url = require('url-file-url').pathToFileURL(
 
 async function runTests () {
   const test = (await import('brittle')).default
-
   test.pause()
 
-  // await import('./constants.test.js')
-  // await import('./crasher.test.js')
-  // await import('./errors.test.js')
-  // await import('./gunk.test.js')
-  // await import('./index.test.js')
-  // await import('./logger.test.js')
+  await import('./constants.test.js')
+  await import('./crasher.test.js')
+  await import('./errors.test.js')
+  await import('./gunk.test.js')
+  await import('./index.test.js')
+  await import('./logger.test.js')
   await import('./opwait.test.js')
-  // await import('./link.test.js')
-  // await import('./state.test.js')
-  // await import('./teardown.test.js')
-  // await import('./terminal.test.js')
-  // await import('./transform.test.js')
-  // await import('./tryboot.test.js')
+  await import('./link.test.js')
+  await import('./state.test.js')
+  await import('./teardown.test.js')
+  await import('./terminal.test.js')
+  await import('./transform.test.js')
+  await import('./tryboot.test.js')
 
   test.resume()
 }

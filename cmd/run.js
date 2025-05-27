@@ -24,6 +24,7 @@ module.exports = [
   flag('--preio', 'Show stdout & stderr of pre scripts'),
   flag('--prequiet', 'Suppress piped output of pre scripts'),
   flag('--rti <info>').hide(),
+  flag('--prerunning').hide(),
   flag('--dht-bootstrap <nodes>').hide(),
   flag('--encryption-key <name>').hide(),
   flag('--parent').hide(),
