@@ -8,6 +8,7 @@ const Pipe = isBare
   : class Pipe extends require('net').Socket { constructor (fd) { super({ fd }) } }
 const { RUNTIME } = require('./constants')
 const rundef = require('./cmd/run')
+const pear = require('./cmd')
 const onteardown = global.Bare ? require('./teardown') : noop
 const program = global.Bare || global.process
 const kIPC = Symbol('ipc')
@@ -131,7 +132,7 @@ class API {
   }
 
   run (link, args = []) {
-    const argv = program.argv.slice(1)
+    const argv = ['run', ...pear(program.argv.slice(1)).rest]
     const parser = command('pear', command('run', ...rundef))
     const cmd = parser.parse(argv, { sync: true })
     const run = argv.map((arg) => arg === cmd.args.link ? link : arg)
@@ -144,6 +145,7 @@ class API {
     }
     if (linksIndex > 0) run.splice(linksIndex, linksElements)
     if (!cmd.flags.trusted) run.splice(1, 0, '--trusted')
+
     const { RUNTIME, RUNTIME_ARGV, RTI } = this.constructor
     if (RTI.startId) run.splice(1, 0, '--parent', RTI.startId)
     const sp = spawn(RUNTIME, [...RUNTIME_ARGV, ...run, ...args], {

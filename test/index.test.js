@@ -277,7 +277,7 @@ test('Pear.run pipe', async function (t) {
   pipe.write('exit')
 })
 
-test('Pear.run should receive args from the parent', async function (t) {
+test('Pear.run args become Pear.config.args', async function (t) {
   t.plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'print-args')
