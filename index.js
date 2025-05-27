@@ -8,7 +8,6 @@ const Pipe = isBare
   : class Pipe extends require('net').Socket { constructor (fd) { super({ fd }) } }
 const { RUNTIME } = require('./constants')
 const rundef = require('./cmd/run')
-const peardef = require('./cmd')
 const onteardown = global.Bare ? require('./teardown') : noop
 const program = global.Bare || global.process
 const kIPC = Symbol('ipc')
@@ -132,8 +131,7 @@ class API {
   }
 
   run (link, args = []) {
-    const { rest } = peardef().parse(program.argv.slice(1))
-    const argv = ['run', ...rest]
+    const argv = program.argv.slice(1) // ['path-to-runtime', 'run' ...args]
     const parser = command('pear', command('run', ...rundef))
     const cmd = parser.parse(argv, { sync: true })
     const run = argv.map((arg) => arg === cmd.args.link ? link : arg)
