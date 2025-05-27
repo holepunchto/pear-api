@@ -29,8 +29,8 @@ test('opwait rejection', async function (t) {
 test('opwait operation failure', async function (t) {
   t.plan(2)
   const stream = new Readable()
-  setImmediate(() => { stream.push({tag: 'error', data: { stack: 'test', code: 'CHECK' }}) })
+  setImmediate(() => { stream.push({ tag: 'error', data: { stack: 'test', code: 'CHECK' } }) })
   const op = opwait(stream)
-  await t.exception(op , /test/)
+  await t.exception(op, /test/)
   try { await op } catch (err) { t.is(err.info.code, 'CHECK') }
 })

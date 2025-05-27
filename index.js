@@ -131,7 +131,7 @@ class API {
   }
 
   run (link, args = []) {
-    const argv = program.argv.slice(1)  // ['path-to-runtime', 'run' ...args]
+    const argv = program.argv.slice(1) // ['path-to-runtime', 'run' ...args]
     const parser = command('pear', command('run', ...rundef))
     const cmd = parser.parse(argv, { sync: true })
     const run = argv.map((arg) => arg === cmd.args.link ? link : arg)
