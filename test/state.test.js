@@ -23,7 +23,7 @@ const rig = () => {
   }
 }
 
-test('state constructor initializes with minimal parameters', async function (t) {
+test('State.constructor initializes with minimal parameters', async function (t) {
   t.plan(2)
 
   const { teardown } = rig()
@@ -36,7 +36,7 @@ test('state constructor initializes with minimal parameters', async function (t)
   t.not(state.cwd === null, 'cwd should be initialized')
 })
 
-test('state constructor sets NODE_ENV to production in stage mode', async function (t) {
+test('State.constructor sets NODE_ENV to production in stage mode', async function (t) {
   t.plan(1)
 
   const { teardown } = rig()
@@ -48,7 +48,7 @@ test('state constructor sets NODE_ENV to production in stage mode', async functi
   t.is(state.env.NODE_ENV, 'production', 'NODE_ENV should be set to production in stage mode')
 })
 
-test('state constructor sets NODE_ENV to production when run param is true and not in dev mode', async function (t) {
+test('State.constructor sets NODE_ENV to production when run param is true and not in dev mode', async function (t) {
   t.plan(1)
 
   const { teardown } = rig()
@@ -60,7 +60,7 @@ test('state constructor sets NODE_ENV to production when run param is true and n
   t.is(state.env.NODE_ENV, 'production')
 })
 
-test('state constructor handles invalid flags gracefully', async function (t) {
+test('State.constructor handles invalid flags gracefully', async function (t) {
   t.plan(1)
 
   const { teardown } = rig()
@@ -72,7 +72,7 @@ test('state constructor handles invalid flags gracefully', async function (t) {
   t.is(state.flags.invalidFlag, true, 'invalid flags should be preserved in state')
 })
 
-test('state update method merges new state properties', async function (t) {
+test('State.update method merges new state properties', async function (t) {
   t.plan(2)
 
   const { teardown } = rig()
@@ -86,7 +86,7 @@ test('state update method merges new state properties', async function (t) {
   t.ok(state.flags !== undefined, 'existing properties should not be removed')
 })
 
-test('state route method returns pathname when no routes are defined', async function (t) {
+test('State.route method returns pathname when no routes are defined', async function (t) {
   t.plan(1)
 
   const { teardown } = rig()
@@ -99,7 +99,7 @@ test('state route method returns pathname when no routes are defined', async fun
   t.is(result, pathname, 'route method should return pathname when no routes are defined')
 })
 
-test('state route method applies routes correctly', async function (t) {
+test('State.route method applies routes correctly', async function (t) {
   t.plan(1)
 
   const { teardown } = rig()
@@ -113,7 +113,7 @@ test('state route method applies routes correctly', async function (t) {
   t.is(result, '/new/path', 'route method should apply routes correctly')
 })
 
-test('state route method skips unrouted paths', async function (t) {
+test('State.route method skips unrouted paths', async function (t) {
   t.plan(1)
 
   const { teardown } = rig()
@@ -127,7 +127,7 @@ test('state route method skips unrouted paths', async function (t) {
   t.is(result, pathname, 'route method should skip unrouted paths')
 })
 
-test('state storageFromLink generates storage path for non-pear links', async function (t) {
+test('State.storageFromLink generates storage path for non-pear links', async function (t) {
   t.plan(1)
 
   const { teardown } = rig()
@@ -140,7 +140,7 @@ test('state storageFromLink generates storage path for non-pear links', async fu
   t.ok(result.includes('by-random'), 'storageFromLink should generate path under by-random for non-pear links')
 })
 
-test('state storageFromLink generates storage path for pear links', async function (t) {
+test('State.storageFromLink generates storage path for pear links', async function (t) {
   t.plan(1)
 
   const { teardown } = rig()
@@ -153,7 +153,7 @@ test('state storageFromLink generates storage path for pear links', async functi
   t.ok(result.includes('by-dkey'), 'storageFromLink should generate path under by-dkey for pear links')
 })
 
-test('state configFrom extracts correct properties from state', async function (t) {
+test('State.configFrom extracts correct properties from state', async function (t) {
   t.plan(1)
 
   const { teardown } = rig()
@@ -166,7 +166,7 @@ test('state configFrom extracts correct properties from state', async function (
   t.ok(config.env !== undefined, 'configFrom should extract env property from state')
 })
 
-test('state constructor throws error for invalid storage path', async function (t) {
+test('State.constructor throws error for invalid storage path', async function (t) {
   t.plan(1)
 
   const { teardown } = rig()
@@ -220,7 +220,7 @@ test('temporary storage', async function (t) {
   t.not(state.storage.includes('by-random'))
 })
 
-test('state localPkg returns package.json contents', async function (t) {
+test('State.localPkg returns package.json contents', async function (t) {
   t.plan(2)
 
   const { teardown } = rig()
@@ -238,7 +238,7 @@ test('state localPkg returns package.json contents', async function (t) {
   t.is(result.pear.name, 'pearname', 'localPkg reads pear.name')
 })
 
-test('state localPkg recurses to parent if package.json missing', async function (t) {
+test('State.localPkg recurses to parent if package.json missing', async function (t) {
   t.plan(1)
 
   const { teardown } = rig()
@@ -256,7 +256,7 @@ test('state localPkg recurses to parent if package.json missing', async function
   t.is(result.name, 'parentpkg', 'localPkg finds parent package.json')
 })
 
-test('state localPkg returns null if no package.json found', async function (t) {
+test('State.localPkg returns null if no package.json found', async function (t) {
   t.plan(1)
 
   const { teardown } = rig()
@@ -271,7 +271,7 @@ test('state localPkg returns null if no package.json found', async function (t) 
   t.is(result, null, 'localPkg returns null if no package.json found')
 })
 
-test('state localPkg throws error for invalid JSON in package.json', async function (t) {
+test('State.localPkg throws error for invalid JSON in package.json', async function (t) {
   t.plan(1)
 
   const { teardown } = rig()
@@ -293,7 +293,7 @@ test('state localPkg throws error for invalid JSON in package.json', async funct
 })
 
 // Disabled on Windows because chmod 000 isn't supported there
-test('state localPkg throws error for inaccessible directory', { skip: isWindows }, async function (t) {
+test('State.localPkg throws error for inaccessible directory', { skip: isWindows }, async function (t) {
   t.plan(1)
 
   const { teardown } = rig()
@@ -316,7 +316,7 @@ test('state localPkg throws error for inaccessible directory', { skip: isWindows
   }
 })
 
-test('state appname returns pear.name if present', async function (t) {
+test('State.appname returns pear.name if present', async function (t) {
   t.plan(1)
 
   const { teardown } = rig()
@@ -327,7 +327,7 @@ test('state appname returns pear.name if present', async function (t) {
   t.is(result, 'bar', 'appname returns pear.name')
 })
 
-test('state appname returns name if pear.name not present', async function (t) {
+test('State.appname returns name if pear.name not present', async function (t) {
   t.plan(1)
 
   const { teardown } = rig()
@@ -338,7 +338,7 @@ test('state appname returns name if pear.name not present', async function (t) {
   t.is(result, 'foo', 'appname returns name')
 })
 
-test('state appname returns null if no name fields', async function (t) {
+test('State.appname returns null if no name fields', async function (t) {
   t.plan(1)
 
   const { teardown } = rig()
@@ -363,14 +363,32 @@ test('state.link', async function (t) {
 })
 
 test('state.applink', async function (t) {
-  t.plan(3)
+  t.plan(4)
 
   const { teardown } = rig()
   t.teardown(teardown)
 
+  const helloWorld = path.join(dirname, 'fixtures', 'hello-world')
+
   const State = require('../state')
 
-  t.is(new State({ link: '/a/b/c', flags: {} }).applink, pathToFileURL(os.cwd()).href)
+  t.is(new State({ dir: helloWorld, link: helloWorld, flags: {} }).applink, pathToFileURL(helloWorld).href)
+  t.is(new State({ dir: helloWorld, link: helloWorld + '/some/route', flags: {} }).applink, pathToFileURL(helloWorld).href)
   t.is(new State({ link: 'pear://b9abnxwa71999xsweicj6ndya8w9w39z7ssg43pkohd76kzcgpmo/check?query', flags: {} }).applink, 'pear://b9abnxwa71999xsweicj6ndya8w9w39z7ssg43pkohd76kzcgpmo')
-  t.is(new State({ link: 'file:///a/b/c', flags: {} }).applink, pathToFileURL(os.cwd()).href)
+  t.is(new State({ link: 'file:///a/b/c#foo', flags: {} }).applink, pathToFileURL(os.cwd()).href)
+})
+
+
+test('state.route', async function (t) {
+  t.plan(2)
+
+  const { teardown } = rig()
+  t.teardown(teardown)
+
+  const helloWorld = path.join(dirname, 'fixtures', 'hello-world')
+
+  const State = require('../state')
+
+  t.is(new State({ dir: helloWorld, link: helloWorld + '/some/route', flags: {} }).route, '/some/route')
+  t.is(new State({ link: 'pear://b9abnxwa71999xsweicj6ndya8w9w39z7ssg43pkohd76kzcgpmo/check?query', flags: {} }).route, '/check')
 })

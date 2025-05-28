@@ -3,8 +3,8 @@ const process = require('process')
 
 const main = async () => {
   const ipc = await Helper.startIpcClient()
-
-  Helper.rig({ ipc, state: { config: { args: process.argv.slice(4) } } })
+  runRigTeardown()
+  const teardown = Helper.rig({ ipc, state: { config: { args: process.argv.slice(4) } } })
 
   const pipe = Pear.pipe
 
@@ -19,6 +19,7 @@ const main = async () => {
   })
 
   await Helper.untilClose(stream)
+  teardown()
   pipe.end()
 }
 main()

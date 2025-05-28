@@ -16,316 +16,316 @@ const dirname = __dirname
 // messages
 //
 
-// test('Pear.messages single client', async function (t) {
-//   t.plan(3)
-
-//   const bus = new Iambus()
-//   await Helper.startIpcServer({
-//     handlers: {
-//       messages: (pattern) => {
-//         const stream = bus.sub(pattern)
-//         stream.push({ type: 'subscribed', pattern })
-//         return stream
-//       },
-//       message: (pattern) => {
-//         bus.pub({ ...pattern, time: Date.now() })
-//         bus.pub({ ...pattern, time: Date.now() })
-//         bus.pub({ ...pattern, time: Date.now() })
-//         bus.pub({ ...pattern, time: Date.now() })
-//       }
-//     },
-//     teardown: t.teardown
-//   })
-//   const ipc = await Helper.startIpcClient()
-
-//   const teardown = Helper.rig({ ipc })
-//   t.teardown(teardown)
-
-//   const stream = Pear.messages({ hello: 'world' })
-//   t.teardown(() => stream.destroy())
-
-//   await new Promise((resolve) => {
-//     stream.on('data', (data) => {
-//       if (data.type !== 'subscribed') return
-//       if (data.pattern.hello === 'world') resolve()
-//     })
-//   })
-
-//   const received = new Promise((resolve) => {
-//     const messages = []
-//     stream.on('data', (data) => {
-//       if (data.type === 'subscribed') return
-//       messages.push(data)
-//       if (messages.length === 4) {
-//         resolve(messages)
-//       }
-//     })
-//   })
-
-//   await Pear.message({ hello: 'world' })
-
-//   const messages = await received
-//   t.is(messages.length, 4, 'received 4 messages')
-//   t.ok(messages.every(msg => msg.hello === 'world'), 'all messages match')
-//   t.ok(messages.every(msg => typeof msg.time === 'number' && msg.time <= Date.now()), 'all messages have time')
-
-//   await Helper.untilClose(stream)
-// })
-
-// test('Pear.messages multi clients', async function (t) {
-//   t.plan(1)
-
-//   const dir = path.join(dirname, 'fixtures', 'run-messages-client')
-
-//   const bus = new Iambus()
-//   await Helper.startIpcServer({
-//     handlers: {
-//       messages: (pattern) => {
-//         const stream = bus.sub(pattern)
-//         stream.push({ type: 'subscribed', pattern })
-//         bus.pub({ type: 'subscribed', pattern })
-//         return stream
-//       },
-//       message: (pattern) => { bus.pub({ ...pattern, time: Date.now() }) }
-//     },
-//     teardown: t.teardown
-//   })
-//   const ipc = await Helper.startIpcClient()
-
-//   const teardown = Helper.rig({ ipc })
-//   t.teardown(teardown)
-
-//   const stream = Pear.messages({ type: 'subscribed' })
-//   t.teardown(() => stream.destroy())
-
-//   const subscribed = new Promise((resolve) => {
-//     stream.on('data', (data) => {
-//       if (data.type !== 'subscribed') return
-//       if (data.pattern.hello === 'world') resolve()
-//     })
-//   })
-
-//   const pipe = Pear.run(dir)
-
-//   await subscribed
-//   await Pear.message({ hello: 'world', msg: 'pear1' })
-
-//   const msg = await Helper.untilResult(pipe)
-//   t.is(msg, 'pear1', 'message received')
-
-//   await Helper.untilClose(stream)
-//   await Helper.untilClose(pipe)
-// })
-
-// test('Pear.messages with no listener', async function (t) {
-//   t.plan(1)
-
-//   const bus = new Iambus()
-//   await Helper.startIpcServer({
-//     handlers: {
-//       messages: (pattern) => { return bus.sub(pattern) },
-//       message: (pattern) => { bus.pub(pattern) }
-//     },
-//     teardown: t.teardown
-//   })
-//   const ipc = await Helper.startIpcClient()
-
-//   const teardown = Helper.rig({ ipc })
-//   t.teardown(teardown)
-
-//   const stream = Pear.messages({ hello: 'world' })
-//   t.teardown(() => stream.destroy())
-
-//   await Pear.message({ hello: 'world' })
-
-//   await Helper.untilClose(stream)
-//   t.pass('no listener did not throw')
-// })
-
-// test('Pear.messages with no pattern', async function (t) {
-//   t.plan(2)
-
-//   const bus = new Iambus()
-//   await Helper.startIpcServer({
-//     handlers: {
-//       messages: (pattern) => {
-//         const stream = bus.sub(pattern)
-//         stream.push({ type: 'subscribed', pattern })
-//         return stream
-//       },
-//       message: (pattern) => { bus.pub({ ...pattern, time: Date.now() }) }
-//     },
-//     teardown: t.teardown
-//   })
-//   const ipc = await Helper.startIpcClient()
-
-//   const teardown = Helper.rig({ ipc })
-//   t.teardown(teardown)
-
-//   const stream = Pear.messages()
-//   t.teardown(() => stream.destroy())
-
-//   await new Promise((resolve) => {
-//     stream.on('data', (data) => {
-//       if (data.type !== 'subscribed') return
-//       resolve()
-//     })
-//   })
-
-//   const received = new Promise((resolve) => {
-//     stream.on('data', (data) => {
-//       if (data.type === 'subscribed') return
-//       resolve(data)
-//     })
-//   })
-
-//   await Pear.message({ hello: 'world' })
-
-//   const msg = await received
-//   t.is(msg.hello, 'world', 'message received')
-//   t.ok(typeof msg.time === 'number' && msg.time <= Date.now(), 'message has time')
-
-//   await Helper.untilClose(stream)
-// })
-
-// //
-// // checkpoint
-// //
-
-// test('Pear.checkpoint returns', async function (t) {
-//   t.plan(5)
-
-//   await Helper.startIpcServer({
-//     handlers: {
-//       checkpoint: (state) => ({ ...state, time: Date.now() })
-//     },
-//     teardown: t.teardown
-//   })
-//   const ipc = await Helper.startIpcClient()
+test('Pear.messages single client', async function (t) {
+  t.plan(3)
+
+  const bus = new Iambus()
+  await Helper.startIpcServer({
+    handlers: {
+      messages: (pattern) => {
+        const stream = bus.sub(pattern)
+        stream.push({ type: 'subscribed', pattern })
+        return stream
+      },
+      message: (pattern) => {
+        bus.pub({ ...pattern, time: Date.now() })
+        bus.pub({ ...pattern, time: Date.now() })
+        bus.pub({ ...pattern, time: Date.now() })
+        bus.pub({ ...pattern, time: Date.now() })
+      }
+    },
+    teardown: t.teardown
+  })
+  const ipc = await Helper.startIpcClient()
+
+  const teardown = Helper.rig({ ipc })
+  t.teardown(teardown)
+
+  const stream = Pear.messages({ hello: 'world' })
+  t.teardown(() => stream.destroy())
+
+  await new Promise((resolve) => {
+    stream.on('data', (data) => {
+      if (data.type !== 'subscribed') return
+      if (data.pattern.hello === 'world') resolve()
+    })
+  })
+
+  const received = new Promise((resolve) => {
+    const messages = []
+    stream.on('data', (data) => {
+      if (data.type === 'subscribed') return
+      messages.push(data)
+      if (messages.length === 4) {
+        resolve(messages)
+      }
+    })
+  })
+
+  await Pear.message({ hello: 'world' })
+
+  const messages = await received
+  t.is(messages.length, 4, 'received 4 messages')
+  t.ok(messages.every(msg => msg.hello === 'world'), 'all messages match')
+  t.ok(messages.every(msg => typeof msg.time === 'number' && msg.time <= Date.now()), 'all messages have time')
+
+  await Helper.untilClose(stream)
+})
+
+test('Pear.messages multi clients', async function (t) {
+  t.plan(1)
+
+  const dir = path.join(dirname, 'fixtures', 'run-messages-client')
+
+  const bus = new Iambus()
+  await Helper.startIpcServer({
+    handlers: {
+      messages: (pattern) => {
+        const stream = bus.sub(pattern)
+        stream.push({ type: 'subscribed', pattern })
+        bus.pub({ type: 'subscribed', pattern })
+        return stream
+      },
+      message: (pattern) => { bus.pub({ ...pattern, time: Date.now() }) }
+    },
+    teardown: t.teardown
+  })
+  const ipc = await Helper.startIpcClient()
+
+  const teardown = Helper.rig({ ipc })
+  t.teardown(teardown)
+
+  const stream = Pear.messages({ type: 'subscribed' })
+  t.teardown(() => stream.destroy())
+
+  const subscribed = new Promise((resolve) => {
+    stream.on('data', (data) => {
+      if (data.type !== 'subscribed') return
+      if (data.pattern.hello === 'world') resolve()
+    })
+  })
+
+  const pipe = Pear.run(dir)
+
+  await subscribed
+  await Pear.message({ hello: 'world', msg: 'pear1' })
+
+  const msg = await Helper.untilResult(pipe)
+  t.is(msg, 'pear1', 'message received')
+
+  await Helper.untilClose(stream)
+  await Helper.untilClose(pipe)
+})
+
+test('Pear.messages with no listener', async function (t) {
+  t.plan(1)
+
+  const bus = new Iambus()
+  await Helper.startIpcServer({
+    handlers: {
+      messages: (pattern) => { return bus.sub(pattern) },
+      message: (pattern) => { bus.pub(pattern) }
+    },
+    teardown: t.teardown
+  })
+  const ipc = await Helper.startIpcClient()
+
+  const teardown = Helper.rig({ ipc })
+  t.teardown(teardown)
+
+  const stream = Pear.messages({ hello: 'world' })
+  t.teardown(() => stream.destroy())
+
+  await Pear.message({ hello: 'world' })
+
+  await Helper.untilClose(stream)
+  t.pass('no listener did not throw')
+})
+
+test('Pear.messages with no pattern', async function (t) {
+  t.plan(2)
+
+  const bus = new Iambus()
+  await Helper.startIpcServer({
+    handlers: {
+      messages: (pattern) => {
+        const stream = bus.sub(pattern)
+        stream.push({ type: 'subscribed', pattern })
+        return stream
+      },
+      message: (pattern) => { bus.pub({ ...pattern, time: Date.now() }) }
+    },
+    teardown: t.teardown
+  })
+  const ipc = await Helper.startIpcClient()
+
+  const teardown = Helper.rig({ ipc })
+  t.teardown(teardown)
+
+  const stream = Pear.messages()
+  t.teardown(() => stream.destroy())
+
+  await new Promise((resolve) => {
+    stream.on('data', (data) => {
+      if (data.type !== 'subscribed') return
+      resolve()
+    })
+  })
+
+  const received = new Promise((resolve) => {
+    stream.on('data', (data) => {
+      if (data.type === 'subscribed') return
+      resolve(data)
+    })
+  })
+
+  await Pear.message({ hello: 'world' })
+
+  const msg = await received
+  t.is(msg.hello, 'world', 'message received')
+  t.ok(typeof msg.time === 'number' && msg.time <= Date.now(), 'message has time')
+
+  await Helper.untilClose(stream)
+})
+
+//
+// checkpoint
+//
+
+test('Pear.checkpoint returns', async function (t) {
+  t.plan(5)
+
+  await Helper.startIpcServer({
+    handlers: {
+      checkpoint: (state) => ({ ...state, time: Date.now() })
+    },
+    teardown: t.teardown
+  })
+  const ipc = await Helper.startIpcClient()
 
-//   const state = {
-//     config: { hello: 'world' }
-//   }
-//   const teardown = Helper.rig({ ipc, state })
-//   t.teardown(teardown)
+  const state = {
+    config: { hello: 'world' }
+  }
+  const teardown = Helper.rig({ ipc, state })
+  t.teardown(teardown)
 
-//   t.is(Pear.config.hello, 'world', 'Pear.config is set')
+  t.is(Pear.config.hello, 'world', 'Pear.config is set')
 
-//   const cp = await Pear.checkpoint({ magic: 'trick' })
-//   t.is(cp.magic, 'trick', 'checkpoint returned')
-//   t.ok(typeof cp.time === 'number' && cp.time <= Date.now(), 'checkpoint has time')
+  const cp = await Pear.checkpoint({ magic: 'trick' })
+  t.is(cp.magic, 'trick', 'checkpoint returned')
+  t.ok(typeof cp.time === 'number' && cp.time <= Date.now(), 'checkpoint has time')
 
-//   t.is(Pear.config.hello, 'world', 'Pear.config is still set')
-//   t.is(Pear.config.checkpoint.magic, 'trick', 'Pear.config is updated')
-// })
+  t.is(Pear.config.hello, 'world', 'Pear.config is still set')
+  t.is(Pear.config.checkpoint.magic, 'trick', 'Pear.config is updated')
+})
 
-// //
-// // versions
-// //
+//
+// versions
+//
 
-// test('Pear.versions returns', async function (t) {
-//   t.plan(2)
+test('Pear.versions returns', async function (t) {
+  t.plan(2)
 
-//   await Helper.startIpcServer({
-//     handlers: {
-//       versions: () => ({ hello: 'world', time: Date.now() })
-//     },
-//     teardown: t.teardown
-//   })
-//   const ipc = await Helper.startIpcClient()
+  await Helper.startIpcServer({
+    handlers: {
+      versions: () => ({ hello: 'world', time: Date.now() })
+    },
+    teardown: t.teardown
+  })
+  const ipc = await Helper.startIpcClient()
 
-//   const teardown = Helper.rig({ ipc })
-//   t.teardown(teardown)
+  const teardown = Helper.rig({ ipc })
+  t.teardown(teardown)
 
-//   const ver = await Pear.versions()
-//   t.is(ver.hello, 'world', 'versions returned')
-//   t.ok(typeof ver.time === 'number' && ver.time <= Date.now(), 'versions has time')
-// })
+  const ver = await Pear.versions()
+  t.is(ver.hello, 'world', 'versions returned')
+  t.ok(typeof ver.time === 'number' && ver.time <= Date.now(), 'versions has time')
+})
 
-// //
-// // run
-// //
+//
+// run
+//
 
-// test('Pear.run pipe', async function (t) {
-//   t.plan(1)
+test('Pear.run pipe', async function (t) {
+  t.plan(1)
 
-//   const dir = path.join(dirname, 'fixtures', 'run')
+  const dir = path.join(dirname, 'fixtures', 'run')
 
-//   const teardown = Helper.rig()
-//   t.teardown(teardown)
+  const teardown = Helper.rig()
+  t.teardown(teardown)
 
-//   const pipe = Pear.run(dir)
+  const pipe = Pear.run(dir)
 
-//   pipe.on('error', (err) => {
-//     if (err.code === 'ENOTCONN') return // when the other side destroys the pipe
-//     throw err
-//   })
+  pipe.on('error', (err) => {
+    if (err.code === 'ENOTCONN') return // when the other side destroys the pipe
+    throw err
+  })
 
-//   const messages = []
-//   const response = new Promise((resolve) => {
-//     pipe.on('data', (data) => {
-//       messages.push(data.toString())
-//       if (messages.length === 4) resolve(messages.join(''))
-//     })
-//   })
+  const messages = []
+  const response = new Promise((resolve) => {
+    pipe.on('data', (data) => {
+      messages.push(data.toString())
+      if (messages.length === 4) resolve(messages.join(''))
+    })
+  })
 
-//   pipe.write('ping')
+  pipe.write('ping')
 
-//   const runResponse = await response
-//   t.is(runResponse, '0123', 'pear pipe can send and receive data')
+  const runResponse = await response
+  t.is(runResponse, '0123', 'pear pipe can send and receive data')
 
-//   pipe.write('exit')
-// })
+  pipe.write('exit')
+})
 
-// test('Pear.run args become Pear.config.args', async function (t) {
-//   t.plan(1)
+test('Pear.run args become Pear.config.args', async function (t) {
+  t.plan(1)
 
-//   const dir = path.join(dirname, 'fixtures', 'print-args')
+  const dir = path.join(dirname, 'fixtures', 'print-args')
 
-//   const teardown = Helper.rig()
-//   t.teardown(teardown)
+  const teardown = Helper.rig()
+  t.teardown(teardown)
 
-//   const args = ['hello', 'world']
-//   const pipe = Pear.run(dir, args)
+  const args = ['hello', 'world']
+  const pipe = Pear.run(dir, args)
 
-//   const result = JSON.parse(await Helper.untilResult(pipe))
+  const result = JSON.parse(await Helper.untilResult(pipe))
 
-//   t.alike(result, args, 'run should receive args from the parent')
+  t.alike(result, args, 'run should receive args from the parent')
 
-//   await Helper.untilClose(pipe)
-// })
+  await Helper.untilClose(pipe)
+})
 
-// test('Pear.run should run inside Pear.run', async function (t) {
-//   t.plan(1)
+test('Pear.run should run inside Pear.run', async function (t) {
+  t.plan(1)
 
-//   const runDir = path.join(dirname, 'fixtures', 'run-runner')
-//   const helloWorldDir = path.join(dirname, 'fixtures', 'hello-world')
+  const runDir = path.join(dirname, 'fixtures', 'run-runner')
+  const helloWorldDir = path.join(dirname, 'fixtures', 'hello-world')
 
-//   const teardown = Helper.rig()
-//   t.teardown(teardown)
+  const teardown = Helper.rig()
+  t.teardown(teardown)
 
-//   const pipe = Pear.run(runDir, [helloWorldDir])
+  const pipe = Pear.run(runDir, [helloWorldDir])
 
-//   const response = await Helper.untilResult(pipe)
+  const response = await Helper.untilResult(pipe)
 
-//   t.is(response, 'hello world', 'run should send expected response')
+  t.is(response, 'hello world', 'run should send expected response')
 
-//   await Helper.untilClose(pipe)
-// })
+  await Helper.untilClose(pipe)
+})
 
-// test('Pear.run exit when child calls pipe.end()', async function (t) {
-//   const runParent = path.join(dirname, 'fixtures', 'run-parent')
-//   const runEndFromChild = path.join(dirname, 'fixtures', 'run-end-from-child')
+test('Pear.run exit when child calls pipe.end()', async function (t) {
+  const runParent = path.join(dirname, 'fixtures', 'run-parent')
+  const runEndFromChild = path.join(dirname, 'fixtures', 'run-end-from-child')
 
-//   const teardown = Helper.rig()
-//   t.teardown(teardown)
+  const teardown = Helper.rig()
+  t.teardown(teardown)
 
-//   const pipe = Pear.run(runParent, [runEndFromChild])
-//   pipe.on('end', () => pipe.end())
+  const pipe = Pear.run(runParent, [runEndFromChild])
+  pipe.on('end', () => pipe.end())
 
-//   const pid = await Helper.untilResult(pipe)
-//   await Helper.untilExit(pid)
-// })
+  const pid = await Helper.untilResult(pipe)
+  await Helper.untilExit(pid)
+})
 
 test('Pear.run exit when child calls pipe.destroy()', async function (t) {
   const runParentErrorHandler = path.join(dirname, 'fixtures', 'run-parent-error-handler')

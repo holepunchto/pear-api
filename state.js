@@ -75,15 +75,17 @@ module.exports = class State {
   }
 
   constructor (params = {}) {
-    const { dht, link, startId = null, id = null, args = null, env = ENV, cwd = CWD, dir = cwd, cmdArgs, onupdate = () => {}, flags, run, storage = null } = params
+    const { dht, link = '.', startId = null, id = null, args = null, env = ENV, cwd = CWD, dir = cwd, cmdArgs, onupdate = () => {}, flags, run, storage = null } = params
     const {
       appling, channel, devtools, checkout, stage, updates, updatesDiff,
       links = '', prerunning = false, dev = false, parent = null,
       followSymlinks, unsafeClearAppStorage, chromeWebrtcInternals
     } = flags
-    const parsedLink = plink.parse(link ?? '.')
+    const parsedLink = plink.parse(link)
     const { drive: { alias = null, key = null } = {}, pathname: route = '', protocol, origin, hash, search } = parsedLink
-    const pathname = protocol === 'file:' && isWindows ? route.slice(1) : route
+    let pathname = protocol === 'file:' && isWindows ? route.slice(1) : route
+    // for on disk route support, this relies on passed in dir being the actual project dir:
+    if (protocol === 'file:') pathname = pathname.slice(dir.length)
     const store = flags.tmpStore ? path.join(os.tmpdir(), crypto.randomBytes(16).toString('hex')) : flags.store
     this.#onupdate = onupdate
     this.startId = startId
@@ -93,8 +95,8 @@ module.exports = class State {
     this.appling = appling
     this.channel = channel || null
     this.checkout = checkout
-    this.dir = dir
     this.cwd = cwd
+    this.dir = dir
     this.run = run
     this.storage = storage
     this.flags = flags
@@ -105,7 +107,8 @@ module.exports = class State {
     this.stage = stage
     this.fragment = hash ? hash.slice(1) : ''
     this.query = search ? search.slice(1) : ''
-    this.linkData = pathname?.startsWith('/') ? pathname.slice(1) : pathname
+    this.route = pathname
+    this.linkData = this.route?.startsWith('/') ? this.route.slice(1) : this.route
     this.key = key
     this.link = link ? (link.startsWith(protocol) ? link : plink.normalize(plink.serialize(parsedLink))) : null
     this.applink = key ? origin : plink.normalize(plink.serialize(plink.parse(this.dir)))
