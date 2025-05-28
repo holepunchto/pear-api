@@ -4,6 +4,7 @@ const { test } = require('brittle')
 const fs = require('fs')
 const path = require('path')
 const os = require('os')
+const { pathToFileURL } = require('url-file-url')
 const { isWindows } = require('which-runtime')
 
 const dirname = __dirname
@@ -346,4 +347,30 @@ test('state appname returns null if no name fields', async function (t) {
   const State = require('../state')
   const result = State.appname({})
   t.is(result, null, 'appname returns null if no name')
+})
+
+test('state.link', async function (t) {
+  t.plan(3)
+
+  const { teardown } = rig()
+  t.teardown(teardown)
+
+  const State = require('../state')
+
+  t.is(new State({ link: '/a/b/c', flags: {} }).link, 'file:///a/b/c')
+  t.is(new State({ link: 'pear://b9abnxwa71999xsweicj6ndya8w9w39z7ssg43pkohd76kzcgpmo/check?query', flags: {} }).link, 'pear://b9abnxwa71999xsweicj6ndya8w9w39z7ssg43pkohd76kzcgpmo/check?query')
+  t.is(new State({ link: 'file:///a/b/c', flags: {} }).link, 'file:///a/b/c')
+})
+
+test('state.applink', async function (t) {
+  t.plan(3)
+
+  const { teardown } = rig()
+  t.teardown(teardown)
+
+  const State = require('../state')
+
+  t.is(new State({ link: '/a/b/c', flags: {} }).applink, pathToFileURL(os.cwd()).href)
+  t.is(new State({ link: 'pear://b9abnxwa71999xsweicj6ndya8w9w39z7ssg43pkohd76kzcgpmo/check?query', flags: {} }).applink, 'pear://b9abnxwa71999xsweicj6ndya8w9w39z7ssg43pkohd76kzcgpmo')
+  t.is(new State({ link: 'file:///a/b/c', flags: {} }).applink, pathToFileURL(os.cwd()).href)
 })
