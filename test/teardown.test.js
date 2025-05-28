@@ -13,7 +13,7 @@ test('teardown default', { skip: !isBare || isWindows }, async function (t) {
 
   const dir = path.join(dirname, 'fixtures', 'teardown-default')
 
-  const teardown = Helper.rig({ runtimeArgv: [dir], clearRequireCache: '../teardown' })
+  const teardown = Helper.rig({ clearRequireCache: '../teardown' })
   t.teardown(teardown)
 
   const pipe = Pear.run(dir)
@@ -27,7 +27,7 @@ test('teardown with position', { skip: !isBare || isWindows }, async function (t
 
   const dir = path.join(dirname, 'fixtures', 'teardown-with-position')
 
-  const teardown = Helper.rig({ runtimeArgv: [dir], clearRequireCache: '../teardown' })
+  const teardown = Helper.rig({ clearRequireCache: '../teardown' })
   t.teardown(teardown)
 
   const pipe = Pear.run(dir)

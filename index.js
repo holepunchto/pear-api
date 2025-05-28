@@ -132,23 +132,24 @@ class API {
   }
 
   run (link, args = []) {
-    const argv = ['run', ...pear(program.argv.slice(1)).rest]
-    const parser = command('pear', command('run', ...rundef))
+    const { RUNTIME, RUNTIME_ARGV, RTI } = this.constructor
+    const argv = pear(program.argv.slice(1)).rest
+    const parser = command('run', ...rundef)
     const cmd = parser.parse(argv, { sync: true })
-    const run = argv.map((arg) => arg === cmd.args.link ? link : arg)
-    if (cmd.indices.rest > 0) run.splice(cmd.indices.rest)
+    const inject = [link]
+    if (!cmd.flags.trusted) inject.unshift('--trusted')
+    if (RTI.startId) inject.unshift('--parent', RTI.startId)
+    argv.splice(cmd.indices.args.link, 1, ...inject)
+    argv.unshift('run')
     let linksIndex = cmd.indices.flags.links
-    const linksElements = linksIndex > 0 ? (cmd.flags.links === run[linksIndex]) ? 2 : 1 : 0
+    const linksElements = linksIndex > 0 ? (cmd.flags.links === argv[linksIndex]) ? 2 : 1 : 0
     if (cmd.indices.flags.startId > 0) {
-      run.splice(cmd.indices.flags.startId, 1)
+      argv.splice(cmd.indices.flags.startId, 1)
       if (linksIndex > cmd.indices.flags.startId) linksIndex -= linksElements
     }
-    if (linksIndex > 0) run.splice(linksIndex, linksElements)
-    if (!cmd.flags.trusted) run.splice(1, 0, '--trusted')
+    if (linksIndex > 0) argv.splice(linksIndex, linksElements)
 
-    const { RUNTIME, RUNTIME_ARGV, RTI } = this.constructor
-    if (RTI.startId) run.splice(1, 0, '--parent', RTI.startId)
-    const sp = spawn(RUNTIME, [...RUNTIME_ARGV, ...run, ...args], {
+    const sp = spawn(RUNTIME, [...RUNTIME_ARGV, ...argv, ...args], {
       stdio: ['inherit', 'inherit', 'inherit', 'overlapped'],
       windowsHide: true
     })

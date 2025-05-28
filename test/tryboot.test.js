@@ -45,7 +45,7 @@ test('tryboot with --dht-bootstrap flag', async function (t) {
 
   const dir = path.join(dirname, 'fixtures', 'tryboot')
 
-  const teardown = Helper.rig({ runtimeArgv: [dir], clearRequireCache: '../tryboot' })
+  const teardown = Helper.rig({ clearRequireCache: '../tryboot' })
   t.teardown(teardown)
 
   const args = ['--dht-bootstrap', 'bootstrap-value']

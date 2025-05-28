@@ -14,7 +14,7 @@ test('crasher uncaught exception', async function (t) {
 
   const dir = path.join(dirname, 'fixtures', 'crasher-uncaught-exception')
 
-  const teardown = Helper.rig({ runtimeArgv: [dir] })
+  const teardown = Helper.rig()
   t.teardown(teardown)
 
   const swap = path.join(os.tmpdir(), `${Date.now()}`)
@@ -45,7 +45,7 @@ test('crasher unhandled rejection', async function (t) {
 
   const dir = path.join(dirname, 'fixtures', 'crasher-unhandled-rejection')
 
-  const teardown = Helper.rig({ runtimeArgv: [dir] })
+  const teardown = Helper.rig()
   t.teardown(teardown)
 
   const swap = path.join(os.tmpdir(), `${Date.now()}`)

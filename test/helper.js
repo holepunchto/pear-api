@@ -3,6 +3,7 @@ global.Pear = null
 
 const { isWindows, isBare } = require('which-runtime')
 const IPC = require('pear-ipc')
+const path = require('path')
 const fs = require('fs')
 const { pathToFileURL } = require('url-file-url')
 const process = require('process')
@@ -22,7 +23,10 @@ class Helper {
     clearRequireCache
   } = {}) {
     if (!require.main.url) require.main.url = pathToFileURL(__filename)
-    if (global.Pear !== null) throw Error(`Prior Pear global not cleaned up: ${global.Pear}`)
+    if (global.Pear !== null) {
+      console.error(global.Pear)
+      throw Error('Prior Pear global not cleaned up')
+    }
 
     class RigAPI {
       static RTI = { checkout: { key: dirname, length: null, fork: null } }
@@ -32,16 +36,22 @@ class Helper {
     const API = require('..')
     class TestAPI extends API {
       static RUNTIME = process.argv[0]
-      static RUNTIME_ARGV = runtimeArgv
+      static RUNTIME_ARGV = runtimeArgv ?? [path.join(dirname, 'run.js')]
       static RTI = RigAPI.RTI
     }
 
+    const program = global.Bare ?? global.process
+    const argv = [...program.argv]
+    program.argv.length = 0
+    program.argv.push('pear', 'run', ...argv.slice(1))
     global.Pear = new TestAPI(ipc, state)
 
     return () => {
       if (clearRequireCache) {
         delete require.cache[isBare ? pathToFileURL(require.resolve(clearRequireCache)) : require.resolve(clearRequireCache)]
       }
+      program.argv.length = 0
+      program.argv.push(...argv)
       global.Pear = null
     }
   }
