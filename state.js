@@ -81,8 +81,9 @@ module.exports = class State {
       links = '', prerunning = false, dev = false, parent = null,
       followSymlinks, unsafeClearAppStorage, chromeWebrtcInternals
     } = flags
-    const { drive: { alias = null, key = null }, pathname: route = '', protocol, hash, search } = link ? plink.parse(link) : { drive: {} }
-    const pathname = protocol === 'file:' ? (isWindows ? route.slice(1).slice(dir.length) : route.slice(dir.length)) : route
+    const parsedLink = plink.parse(link ?? '.')
+    const { drive: { alias = null, key = null } = {}, pathname: route = '', protocol, origin, hash, search } = parsedLink
+    const pathname = protocol === 'file:' && isWindows ? route.slice(1) : route
     const store = flags.tmpStore ? path.join(os.tmpdir(), crypto.randomBytes(16).toString('hex')) : flags.store
     this.#onupdate = onupdate
     this.startId = startId
@@ -106,8 +107,8 @@ module.exports = class State {
     this.query = search ? search.slice(1) : ''
     this.linkData = pathname?.startsWith('/') ? pathname.slice(1) : pathname
     this.key = key
-    this.link = link ? (link.startsWith(protocol) ? link : plink.serialize(plink.parse(link))) : null
-    this.applink = key ? plink.parse(link).origin : plink.serialize(plink.parse(this.dir))
+    this.link = link ? (link.startsWith(protocol) ? link : plink.normalize(plink.serialize(parsedLink))) : null
+    this.applink = key ? origin : plink.normalize(plink.serialize(plink.parse(this.dir)))
     this.alias = alias
     this.cmdArgs = cmdArgs
     this.id = id
