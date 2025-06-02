@@ -76,7 +76,6 @@
   },
   "dependencies": {
     "b4a": "^1.6.7",
-    "bare-daemon": "^1.1.0",
     "bare-env": "^3.0.0",
     "bare-format": "^1.0.1",
     "bare-hrtime": "^2.0.10",
