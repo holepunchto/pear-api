@@ -1,5 +1,5 @@
 'use strict'
-const daemon = require('bare-daemon')
+const { spawn } = require('child_process')
 const { RUNTIME, PLATFORM_DIR } = require('./constants')
 const pear = require('./cmd')
 
@@ -24,5 +24,6 @@ module.exports = function tryboot () {
     if (args.length > length) detached = false
   }
   if (flags.logStacks) args.push('--log-stacks')
-  daemon.spawn(RUNTIME, args, { detached, stdio: detached ? 'ignore' : 'inherit', cwd: PLATFORM_DIR })
+  const sc = spawn(RUNTIME, args, { detached, stdio: detached ? 'ignore' : 'inherit', cwd: PLATFORM_DIR })
+  sc.unref()
 }
