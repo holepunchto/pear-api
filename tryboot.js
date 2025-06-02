@@ -12,17 +12,13 @@ module.exports = function tryboot () {
     args.push('--dht-bootstrap')
     args.push(dhtBootstrap)
   }
-  let log = false
   if (flags.log) {
     args.push('--log')
-    log = true
   } else {
-    const { length } = args
     if (flags.logLevel) args.push('--log-level', flags.logLevel)
     if (flags.logFields) args.push('--log-fields', flags.logFields)
     if (flags.logLabels) args.push('--log-labels', flags.logLabels)
-    if (args.length > length) log = true
   }
   if (flags.logStacks) args.push('--log-stacks')
-  daemon.spawn(RUNTIME, args, { stdio: log ? 'inherit' : 'ignore', cwd: PLATFORM_DIR })
+  daemon.spawn(RUNTIME, args, { cwd: PLATFORM_DIR })
 }
