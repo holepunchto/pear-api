@@ -3,6 +3,7 @@ const process = require('process')
 
 const main = async () => {
   const ipc = await Helper.startIpcClient()
+  /* global runRigTeardown */
   runRigTeardown()
   const teardown = Helper.rig({ ipc, state: { config: { args: process.argv.slice(4) } } })
 
