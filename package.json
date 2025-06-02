@@ -84,7 +84,7 @@
     "bare-pipe": "^4.0.3",
     "bare-readline": "^1.0.7",
     "bare-signals": "^3.0.2",
-    "bare-subprocess": "^5.0.2",
+    "bare-subprocess": "^4.0.5",
     "bare-tty": "^5.0.1",
     "child_process": "npm:bare-node-child-process",
     "fs": "npm:bare-node-fs",
