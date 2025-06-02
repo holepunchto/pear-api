@@ -378,7 +378,6 @@ test('state.applink', async function (t) {
   t.is(new State({ link: 'file:///a/b/c#foo', flags: {} }).applink, pathToFileURL(os.cwd()).href)
 })
 
-
 test('state.route', async function (t) {
   t.plan(2)
 
