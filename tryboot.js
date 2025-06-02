@@ -12,13 +12,6 @@ module.exports = function tryboot () {
     args.push('--dht-bootstrap')
     args.push(dhtBootstrap)
   }
-  if (flags.log) {
-    args.push('--log')
-  } else {
-    if (flags.logLevel) args.push('--log-level', flags.logLevel)
-    if (flags.logFields) args.push('--log-fields', flags.logFields)
-    if (flags.logLabels) args.push('--log-labels', flags.logLabels)
-  }
-  if (flags.logStacks) args.push('--log-stacks')
+
   daemon.spawn(RUNTIME, args, { cwd: PLATFORM_DIR })
 }
