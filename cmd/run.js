@@ -27,7 +27,7 @@ module.exports = [
   flag('--prerunning').hide(),
   flag('--dht-bootstrap <nodes>').hide(),
   flag('--encryption-key <name>').hide(),
-  flag('--parent').hide(),
+  flag('--parent <id>').hide(),
   flag('--trusted').hide(),
   flag('--detach').hide(),
   flag('--sandbox').hide() // electron passthrough
