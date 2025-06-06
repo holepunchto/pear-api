@@ -18,7 +18,7 @@ module.exports = [
   flag('--appling <path>', 'Set application shell path'),
   flag('--checkout <n|release|staged>', 'Run a checkout from version length'),
   flag('--detached', 'Wakeup existing app or run detached'),
-  flag('--no-ask', 'Suppress permissions dialog'),
+  flag('--no-ask', 'Suppress permission prompt'),
   flag('--follow-symlinks|-f', 'Follow in-project symlinks'),
   flag('--no-pre', 'Skip pre scripts'),
   flag('--preio', 'Show stdout & stderr of pre scripts'),
