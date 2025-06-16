@@ -75,7 +75,7 @@ module.exports = class State {
   }
 
   constructor (params = {}) {
-    const { dht, link = '.', startId = null, id = null, args = null, env = ENV, cwd = CWD, dir = cwd, cmdArgs, onupdate = () => {}, flags, run, storage = null } = params
+    const { dht, link = '.', startId = null, id = null, args = null, env = ENV, cwd = CWD, dir = cwd, cmdArgs, onupdate = () => {}, flags, run, storage = null, pid } = params
     const {
       appling, channel, devtools, checkout, stage, updates, updatesDiff,
       links = '', prerunning = false, dev = false, parent = null,
@@ -119,6 +119,7 @@ module.exports = class State {
     this.rti = flags.rti ? JSON.parse(flags.rti) : null // important to know if this throws, so no try/catch
     this.prerunning = prerunning
     this.parent = parent
+    this.pid = pid
     this.clearAppStorage = unsafeClearAppStorage
     this.chromeWebrtcInternals = chromeWebrtcInternals
     this.env = { ...env }
