@@ -391,3 +391,20 @@ test('state.route', async function (t) {
   t.is(new State({ dir: helloWorld, link: helloWorld + '/some/route', flags: {} }).route, '/some/route')
   t.is(new State({ link: 'pear://b9abnxwa71999xsweicj6ndya8w9w39z7ssg43pkohd76kzcgpmo/check?query', flags: {} }).route, '/check')
 })
+
+test('State.constructor sets pid', async function (t) {
+  t.plan(2)
+
+  const { teardown } = rig()
+  t.teardown(teardown)
+
+  const State = require('../state')
+  {
+    const state = new State({ pid: 999, flags: {} })
+    t.is(state.pid, 999)
+  }
+  {
+    const state = new State({ flags: {} })
+    t.is(state.pid, undefined)
+  }
+})
