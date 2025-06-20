@@ -76,8 +76,6 @@ class API {
 
   async #unload () {
     this.#unloading()
-    console.log(this.#teardownsArr)
-
     const withIndex = this.#teardownsArr.map((item, index) => ({ ...item, index }))
 
     withIndex.sort((a, b) => {
