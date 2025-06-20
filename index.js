@@ -17,8 +17,8 @@ class API {
   #ipc = null
   #state = null
   #unloading = null
-  #teardowns = null
-  #teardownsArr = []
+  #teardown = null
+  #teardowns = []
   #onteardown = null
   #refs = 0
   #exitCode = 0
@@ -34,7 +34,7 @@ class API {
     this.#ipc = ipc
     this.#state = state
     this.#refs = 0
-    this.#teardowns = new Promise((resolve) => { this.#unloading = resolve })
+    this.#teardown = new Promise((resolve) => { this.#unloading = resolve })
     this.#onteardown = teardown
     this.key = this.#state.key ? (this.#state.key.type === 'Buffer' ? Buffer.from(this.#state.key.data) : this.#state.key) : null
     this.config = state.config
@@ -76,14 +76,9 @@ class API {
 
   async #unload () {
     this.#unloading()
-    const withIndex = this.#teardownsArr.map((item, index) => ({ ...item, index }))
 
-    withIndex.sort((a, b) => {
-      if (a.position !== b.position) return a.position - b.position
-      return a.index - b.index
-    })
-
-    withIndex.forEach((teardown) => { this.#teardowns = this.#teardowns.then(teardown.fn) })
+    this.#teardowns.sort((a, b) => a.position - b.position)
+    for (const teardown of this.#teardowns) this.#teardown = this.#teardown.then(teardown.fn)
 
     const MAX_TEARDOWN_WAIT = 15000
     let timeout = null
@@ -95,8 +90,8 @@ class API {
         resolve()
       }, MAX_TEARDOWN_WAIT)
     })
-    this.#teardowns.finally(() => { clearTimeout(timeout) })
-    await Promise.race([this.#teardowns, countdown]).catch((err) => {
+    this.#teardown.finally(() => { clearTimeout(timeout) })
+    await Promise.race([this.#teardown, countdown]).catch((err) => {
       rejected = err
     })
     if (timedout || rejected) {
@@ -218,7 +213,7 @@ class API {
   wakeups = (listener) => this.messages({ type: 'pear/wakeup' }, listener)
 
   teardown = (fn, position) => {
-    if (typeof fn === 'function') this.#teardownsArr.push({ fn, position })
+    if (typeof fn === 'function') this.#teardowns.push({ fn, position })
   }
 
   exit = (code) => program.exit(code)
