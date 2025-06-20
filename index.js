@@ -18,6 +18,7 @@ class API {
   #state = null
   #unloading = null
   #teardowns = null
+  #teardownsArr = []
   #onteardown = null
   #refs = 0
   #exitCode = 0
@@ -75,6 +76,16 @@ class API {
 
   async #unload () {
     this.#unloading()
+    console.log(this.#teardownsArr)
+
+    const withIndex = this.#teardownsArr.map((item, index) => ({ ...item, index }))
+
+    withIndex.sort((a, b) => {
+      if (a.position !== b.position) return a.position - b.position
+      return a.index - b.index
+    })
+
+    withIndex.forEach((teardown) => { this.#teardowns = this.#teardowns.then(teardown.fn) })
 
     const MAX_TEARDOWN_WAIT = 15000
     let timeout = null
@@ -208,9 +219,8 @@ class API {
 
   wakeups = (listener) => this.messages({ type: 'pear/wakeup' }, listener)
 
-  teardown = (fn) => {
-    if (typeof fn === 'function') this.#teardowns = this.#teardowns.then(fn)
-    return this.#teardowns
+  teardown = (fn, position) => {
+    if (typeof fn === 'function') this.#teardownsArr.push({ fn, position })
   }
 
   exit = (code) => program.exit(code)
