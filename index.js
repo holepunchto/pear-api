@@ -213,10 +213,10 @@ class API {
   wakeups = (listener) => this.messages({ type: 'pear/wakeup' }, listener)
 
   teardown = (fn = () => {}, position = 0) => {
-    if (typeof fn !== 'function') throw new TypeError(`First argument of Pear.teardown must be a function, recieved type '${typeof fn}'`)
+    if (typeof fn !== 'function') throw new TypeError('teardown expects function')
 
     const isValidPosition = Number.isInteger(position) || position === Infinity || position === -Infinity
-    if (!isValidPosition) throw new TypeError(`Second argument of Pear.teardown must be an integer or ±Infinity, recieved type '${typeof position}'`)
+    if (!isValidPosition) throw new TypeError('teardown position must be integer')
 
     this.#teardowns.push({ fn, position })
   }

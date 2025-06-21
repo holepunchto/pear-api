@@ -38,16 +38,16 @@ test('teardown with position', { skip: !isBare || isWindows }, async function (t
 
 test('teardown with type err in first arg', { skip: !isBare || isWindows }, async function (t) {
   t.plan(1)
-  const fnErr = `First argument of Pear.teardown must be a function, recieved type 'string'`
   const teardown = Helper.rig({ clearRequireCache: '../teardown' })
   t.teardown(teardown)
-  t.exception(() => Pear.teardown('notAFunction'), fnErr)
+
+  t.exception(() => {try{Pear.teardown('notAFunction')} catch(err){throw new Error(err)}}, /teardown expects function/)
 })
 
-test('teardown with type err in first arg', { skip: !isBare || isWindows }, async function (t) {
+test('teardown with type err in second arg', { skip: !isBare || isWindows }, async function (t) {
   t.plan(1)
-  const positionErr = `Second argument of Pear.teardown must be an integer or ±Infinity, recieved type 'string'`
   const teardown = Helper.rig({ clearRequireCache: '../teardown' })
   t.teardown(teardown)
-  t.exception(() => Pear.teardown(()=>{}, '5'), positionErr)
+
+  t.exception(() => {try{Pear.teardown(() => {}, 'notAnInt')} catch(err){throw new Error(err)}}, /teardown position must be integer/)
 })
