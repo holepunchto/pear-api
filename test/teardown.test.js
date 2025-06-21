@@ -35,3 +35,19 @@ test('teardown with position', { skip: !isBare || isWindows }, async function (t
   const td = await Helper.untilResult(pipe, { runFn: () => pipe.end() })
   t.is(td, 'teardown', 'teardown executed')
 })
+
+test('teardown with type err in first arg', { skip: !isBare || isWindows }, async function (t) {
+  t.plan(1)
+  const teardown = Helper.rig({ clearRequireCache: '../teardown' })
+  t.teardown(teardown)
+
+  t.exception(() => {try{Pear.teardown('notAFunction')} catch(err){throw new Error(err)}}, /teardown expects function/)
+})
+
+test('teardown with type err in second arg', { skip: !isBare || isWindows }, async function (t) {
+  t.plan(1)
+  const teardown = Helper.rig({ clearRequireCache: '../teardown' })
+  t.teardown(teardown)
+
+  t.exception(() => {try{Pear.teardown(() => {}, 'notAnInt')} catch(err){throw new Error(err)}}, /teardown position must be integer/)
+})

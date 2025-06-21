@@ -17,7 +17,8 @@ class API {
   #ipc = null
   #state = null
   #unloading = null
-  #teardowns = null
+  #teardown = null
+  #teardowns = []
   #onteardown = null
   #refs = 0
   #exitCode = 0
@@ -33,7 +34,7 @@ class API {
     this.#ipc = ipc
     this.#state = state
     this.#refs = 0
-    this.#teardowns = new Promise((resolve) => { this.#unloading = resolve })
+    this.#teardown = new Promise((resolve) => { this.#unloading = resolve })
     this.#onteardown = teardown
     this.key = this.#state.key ? (this.#state.key.type === 'Buffer' ? Buffer.from(this.#state.key.data) : this.#state.key) : null
     this.config = state.config
@@ -76,6 +77,9 @@ class API {
   async #unload () {
     this.#unloading()
 
+    this.#teardowns.sort((a, b) => a.position - b.position)
+    for (const teardown of this.#teardowns) this.#teardown = this.#teardown.then(teardown.fn)
+
     const MAX_TEARDOWN_WAIT = 15000
     let timeout = null
     let timedout = false
@@ -86,8 +90,8 @@ class API {
         resolve()
       }, MAX_TEARDOWN_WAIT)
     })
-    this.#teardowns.finally(() => { clearTimeout(timeout) })
-    await Promise.race([this.#teardowns, countdown]).catch((err) => {
+    this.#teardown.finally(() => { clearTimeout(timeout) })
+    await Promise.race([this.#teardown, countdown]).catch((err) => {
       rejected = err
     })
     if (timedout || rejected) {
@@ -208,9 +212,13 @@ class API {
 
   wakeups = (listener) => this.messages({ type: 'pear/wakeup' }, listener)
 
-  teardown = (fn) => {
-    if (typeof fn === 'function') this.#teardowns = this.#teardowns.then(fn)
-    return this.#teardowns
+  teardown = (fn = () => {}, position = 0) => {
+    if (typeof fn !== 'function') throw new TypeError('teardown expects function')
+
+    const isValidPosition = Number.isInteger(position) || position === Infinity || position === -Infinity
+    if (!isValidPosition) throw new TypeError('teardown position must be integer')
+
+    this.#teardowns.push({ fn, position })
   }
 
   exit = (code) => program.exit(code)
