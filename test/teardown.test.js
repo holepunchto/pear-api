@@ -41,7 +41,13 @@ test('teardown with type err in first arg', { skip: !isBare || isWindows }, asyn
   const teardown = Helper.rig({ clearRequireCache: '../teardown' })
   t.teardown(teardown)
 
-  t.exception(() => {try{Pear.teardown('notAFunction')} catch(err){throw new Error(err)}}, /teardown expects function/)
+  try{
+    Pear.teardown('test')
+  } catch (err){
+    console.log(err)
+  }
+
+  t.exception(() => Pear.teardown('notAFunction'), /teardown expects function/)
 })
 
 test('teardown with type err in second arg', { skip: !isBare || isWindows }, async function (t) {
@@ -49,5 +55,5 @@ test('teardown with type err in second arg', { skip: !isBare || isWindows }, asy
   const teardown = Helper.rig({ clearRequireCache: '../teardown' })
   t.teardown(teardown)
 
-  t.exception(() => {try{Pear.teardown(() => {}, 'notAnInt')} catch(err){throw new Error(err)}}, /teardown position must be integer/)
+  t.exception(() => Pear.teardown(() => {}, 'notAnInt'), /teardown position must be integer/)
 })
