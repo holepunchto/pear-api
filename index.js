@@ -226,13 +226,6 @@ class API {
   set exitCode (code) { this.#exitCode = code }
   get exitCode () { return this.#exitCode }
 
-  asset = (link, opts = {}) => {
-    this.#ref()
-    const stream = this.#ipc.asset({ ...opts, link })
-    stream.on('close', () => this.#unref())
-    return stream
-  }
-
   dump = (link, opts = {}) => {
     this.#ref()
     const stream = this.#ipc.dump({ ...opts, link })
