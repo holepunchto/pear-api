@@ -12,7 +12,7 @@ const pear = require('./cmd')
 const onteardown = global.Bare ? require('./teardown') : noop
 const program = global.Bare || global.process
 const kIPC = Symbol('ipc')
-const PearError = require('./errors')
+const { ERR_INVALID_INPUT } = require('./errors')
 
 class API {
   #ipc = null
@@ -214,10 +214,10 @@ class API {
   wakeups = (listener) => this.messages({ type: 'pear/wakeup' }, listener)
 
   teardown = (fn = () => {}, position = 0) => {
-    if (typeof fn !== 'function') throw PearError.ERR_INVALID_INPUT('teardown expects function')
+    if (typeof fn !== 'function') throw ERR_INVALID_INPUT('teardown expects function')
 
     const isValidPosition = Number.isInteger(position) || position === Infinity || position === -Infinity
-    if (!isValidPosition) throw PearError.ERR_INVALID_INPUT('teardown position must be integer')
+    if (!isValidPosition) throw ERR_INVALID_INPUT('teardown position must be integer')
 
     this.#teardowns.push({ fn, position })
   }
