@@ -8,7 +8,7 @@ const verbose = pear?.flags.logVerbose || max
 const log = pear?.flags.log || !!pear?.flags.logLabels || verbose || max
 const switches = {
   log,
-  level: pear?.flags.logLevel ?? (max ? 3 : (log ? 2 : 0)),
+  level: pear?.flags.logLevel ?? (max ? 3 : (log ? 2 : 1)),
   labels: pear?.flags.logLabels ?? '',
   fields: verbose ? 'date,time,level,label,delta' : (pear?.flags.logFields ?? ''),
   stacks: pear?.flags.logStacks ?? false,

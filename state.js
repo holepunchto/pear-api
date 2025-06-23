@@ -27,7 +27,7 @@ module.exports = class State {
   route = null
   routes = null
   unrouted = null
-
+  assets = {}
   static async localPkg (state) {
     let pkg
     try {
@@ -63,10 +63,10 @@ module.exports = class State {
   }
 
   static configFrom (state) {
-    const { id, startId, key, links, alias, env, gui, options, checkpoint, checkout, flags, dev, stage, storage, name, main, args, channel, release, applink, query, fragment, link, linkData, entrypoint, route, routes, dir, dht, prerunning } = state
+    const { id, startId, key, links, alias, env, gui, assets, options, checkpoint, checkout, flags, dev, stage, storage, name, main, args, channel, release, applink, query, fragment, link, linkData, entrypoint, route, routes, dir, dht, prerunning } = state
     const pearDir = PLATFORM_DIR
     const swapDir = SWAP
-    return { id, startId, key, links, alias, env, gui, options, checkpoint, checkout, flags, dev, stage, storage, name, main, args, channel, release, applink, query, fragment, link, linkData, entrypoint, route, routes, dir, dht, prerunning, pearDir, swapDir }
+    return { id, startId, key, links, alias, env, gui, assets, options, checkpoint, checkout, flags, dev, stage, storage, name, main, args, channel, release, applink, query, fragment, link, linkData, entrypoint, route, routes, dir, dht, prerunning, pearDir, swapDir }
   }
 
   update (state) {
