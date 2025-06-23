@@ -36,21 +36,15 @@ test('teardown with position', { skip: !isBare || isWindows }, async function (t
   t.is(td, 'teardown', 'teardown executed')
 })
 
-test('teardown with type err in first arg', { skip: !isBare || isWindows }, async function (t) {
+test('teardown with type err in first arg', { skip: isWindows }, async function (t) {
   t.plan(1)
   const teardown = Helper.rig({ clearRequireCache: '../teardown' })
   t.teardown(teardown)
 
-  try {
-    Pear.teardown('test')
-  } catch (err) {
-    console.log(err)
-  }
-
   t.exception(() => Pear.teardown('notAFunction'), /teardown expects function/)
 })
 
-test('teardown with type err in second arg', { skip: !isBare || isWindows }, async function (t) {
+test('teardown with type err in second arg', { skip: isWindows }, async function (t) {
   t.plan(1)
   const teardown = Helper.rig({ clearRequireCache: '../teardown' })
   t.teardown(teardown)
