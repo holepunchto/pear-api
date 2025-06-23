@@ -1,6 +1,6 @@
 {
   "name": "pear-api",
-  "version": "1.18.0",
+  "version": "1.18.1",
   "description": "Pear API Base & Integration Module",
   "main": "index.js",
   "scripts": {
