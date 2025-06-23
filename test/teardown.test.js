@@ -41,9 +41,9 @@ test('teardown with type err in first arg', { skip: !isBare || isWindows }, asyn
   const teardown = Helper.rig({ clearRequireCache: '../teardown' })
   t.teardown(teardown)
 
-  try{
+  try {
     Pear.teardown('test')
-  } catch (err){
+  } catch (err) {
     console.log(err)
   }
 
