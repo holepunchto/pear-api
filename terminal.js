@@ -245,7 +245,7 @@ const outputter = (cmd, taggers = {}) => (opts, stream, info = {}, ipc) => {
     ? promise
     : promise.finally(() => {
       stdio.out.write(ansi.showCursor())
-      dereg()
+      dereg(false)
     })
 }
 

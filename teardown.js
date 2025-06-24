@@ -76,10 +76,10 @@ function teardown (fn, position = 0) {
   const handler = { position, fn }
   handlers.push(handler)
 
-  return function unregister () {
+  return function unregister (unlisten = true) {
     const i = handlers.indexOf(handler)
     if (i > -1) handlers.splice(i, 1)
-    if (!handlers.length) cleanup()
+    if (unlisten && handlers.length === 0) cleanup()
   }
 }
 
