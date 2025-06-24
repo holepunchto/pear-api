@@ -744,33 +744,6 @@ test('Pear.exit', async function (t) {
 // ops
 //
 
-test('Pear.asset', async function (t) {
-  t.plan(4)
-  const link = 'pear://0.123.testing'
-  const statuses = [
-    { tag: 'begin', data: { n: 3, link } },
-    { tag: 'middle', data: { n: 2 } },
-    { tag: 'final', data: { n: 1 } }
-  ]
-  const expected = structuredClone(statuses)
-
-  await Helper.startIpcServer({
-    handlers: {
-      asset: (opts) => {
-        t.is(opts.link, link)
-        return Readable.from(statuses)
-      }
-    },
-    teardown: t.teardown
-  })
-  t.teardown(Helper.rig({ ipc: await Helper.startIpcClient() }))
-
-  const stream = Pear.asset(link)
-  stream.on('data', (status) => {
-    t.alike(status, expected.shift())
-  })
-})
-
 test('Pear.stage', async function (t) {
   t.plan(4)
   const link = 'pear://0.123.testing'

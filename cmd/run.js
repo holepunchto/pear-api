@@ -17,6 +17,7 @@ module.exports = [
   flag('--unsafe-clear-preferences', 'Clear preferences (such as trustlist)'),
   flag('--appling <path>', 'Set application shell path'),
   flag('--checkout <n|release|staged>', 'Run a checkout from version length'),
+  flag('--json', 'Newline-delimited-JSON operational status'),
   flag('--detached', 'Wakeup existing app or run detached'),
   flag('--no-ask', 'Suppress permission prompt'),
   flag('--follow-symlinks|-f', 'Follow in-project symlinks'),
