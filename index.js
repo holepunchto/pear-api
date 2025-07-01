@@ -31,6 +31,11 @@ class API {
   static IPC = kIPC
   static RUNTIME = RUNTIME
   static RUNTIME_ARGV = []
+  static #COMPAT = false
+  static set COMPAT (compat) {
+    if (compat) Pear.config.tier = Pear.config.key ? 'production' : 'dev'
+  }
+  static get COMPAT () { return this.#COMPAT }
   constructor (ipc, state, { teardown = onteardown } = {}) {
     this.#ipc = ipc
     this.#state = state
@@ -46,16 +51,16 @@ class API {
   get [kIPC] () { return this.#ipc }
 
   get worker () {
-    console.error('[ DEPRECATED ] Pear.worker is deprecated and will be removed')
+    if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.worker is deprecated and will be removed')
     const api = this
     return new class DeprecatedWorker {
       pipe () {
-        console.error('[ DEPRECATED ] Pear.worker.pipe() is now Pear.pipe')
+        if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.worker.pipe() is now Pear.pipe')
         return api.pipe
       }
 
       run (...args) {
-        console.error('[ DEPRECATED ] Pear.worker.run() is now Pear.run()')
+        if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.worker.run() is now Pear.run()')
         return api.run(...args)
       }
     }()

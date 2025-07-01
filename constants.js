@@ -41,7 +41,7 @@ const ALIASES = {
   keet: hypercoreid.decode('8kwmb7myncf56o8bpxfcgtwysgsukbydjef1zy86bye7msc4mooo'),
   runtime: hypercoreid.decode('jgt6kkwanq98x85d74xeaihxdmg8m95714kwc7g7ycdgirda6ojy'),
   doctor: hypercoreid.decode('ouenymy889n4ri9g74jm5bcr46wc6hqnxadqhfmbc4xbskerehby'),
-  electron: hypercoreid.decode('yceb7sjhgfzsnza7oc38hy3oxu9dhnywi3mzxdm9ubc48kjnxqgo')
+  electron: hypercoreid.decode('goowesg5dga9j1ryx47rsk9o4zms4541me4zerxsnbu8u99duh4o')
 }
 
 const EOLS = {
