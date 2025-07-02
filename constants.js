@@ -38,7 +38,7 @@ const WAKEUP_EXEC = isWindows
 
 const ALIASES = {
   pear: hypercoreid.decode(LOCALDEV ? 'dhpc5npmqkansx38uh18h3uwpdp6g9ukozrqyc4irbhwriedyeho' : CHECKOUT.key),
-  keet: hypercoreid.decode('8kwmb7myncf56o8bpxfcgtwysgsukbydjef1zy86bye7msc4mooo'),
+  keet: hypercoreid.decode('yx8yxsegdyow6kawrruhsx5k7scampx5kww1d7py5ebjf1gm5sjo'),
   runtime: hypercoreid.decode('jgt6kkwanq98x85d74xeaihxdmg8m95714kwc7g7ycdgirda6ojy'),
   doctor: hypercoreid.decode('ouenymy889n4ri9g74jm5bcr46wc6hqnxadqhfmbc4xbskerehby'),
   electron: hypercoreid.decode('goowesg5dga9j1ryx47rsk9o4zms4541me4zerxsnbu8u99duh4o')
