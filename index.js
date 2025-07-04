@@ -34,6 +34,7 @@ class API {
   static #COMPAT = false
   static set COMPAT (compat) {
     if (compat) Pear.config.tier = Pear.config.key ? 'production' : 'dev'
+    return (this.#COMPAT = compat)
   }
   static get COMPAT () { return this.#COMPAT }
   constructor (ipc, state, { teardown = onteardown } = {}) {
