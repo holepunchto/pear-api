@@ -14,6 +14,8 @@ const program = global.Bare || global.process
 const kIPC = Symbol('ipc')
 const { ERR_INVALID_INPUT } = require('./errors')
 
+let COMPAT = false
+
 class API {
   #ipc = null
   #state = null
@@ -31,12 +33,11 @@ class API {
   static IPC = kIPC
   static RUNTIME = RUNTIME
   static RUNTIME_ARGV = []
-  static #COMPAT = false
   static set COMPAT (compat) {
     if (compat) Pear.config.tier = Pear.config.key ? 'production' : 'dev'
-    return (this.#COMPAT = compat)
+    return (COMPAT = compat)
   }
-  static get COMPAT () { return this.#COMPAT }
+  static get COMPAT () { return COMPAT }
   constructor (ipc, state, { teardown = onteardown } = {}) {
     this.#ipc = ipc
     this.#state = state
