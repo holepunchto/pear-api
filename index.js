@@ -31,11 +31,11 @@ class API {
   static IPC = kIPC
   static RUNTIME = RUNTIME
   static RUNTIME_ARGV = []
-  static #COMPAT = false
+  static COMPAT = false
   static set COMPAT (compat) {
     if (compat) Pear.config.tier = Pear.config.key ? 'production' : 'dev'
   }
-  static get COMPAT () { return this.#COMPAT }
+  static get COMPAT () { return this.COMPAT }
   constructor (ipc, state, { teardown = onteardown } = {}) {
     this.#ipc = ipc
     this.#state = state
