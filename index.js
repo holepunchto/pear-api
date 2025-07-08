@@ -38,6 +38,7 @@ class API {
     return (COMPAT = compat)
   }
   static get COMPAT () { return COMPAT }
+  static CUTOVER = true
   constructor (ipc, state, { teardown = onteardown } = {}) {
     this.#ipc = ipc
     this.#state = state
@@ -195,7 +196,10 @@ class API {
 
   versions = () => this.#reftrack(this.#ipc.versions())
 
-  updated = () => this.#reftrack(this.#ipc.updated())
+  updated = () => {
+    if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.updated is deprecated, always resolves to undefined from here on and will be removed')
+    return Promise.resolve() // compat-mode, always resolve to undefined, update comes through Pear.updates
+  }
 
   get = (key, opts = {}) => this.#reftrack(this.#ipc.get({ key, ...opts }))
 
