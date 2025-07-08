@@ -37,6 +37,7 @@ class API {
     if (compat) Pear.config.tier = Pear.config.key ? 'production' : 'dev'
     return (COMPAT = compat)
   }
+
   static get COMPAT () { return COMPAT }
   static CUTOVER = true
   constructor (ipc, state, { teardown = onteardown } = {}) {
@@ -152,7 +153,8 @@ class API {
     const inject = [link]
     if (!cmd.flags.trusted) inject.unshift('--trusted')
     if (RTI.startId) inject.unshift('--parent', RTI.startId)
-    argv.splice(cmd.indices.args.link, 1, ...inject)
+    argv.length = cmd.indices.args.link
+    argv.push(...inject)
     argv.unshift('run')
     let linksIndex = cmd.indices.flags.links
     const linksElements = linksIndex > 0 ? (cmd.flags.links === argv[linksIndex]) ? 2 : 1 : 0
@@ -161,7 +163,6 @@ class API {
       if (linksIndex > cmd.indices.flags.startId) linksIndex -= linksElements
     }
     if (linksIndex > 0) argv.splice(linksIndex, linksElements)
-
     const sp = spawn(RUNTIME, [...RUNTIME_ARGV, ...argv, ...args], {
       stdio: ['inherit', 'inherit', 'inherit', 'overlapped'],
       windowsHide: true

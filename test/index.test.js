@@ -882,7 +882,7 @@ test('Pear.seed', async function (t) {
 })
 
 test('Pear.updated', async function (t) {
-  t.plan(2)
+  t.plan(1)
 
   await Helper.startIpcServer({
     handlers: {
@@ -896,7 +896,5 @@ test('Pear.updated', async function (t) {
   t.teardown(teardown)
 
   const res = await Pear.updated()
-  const { time, ...resOthers } = res
-  t.alike(resOthers, { app: false, version: {}, diff: null }, 'updated returned ok')
-  t.ok(typeof time === 'number' && time <= Date.now(), 'updated has time')
+  t.is(res, undefined)
 })
