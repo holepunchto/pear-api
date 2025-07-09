@@ -1,8 +1,8 @@
 'use strict'
 /* global Bare */
-const Pipe = require('bare-pipe')
 const readline = require('readline')
 const tty = require('tty')
+const fs = require('fs')
 const { Writable, Readable } = require('streamx')
 const { once } = require('events')
 const hypercoreid = require('hypercore-id-encoding')
@@ -56,19 +56,19 @@ const stdio = new class Stdio {
 
   get in () {
     if (this._in === null) {
-      this._in = tty.isTTY(0) ? new tty.ReadStream(0) : new Pipe(0)
+      this._in = tty.isTTY(0) ? new tty.ReadStream(0) : new fs.ReadStream('/dev/stdin', { fd: 0 })
       this._in.once('close', () => { this._in = null })
     }
     return this._in
   }
 
   get out () {
-    if (this._out === null) this._out = tty.isTTY(1) ? new tty.WriteStream(1) : new Pipe(1)
+    if (this._out === null) this._out = tty.isTTY(1) ? new tty.WriteStream(1) : new fs.WriteStream('/dev/stdout', { fd: 1 })
     return this._out
   }
 
   get err () {
-    if (this._err === null) this._err = tty.isTTY(2) ? new tty.WriteStream(2) : new Pipe(2)
+    if (this._err === null) this._err = tty.isTTY(2) ? new tty.WriteStream(2) : new fs.WriteStream('/dev/stderr', { fd: 2 })
     return this._err
   }
 
