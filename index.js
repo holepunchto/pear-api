@@ -24,7 +24,6 @@ class API {
   #teardowns = []
   #onteardown = null
   #refs = 0
-  #exitCode = 0
   #pipe = null
   config = null
   argv = program.argv
@@ -235,8 +234,8 @@ class API {
   }
 
   exit = (code) => program.exit(code)
-  set exitCode (code) { this.#exitCode = code }
-  get exitCode () { return this.#exitCode }
+  set exitCode (code) { program.exitCode = code }
+  get exitCode () { return program.exitCode }
 
   dump = (link, opts = {}) => {
     this.#ref()
