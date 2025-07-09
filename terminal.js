@@ -80,7 +80,7 @@ const stdio = new class Stdio {
 
   raw (rawMode) {
     this.rawMode = !!rawMode
-    return this.in.setMode(this.rawMode ? this.tty.constants.MODE_RAW : this.tty.constants.MODE_NORMAL)
+    return this.in.setMode?.(this.rawMode ? this.tty.constants.MODE_RAW : this.tty.constants.MODE_NORMAL)
   }
 }()
 
@@ -108,7 +108,7 @@ class Interact {
       output: opts.masked ? new Writable({ write: mask }) : stdio.out
     })
 
-    this._rl.input?.setMode(tty.constants.MODE_RAW)
+    this._rl.input?.setMode?.(tty.constants.MODE_RAW)
     this._rl.on('close', () => {
       console.log() // new line
       Bare.exit()
