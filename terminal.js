@@ -7,7 +7,7 @@ const { Writable, Readable } = require('streamx')
 const { once } = require('events')
 const hypercoreid = require('hypercore-id-encoding')
 const byteSize = require('tiny-byte-size')
-const { isWindows } = require('which-runtime')
+const { isWindows, isBare } = require('which-runtime')
 const { CHECKOUT } = require('./constants')
 const teardown = require('./teardown')
 const opwait = require('./opwait')
@@ -44,6 +44,24 @@ ansi.down = isWindows ? '↓' : '⬇'
 ansi.up = isWindows ? '↑' : '⬆'
 
 const stdio = new class Stdio {
+  WriteStream = !isBare ? fs.WriteStream : class extends fs.WriteStream {
+    constructor(path, opts = {}) {
+      super(path, opts)
+      this.fd = opts.fd
+    }
+    _open (cb) { return cb(null) }
+    _destroy(err, cb) { return cb(err) }
+  }
+
+  ReadStream = !isBare ? fs.ReadStream : class extends fs.ReadStream {
+    constructor(path, opts = {}) {
+      super(path, opts)
+      this.fd = opts.fd
+    }
+    _open (cb) { return cb(null) }
+    _destroy(err, cb) { return cb(err) }
+  }
+
   drained = Writable.drained
   constructor () {
     this._in = null
@@ -56,19 +74,19 @@ const stdio = new class Stdio {
 
   get in () {
     if (this._in === null) {
-      this._in = tty.isTTY(0) ? new tty.ReadStream(0) : new fs.ReadStream('/dev/stdin', { fd: 0 })
+      this._in = tty.isTTY(0) ? new tty.ReadStream(0) : new this.ReadStream(null, { fd: 0 })
       this._in.once('close', () => { this._in = null })
     }
     return this._in
   }
 
   get out () {
-    if (this._out === null) this._out = tty.isTTY(1) ? new tty.WriteStream(1) : new fs.WriteStream('/dev/stdout', { fd: 1 })
+    if (this._out === null) this._out = tty.isTTY(1) ? new tty.WriteStream(1) : new this.WriteStream(null, { fd: 1 })
     return this._out
   }
 
   get err () {
-    if (this._err === null) this._err = tty.isTTY(2) ? new tty.WriteStream(2) : new fs.WriteStream('/dev/stderr', { fd: 2 })
+    if (this._err === null) this._err = tty.isTTY(2) ? new tty.WriteStream(2) : new this.WriteStream(null, { fd: 2 })
     return this._err
   }
 
