@@ -109,7 +109,7 @@ test('State.route method applies routes correctly', async function (t) {
   const pathname = '/test/path'
   const routes = { '/test/path': '/new/path' }
   const State = require('../state')
-  const result = State.route({route: pathname, routes, unrouted: []})
+  const result = State.route({ route: pathname, routes, unrouted: [] })
 
   t.is(result.entrypoint, '/new/path', 'route method should apply routes correctly')
   t.is(result.routed, true)
