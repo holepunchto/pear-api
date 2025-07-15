@@ -71,20 +71,27 @@ module.exports = class State {
     state.routes = state.options.routes || null
     const unrouted = Array.isArray(state.options.unrouted) ? state.options.unrouted : []
     state.unrouted = Array.from(new Set([...unrouted, ...state.entrypoints]))
-    let entrypoint = state.prerunning ? state.route : this.route(state.route, state.routes, state.unrouted)
-    if (entrypoint.startsWith('/') === false) entrypoint = '/' + entrypoint
-    else if (entrypoint.startsWith('./')) entrypoint = entrypoint.slice(1)
+    const { entrypoint, routed } = this.route(state)
     state.entrypoint = entrypoint
+    state.routed = routed
     state.manifest = { ...pkg, pear: state.options }
     return state.manifest
   }
 
-  static route (pathname, routes, unrouted) {
-    if (!routes) return pathname
-    if (unrouted.some((unroute) => pathname.startsWith(unroute))) return pathname
-    let route = typeof routes === 'string' ? routes : (routes[pathname] ?? pathname)
-    if (route[0] === '.') route = route.length === 1 ? '/' : route.slice(1)
-    return route
+  static route (state) {
+    let result = null
+    if (state.prerunning || !state.routes) {
+      result = { entrypoint: state.route, routed: false }
+    } else if (state.unrouted.some((unroute) => state.route.startsWith(unroute))) {
+      result = { entrypoint: state.route, routed: false }
+    } else {
+      let route = typeof state.routes === 'string' ? state.routes : (state.routes[state.route] ?? state.route)
+      if (route[0] === '.') route = route.length === 1 ? '/' : route.slice(1)
+      result = { entrypoint: route, routed: true }
+    }
+    if (result.entrypoint.startsWith('/') === false) result.entrypoint = '/' + result.entrypoint
+    else if (result.entrypoint.startsWith('./')) result.entrypoint = result.entrypoint.slice(1)
+    return result
   }
 
   static storageFromLink (link) {
@@ -108,7 +115,7 @@ module.exports = class State {
   }
 
   constructor (params = {}) {
-    const { dht, link = '.', startId = null, id = null, args = null, env = ENV, cwd = CWD, dir = cwd, cmdArgs, onupdate = () => {}, flags, run, storage = null, pid } = params
+    const { dht, link = '.', startId = null, id = null, args = null, env = ENV, cwd = CWD, dir = cwd, cmdArgs, onupdate = () => {}, flags = {}, run, storage = null, pid } = params
     const {
       appling, channel, devtools, checkout, stage, updates, updatesDiff,
       links = '', prerunning = false, dev = false, parent = null,

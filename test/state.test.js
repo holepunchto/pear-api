@@ -87,20 +87,21 @@ test('State.update method merges new state properties', async function (t) {
 })
 
 test('State.route method returns pathname when no routes are defined', async function (t) {
-  t.plan(1)
+  t.plan(2)
 
   const { teardown } = rig()
   t.teardown(teardown)
 
   const pathname = '/test/path'
   const State = require('../state')
-  const result = State.route(pathname, null, [])
+  const result = State.route({ route: pathname, routes: null, unrouted: [] })
 
-  t.is(result, pathname, 'route method should return pathname when no routes are defined')
+  t.is(result.entrypoint, pathname, 'route method should return pathname when no routes are defined')
+  t.is(result.routed, false)
 })
 
 test('State.route method applies routes correctly', async function (t) {
-  t.plan(1)
+  t.plan(2)
 
   const { teardown } = rig()
   t.teardown(teardown)
@@ -108,13 +109,14 @@ test('State.route method applies routes correctly', async function (t) {
   const pathname = '/test/path'
   const routes = { '/test/path': '/new/path' }
   const State = require('../state')
-  const result = State.route(pathname, routes, [])
+  const result = State.route({route: pathname, routes, unrouted: []})
 
-  t.is(result, '/new/path', 'route method should apply routes correctly')
+  t.is(result.entrypoint, '/new/path', 'route method should apply routes correctly')
+  t.is(result.routed, true)
 })
 
 test('State.route method skips unrouted paths', async function (t) {
-  t.plan(1)
+  t.plan(2)
 
   const { teardown } = rig()
   t.teardown(teardown)
@@ -122,9 +124,10 @@ test('State.route method skips unrouted paths', async function (t) {
   const pathname = '/node_modules/.bin/test'
   const unrouted = ['/node_modules/.bin/']
   const State = require('../state')
-  const result = State.route(pathname, {}, unrouted)
+  const result = State.route({ route: pathname, routes: {}, unrouted })
 
-  t.is(result, pathname, 'route method should skip unrouted paths')
+  t.is(result.entrypoint, pathname, 'route method should skip unrouted paths')
+  t.is(result.routed, false, 'route method should skip unrouted paths')
 })
 
 test('State.storageFromLink generates storage path for non-pear links', async function (t) {
