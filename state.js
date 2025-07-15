@@ -9,7 +9,7 @@ const { PLATFORM_DIR, SWAP, RUNTIME } = require('./constants')
 const CWD = isBare ? os.cwd() : process.cwd()
 const ENV = isBare ? require('bare-env') : process.env
 const plink = require('./link')
-const { ERR_INVALID_APP_STORAGE } = require('./errors')
+const { ERR_INVALID_PROJECT_DIR, ERR_INVALID_APP_STORAGE, ERR_INVALID_APP_NAME } = require('pear-api/errors')
 
 module.exports = class State {
   env = null
@@ -28,6 +28,9 @@ module.exports = class State {
   routes = null
   unrouted = null
   assets = {}
+  version = { key: null, length: 0, fork: 0 }
+  options = null
+  manifest = null
   static async localPkg (state) {
     let pkg
     try {
@@ -44,6 +47,36 @@ module.exports = class State {
 
   static appname (pkg) {
     return pkg?.pear?.name ?? pkg?.name ?? null
+  }
+
+  static async build (state, pkg = null) {
+    if (state.manifest) return state.manifest
+    if (pkg === null && state.key === null) pkg = await this.localPkg(state)
+    if (pkg === null) throw ERR_INVALID_PROJECT_DIR(`"${path.join(this.dir, 'package.json')}" not found. Pear project must have a package.json`)
+    state.pkg = pkg
+    state.options = state.pkg?.pear ?? {}
+
+    state.name = state.name ?? this.appname(state.pkg)
+
+    state.main = state.options.main ?? pkg?.main ?? 'index.js'
+
+    const invalidName = /^[@/a-z0-9-_]+$/.test(state.name) === false
+    if (invalidName) throw ERR_INVALID_APP_NAME('App name must be lowercase and one word, and may contain letters, numbers, hyphens (-), underscores (_), forward slashes (/) and asperands (@).')
+
+    state.links = {
+      ...Object.fromEntries(Object.entries((state.options.links ?? {}))),
+      ...(state.links ?? {})
+    }
+    state.entrypoints = Array.isArray(state.options.stage?.entrypoints) ? state.options.stage?.entrypoints : []
+    state.routes = state.options.routes || null
+    const unrouted = Array.isArray(state.options.unrouted) ? state.options.unrouted : []
+    state.unrouted = Array.from(new Set([...unrouted, ...state.entrypoints]))
+    let entrypoint = state.prerunning ? state.route : this.route(state.route, state.routes, state.unrouted)
+    if (entrypoint.startsWith('/') === false) entrypoint = '/' + entrypoint
+    else if (entrypoint.startsWith('./')) entrypoint = entrypoint.slice(1)
+    state.entrypoint = entrypoint
+    state.manifest = { ...pkg, pear: state.options }
+    return state.manifest
   }
 
   static route (pathname, routes, unrouted) {
