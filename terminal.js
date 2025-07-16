@@ -7,7 +7,7 @@ const { Writable, Readable } = require('streamx')
 const { once } = require('events')
 const hypercoreid = require('hypercore-id-encoding')
 const byteSize = require('tiny-byte-size')
-const { isWindows, isBare } = require('which-runtime')
+const { isWindows } = require('which-runtime')
 const { CHECKOUT } = require('./constants')
 const teardown = require('./teardown')
 const opwait = require('./opwait')
@@ -44,36 +44,32 @@ ansi.down = isWindows ? '↓' : '⬇'
 ansi.up = isWindows ? '↑' : '⬆'
 
 const stdio = new class Stdio {
-  WriteStream = !isBare
-    ? fs.WriteStream
-    : class FdWriteStream extends Writable {
-      constructor (path, opts = {}) {
-        super()
-        this.fd = opts.fd
-      }
-
-      _writev (batch, cb) {
-        fs.writev(this.fd, batch.map(({ chunk }) => chunk), -1, cb)
-      }
+  static WriteStream = class FdWriteStream extends Writable {
+    constructor (fd) {
+      super()
+      this.fd = fd
     }
 
-  ReadStream = !isBare
-    ? fs.ReadStream
-    : class FdReadStream extends Readable {
-      constructor (path, opts = {}) {
-        super()
-        this.fd = opts.fd
-      }
-
-      _read (size) {
-        const buffer = Buffer.alloc(size)
-        fs.read(this.fd, buffer, 0, size, null, (err, bytesRead) => {
-          if (err) return this.destroy(err)
-          if (bytesRead === 0) return this.push(null)
-          this.push(buffer.slice(0, bytesRead))
-        })
-      }
+    _writev (batch, cb) {
+      fs.writev(this.fd, batch.map(({ chunk }) => chunk), -1, cb)
     }
+  }
+
+  static ReadStream = class FdReadStream extends Readable {
+    constructor (fd) {
+      super()
+      this.fd = fd
+    }
+
+    _read (size) {
+      const buffer = Buffer.alloc(size)
+      fs.read(this.fd, buffer, 0, size, null, (err, bytesRead) => {
+        if (err) return this.destroy(err)
+        if (bytesRead === 0) return this.push(null)
+        this.push(buffer.slice(0, bytesRead))
+      })
+    }
+  }
 
   drained = Writable.drained
   constructor () {
@@ -87,19 +83,19 @@ const stdio = new class Stdio {
 
   get in () {
     if (this._in === null) {
-      this._in = tty.isTTY(0) ? new tty.ReadStream(0) : new this.ReadStream(null, { fd: 0 })
+      this._in = tty.isTTY(0) ? new tty.ReadStream(0) : new Stdio.ReadStream(0)
       this._in.once('close', () => { this._in = null })
     }
     return this._in
   }
 
   get out () {
-    if (this._out === null) this._out = tty.isTTY(1) ? new tty.WriteStream(1) : new this.WriteStream(null, { fd: 1 })
+    if (this._out === null) this._out = tty.isTTY(1) ? new tty.WriteStream(1) : new Stdio.WriteStream(1)
     return this._out
   }
 
   get err () {
-    if (this._err === null) this._err = tty.isTTY(2) ? new tty.WriteStream(2) : new this.WriteStream(null, { fd: 2 })
+    if (this._err === null) this._err = tty.isTTY(2) ? new tty.WriteStream(2) : new Stdio.WriteStream(2)
     return this._err
   }
 
