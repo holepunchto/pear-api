@@ -44,14 +44,15 @@ ansi.down = isWindows ? '↓' : '⬇'
 ansi.up = isWindows ? '↑' : '⬆'
 
 const stdio = new class Stdio {
-  static WriteStream = class extends fs.WriteStream {
+  static WriteStream = class FdWriteStream extends Writable {
     constructor (fd) {
-      super(null)
+      super()
       this.fd = fd
     }
 
-    _open (cb) { return cb(null) }
-    _destroy (err, cb) { return cb(err) }
+    _writev (batch, cb) {
+      fs.writev(this.fd, batch.map(({ chunk }) => chunk), cb)
+    }
   }
 
   static ReadStream = class FdReadStream extends Readable {
