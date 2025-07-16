@@ -59,6 +59,14 @@ const stdio = new class Stdio {
       this.fd = opts.fd
     }
     _open (cb) { return cb(null) }
+    _read(size) {
+      const buffer = Buffer.alloc(size);
+      fs.read(this.fd, buffer, 0, size, null, (err, bytesRead) => {
+        if (err) return this.destroy(err);
+        if (bytesRead === 0) return this.push(null); // EOF
+        this.push(buffer.slice(0, bytesRead));
+      });
+    }
     _destroy(err, cb) { return cb(err) }
   }
 
