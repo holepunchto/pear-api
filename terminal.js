@@ -51,7 +51,7 @@ const stdio = new class Stdio {
     }
 
     _writev (batch, cb) {
-      fs.writev(this.fd, batch.map(({ chunk }) => chunk), -1, cb)
+      fs.writev(this.fd, batch.map(({ chunk }) => chunk), cb)
     }
   }
 
