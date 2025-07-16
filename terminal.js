@@ -44,31 +44,36 @@ ansi.down = isWindows ? '↓' : '⬇'
 ansi.up = isWindows ? '↑' : '⬆'
 
 const stdio = new class Stdio {
-  WriteStream = !isBare ? fs.WriteStream : class extends fs.WriteStream {
-    constructor(path, opts = {}) {
-      super(path, opts)
-      this.fd = opts.fd
-    }
-    _open (cb) { return cb(null) }
-    _destroy(err, cb) { return cb(err) }
-  }
+  WriteStream = !isBare
+    ? fs.WriteStream
+    : class FdWriteStream extends Writable {
+      constructor (path, opts = {}) {
+        super()
+        this.fd = opts.fd
+      }
 
-  ReadStream = !isBare ? fs.ReadStream : class extends fs.ReadStream {
-    constructor(path, opts = {}) {
-      super(path, opts)
-      this.fd = opts.fd
+      _writev (batch, cb) {
+        fs.writev(this.fd, batch.map(({ chunk }) => chunk), -1, cb)
+      }
     }
-    _open (cb) { return cb(null) }
-    _read(size) {
-      const buffer = Buffer.alloc(size);
-      fs.read(this.fd, buffer, 0, size, null, (err, bytesRead) => {
-        if (err) return this.destroy(err);
-        if (bytesRead === 0) return this.push(null); // EOF
-        this.push(buffer.slice(0, bytesRead));
-      });
+
+  ReadStream = !isBare
+    ? fs.ReadStream
+    : class FdReadStream extends Readable {
+      constructor (path, opts = {}) {
+        super()
+        this.fd = opts.fd
+      }
+
+      _read (size) {
+        const buffer = Buffer.alloc(size)
+        fs.read(this.fd, buffer, 0, size, null, (err, bytesRead) => {
+          if (err) return this.destroy(err)
+          if (bytesRead === 0) return this.push(null)
+          this.push(buffer.slice(0, bytesRead))
+        })
+      }
     }
-    _destroy(err, cb) { return cb(err) }
-  }
 
   drained = Writable.drained
   constructor () {
