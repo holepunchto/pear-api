@@ -46,16 +46,12 @@ ansi.up = isWindows ? '↑' : '⬆'
 const stdio = new class Stdio {
   static WriteStream = class FdWriteStream extends Writable {
     constructor (fd) {
-      super()
+      super({ map: (data) => typeof data === 'string' ? Buffer.from(data) : data })
       this.fd = fd
     }
 
     _writev (batch, cb) {
       fs.writev(this.fd, batch.map(({ chunk }) => chunk), cb)
-    }
-
-    _destroy (err, cb) {
-      cb(err)
     }
   }
 
