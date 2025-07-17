@@ -3,7 +3,8 @@
 const readline = require('readline')
 const tty = require('tty')
 const fs = require('fs')
-const { Writable, Readable } = require('bare-stream')
+const { Writable, Readable } = require('streamx')
+const { BareWritable, BareReadable } = require('bare-stream')
 const { once } = require('events')
 const hypercoreid = require('hypercore-id-encoding')
 const byteSize = require('tiny-byte-size')
@@ -44,7 +45,7 @@ ansi.down = isWindows ? '↓' : '⬇'
 ansi.up = isWindows ? '↑' : '⬆'
 
 const stdio = new class Stdio {
-  static WriteStream = class FdWriteStream extends Writable {
+  static WriteStream = class FdWriteStream extends BareWritable {
     constructor (fd) {
       super({ map: (data) => typeof data === 'string' ? Buffer.from(data) : data })
       this.fd = fd
@@ -55,7 +56,7 @@ const stdio = new class Stdio {
     }
   }
 
-  static ReadStream = class FdReadStream extends Readable {
+  static ReadStream = class FdReadStream extends BareReadable {
     constructor (fd) {
       super()
       this.fd = fd
