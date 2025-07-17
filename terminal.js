@@ -1,9 +1,10 @@
 'use strict'
 /* global Bare */
-const Pipe = require('bare-pipe')
 const readline = require('readline')
 const tty = require('tty')
+const fs = require('fs')
 const { Writable, Readable } = require('streamx')
+const { Writable: BareWritable, Readable: BareReadable } = require('bare-stream')
 const { once } = require('events')
 const hypercoreid = require('hypercore-id-encoding')
 const byteSize = require('tiny-byte-size')
@@ -44,6 +45,33 @@ ansi.down = isWindows ? '↓' : '⬇'
 ansi.up = isWindows ? '↑' : '⬆'
 
 const stdio = new class Stdio {
+  static WriteStream = class FdWriteStream extends BareWritable {
+    constructor (fd) {
+      super({ map: (data) => typeof data === 'string' ? Buffer.from(data) : data })
+      this.fd = fd
+    }
+
+    _writev (batch, cb) {
+      fs.writev(this.fd, batch.map(({ chunk }) => chunk), cb)
+    }
+  }
+
+  static ReadStream = class FdReadStream extends BareReadable {
+    constructor (fd) {
+      super()
+      this.fd = fd
+    }
+
+    _read (size) {
+      const buffer = Buffer.alloc(size)
+      fs.read(this.fd, buffer, 0, size, null, (err, bytesRead) => {
+        if (err) return this.destroy(err)
+        if (bytesRead === 0) return this.push(null)
+        this.push(buffer.slice(0, bytesRead))
+      })
+    }
+  }
+
   drained = Writable.drained
   constructor () {
     this._in = null
@@ -56,19 +84,19 @@ const stdio = new class Stdio {
 
   get in () {
     if (this._in === null) {
-      this._in = tty.isTTY(0) ? new tty.ReadStream(0) : new Pipe(0)
+      this._in = tty.isTTY(0) ? new tty.ReadStream(0) : new this.constructor.ReadStream(0)
       this._in.once('close', () => { this._in = null })
     }
     return this._in
   }
 
   get out () {
-    if (this._out === null) this._out = tty.isTTY(1) ? new tty.WriteStream(1) : new Pipe(1)
+    if (this._out === null) this._out = tty.isTTY(1) ? new tty.WriteStream(1) : new this.constructor.WriteStream(1)
     return this._out
   }
 
   get err () {
-    if (this._err === null) this._err = tty.isTTY(2) ? new tty.WriteStream(2) : new Pipe(2)
+    if (this._err === null) this._err = tty.isTTY(2) ? new tty.WriteStream(2) : new this.constructor.WriteStream(2)
     return this._err
   }
 
@@ -80,7 +108,7 @@ const stdio = new class Stdio {
 
   raw (rawMode) {
     this.rawMode = !!rawMode
-    return this.in.setMode(this.rawMode ? this.tty.constants.MODE_RAW : this.tty.constants.MODE_NORMAL)
+    return this.in.setMode?.(this.rawMode ? this.tty.constants.MODE_RAW : this.tty.constants.MODE_NORMAL)
   }
 }()
 
@@ -108,7 +136,7 @@ class Interact {
       output: opts.masked ? new Writable({ write: mask }) : stdio.out
     })
 
-    this._rl.input?.setMode(tty.constants.MODE_RAW)
+    this._rl.input?.setMode?.(tty.constants.MODE_RAW)
     this._rl.on('close', () => {
       console.log() // new line
       Bare.exit()
