@@ -3,7 +3,7 @@
 const readline = require('readline')
 const tty = require('tty')
 const fs = require('fs')
-const { Writable, Readable } = require('streamx')
+const { Writable, Readable } = require('bare-stream')
 const { once } = require('events')
 const hypercoreid = require('hypercore-id-encoding')
 const byteSize = require('tiny-byte-size')
