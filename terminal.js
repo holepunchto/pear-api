@@ -83,19 +83,19 @@ const stdio = new class Stdio {
 
   get in () {
     if (this._in === null) {
-      this._in = tty.isTTY(0) ? new tty.ReadStream(0) : new Stdio.ReadStream(0)
+      this._in = tty.isTTY(0) ? new tty.ReadStream(0) : new this.constructor.ReadStream(0)
       this._in.once('close', () => { this._in = null })
     }
     return this._in
   }
 
   get out () {
-    if (this._out === null) this._out = tty.isTTY(1) ? new tty.WriteStream(1) : new Stdio.WriteStream(1)
+    if (this._out === null) this._out = tty.isTTY(1) ? new tty.WriteStream(1) : new this.constructor.WriteStream(1)
     return this._out
   }
 
   get err () {
-    if (this._err === null) this._err = tty.isTTY(2) ? new tty.WriteStream(2) : new Stdio.WriteStream(2)
+    if (this._err === null) this._err = tty.isTTY(2) ? new tty.WriteStream(2) : new this.constructor.WriteStream(2)
     return this._err
   }
 
