@@ -40,7 +40,7 @@ const ALIASES = {
   pear: hypercoreid.decode(LOCALDEV ? 'dhpc5npmqkansx38uh18h3uwpdp6g9ukozrqyc4irbhwriedyeho' : CHECKOUT.key),
   keet: hypercoreid.decode('yx8yxsegdyow6kawrruhsx5k7scampx5kww1d7py5ebjf1gm5sjo'),
   runtime: hypercoreid.decode('rbw6fbxorqgjgyitworh3f73utc5cu7sczhptn64oonbznuojiao'),
-  doctor: hypercoreid.decode('ouenymy889n4ri9g74jm5bcr46wc6hqnxadqhfmbc4xbskerehby'),
+  doctor: hypercoreid.decode('jynt11pyuzxmziim69bihw96uttzqrtqir1i747ybxezapk9awyy'),
   electron: hypercoreid.decode('goowesg5dga9j1ryx47rsk9o4zms4541me4zerxsnbu8u99duh4o')
 }
 
