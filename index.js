@@ -145,6 +145,9 @@ class API {
   }
 
   run (link, args = []) {
+    if (link.startsWith('pear://dev')) link = link.slice(0, 10)
+    else if (link.startsWith('pear:dev')) link = link.slice(0, 8)
+
     const { RUNTIME, RUNTIME_ARGV, RTI } = this.constructor
     const argv = pear(program.argv.slice(1)).rest
     const parser = command('run', ...rundef)

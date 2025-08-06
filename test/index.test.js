@@ -295,6 +295,24 @@ test('Pear.run args become Pear.config.args', async function (t) {
   await Helper.untilClose(pipe)
 })
 
+test('Pear.run args become Pear.config.args', async function (t) {
+  t.plan(1)
+
+  const dir = path.join(dirname, 'fixtures', 'print-args')
+
+  const teardown = Helper.rig()
+  t.teardown(teardown)
+
+  const args = ['hello', 'world']
+  const pipe = Pear.run(dir, args)
+
+  const result = JSON.parse(await Helper.untilResult(pipe))
+
+  t.alike(result, args, 'run should receive args from the parent')
+
+  await Helper.untilClose(pipe)
+})
+
 test('Pear.run should run inside Pear.run', async function (t) {
   t.plan(1)
 
