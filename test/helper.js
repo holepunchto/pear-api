@@ -18,7 +18,7 @@ const noop = () => {}
 class Helper {
   static rig ({
     ipc = { ref: noop, unref: noop },
-    state = {},
+    state = { config: { applink: 'pear://keet' } },
     runtimeArgv,
     clearRequireCache
   } = {}) {

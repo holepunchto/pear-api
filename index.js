@@ -3,13 +3,16 @@ const fs = require('fs')
 const { spawn } = require('child_process')
 const { isWindows, isBare } = require('which-runtime')
 const { command } = require('paparam')
+const b4a = require('b4a')
 const Pipe = isBare
   ? require('bare-pipe')
   : class Pipe extends require('net').Socket { constructor (fd) { super({ fd }) } }
+const hypercoreid = require('hypercore-id-encoding')
 const { RUNTIME } = require('./constants')
 const rundef = require('./cmd/run')
 const pear = require('./cmd')
 const onteardown = global.Bare ? require('./teardown') : noop
+const plink = require('./link')
 const program = global.Bare || global.process
 const kIPC = Symbol('ipc')
 const { ERR_INVALID_INPUT } = require('./errors')
@@ -64,7 +67,7 @@ class API {
 
   get worker () {
     if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.worker is deprecated and will be removed (use pear-run & pear-pipe)')
-    const onteardown = this.#onteardown
+    const app = this.app
     const ref = this.#ref.bind(this)
     const unref = this.#unref.bind(this)
     const settings = this.constructor
@@ -81,13 +84,9 @@ class API {
           return null
         }
         const pipe = new Pipe(fd)
-        pipe.on('end', () => {
-          onteardown(() => pipe.end(), Number.MAX_SAFE_INTEGER)
-        })
+        pipe.on('end', () => { Pear.exit() })
+        pipe.once('close', () => { Pear.exit() })
         this.#pipe = pipe
-        pipe.once('close', () => {
-          onteardown(() => program.exit(), Number.MAX_SAFE_INTEGER)
-        })
         return pipe
       }
 
@@ -95,6 +94,12 @@ class API {
         if (link.startsWith('pear://dev')) link = link.slice(0, 10)
         else if (link.startsWith('pear:dev')) link = link.slice(0, 8)
         const { RUNTIME, RUNTIME_ARGV, RTI } = settings
+        const parsed = plink.parse(link)
+        const { key, fork, length } = parsed.drive
+        const { key: appKey } = (plink.parse(app.applink)).drive
+        if (appKey && key && b4a.equals(key, appKey) && fork === null && length === null) {
+          link = `pear://${app.fork}.${app.length}.${hypercoreid.encode(key)}${parsed.pathname || ''}`
+        }
         const argv = pear(program.argv.slice(1)).rest
         const parser = command('run', ...rundef)
         const cmd = parser.parse(argv, { sync: true })
@@ -121,6 +126,7 @@ class API {
           unref()
         })
         const pipe = sp.stdio[3]
+        pipe.on('end', () => { pipe.end() })
         return pipe
       }
     }()
@@ -191,21 +197,22 @@ class API {
       return null
     }
     const pipe = new Pipe(fd)
-    pipe.on('end', () => {
-      this.#onteardown(() => pipe.end(), Number.MAX_SAFE_INTEGER)
-    })
+    pipe.on('end', () => { Pear.exit() })
+    pipe.once('close', () => { Pear.exit() })
     this.#pipe = pipe
-    pipe.once('close', () => {
-      this.#onteardown(() => program.exit(), Number.MAX_SAFE_INTEGER)
-    })
     return pipe
   }
 
   run (link, args = []) {
     if (link.startsWith('pear://dev')) link = link.slice(0, 10)
     else if (link.startsWith('pear:dev')) link = link.slice(0, 8)
-
     const { RUNTIME, RUNTIME_ARGV, RTI } = this.constructor
+    const parsed = plink.parse(link)
+    const { key, fork, length } = parsed.drive
+    const { key: appKey } = (plink.parse(this.app.applink)).drive
+    if (appKey && key && b4a.equals(key, appKey) && fork === null && length === null) {
+      link = `pear://${this.app.fork}.${this.app.length}.${hypercoreid.encode(key)}${parsed.pathname || ''}`
+    }
     const argv = pear(program.argv.slice(1)).rest
     const parser = command('run', ...rundef)
     const cmd = parser.parse(argv, { sync: true })
@@ -232,6 +239,7 @@ class API {
       this.#unref()
     })
     const pipe = sp.stdio[3]
+    pipe.on('end', () => pipe.end())
     return pipe
   }
 
@@ -292,7 +300,13 @@ class API {
     this.#teardowns.push({ fn, position })
   }
 
-  exit = (code) => program.exit(code)
+  exit = (code) => {
+    program.exitCode = code
+    this.#unload().finally(() => {
+      return program.exit(code)
+    })
+  }
+
   set exitCode (code) { program.exitCode = code }
   get exitCode () { return program.exitCode }
 

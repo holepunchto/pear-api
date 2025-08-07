@@ -31,7 +31,6 @@ test('teardown with position', { skip: !isBare || isWindows }, async function (t
   t.teardown(teardown)
 
   const pipe = Pear.run(dir)
-
   const td = await Helper.untilResult(pipe, { runFn: () => pipe.end() })
   t.is(td, 'teardown', 'teardown executed')
 })

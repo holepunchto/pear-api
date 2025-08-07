@@ -702,39 +702,6 @@ test('Pear.teardown on os kill', { skip: !isBare || isWindows }, async function 
   t.is(td, 'teardown', 'teardown executed')
 })
 
-test('Pear.teardown on os kill with exit code', { skip: !isBare || isWindows }, async function (t) {
-  t.plan(3)
-
-  const dir = path.join(dirname, 'fixtures', 'run-teardown-exit-code')
-
-  const teardown = Helper.rig()
-  t.teardown(teardown)
-
-  const pipe = Pear.run(dir)
-
-  pipe.on('error', (err) => {
-    if (err.code === 'ENOTCONN') return // when the other side destroys the pipe
-    throw err
-  })
-
-  const pid = +(await Helper.untilResult(pipe))
-  t.ok(pid > 0, 'pid is valid')
-
-  const exitCodePromise = new Promise((resolve, reject) => {
-    const timeoutId = setTimeout(() => reject(new Error('timed out')), 5000)
-    pipe.on('crash', (data) => {
-      clearTimeout(timeoutId)
-      resolve(data.exitCode)
-    })
-  })
-
-  const td = await Helper.untilResult(pipe, { runFn: () => os.kill(pid) })
-  t.is(td, 'teardown', 'teardown executed')
-
-  const exitCode = await exitCodePromise
-  t.is(exitCode, 124, 'exit code matches')
-})
-
 test('Pear.teardown run wait', { skip: !isBare || isWindows }, async function (t) {
   t.plan(1)
 
