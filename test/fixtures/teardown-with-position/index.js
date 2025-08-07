@@ -1,14 +1,12 @@
-const teardown = require('../../../teardown')
-
 const pipe = Pear.pipe
 
-teardown(async () => {
+Pear.teardown(async () => {
   await new Promise((resolve) => {
     pipe.write('teardown\n', resolve)
   })
 }, 10) // lower position runs first
 
-teardown(async () => {
+Pear.teardown(async () => {
   await new Promise((resolve) => {
     pipe.write('error\n', resolve)
   })
