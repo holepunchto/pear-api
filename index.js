@@ -25,7 +25,7 @@ class API {
   #onteardown = null
   #refs = 0
   #pipe = null
-  config = null
+  app = null
   argv = program.argv
   pid = program.pid
   static RTI = global.Pear?.constructor.RTI ?? null
@@ -33,7 +33,7 @@ class API {
   static RUNTIME = RUNTIME
   static RUNTIME_ARGV = []
   static set COMPAT (compat) {
-    if (compat) Pear.config.tier = Pear.config.key ? 'production' : 'dev'
+    if (compat) Pear.app.tier = Pear.app.key ? 'production' : 'dev'
     return (COMPAT = compat)
   }
 
@@ -46,25 +46,82 @@ class API {
     this.#teardown = new Promise((resolve) => { this.#unloading = resolve })
     this.#onteardown = teardown
     this.key = this.#state.key ? (this.#state.key.type === 'Buffer' ? Buffer.from(this.#state.key.data) : this.#state.key) : null
-    this.config = state.config
+    this.app = state.config
     this.#onteardown(() => this.#unload())
     this.#ipc.unref()
+  }
+
+  get config () {
+    if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.config is deprecated and will be removed, use Pear.app')
+    return this.app
+  }
+
+  set config (v) {
+    return (this.app = v)
   }
 
   get [kIPC] () { return this.#ipc }
 
   get worker () {
-    if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.worker is deprecated and will be removed')
-    const api = this
+    if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.worker is deprecated and will be removed (use pear-run & pear-pipe)')
+    const onteardown = this.#onteardown
+    const ref = this.#ref.bind(this)
+    const unref = this.#unref.bind(this)
+    const settings = this.constructor
     return new class DeprecatedWorker {
+      #pipe = null
       pipe () {
-        if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.worker.pipe() is now Pear.pipe')
-        return api.pipe
+        if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.worker.pipe() is now pear-pipe')
+        if (this.#pipe !== null) return this.#pipe
+        const fd = 3
+        try {
+          const hasPipe = isWindows ? fs.fstatSync(fd).isFIFO() : fs.fstatSync(fd).isSocket()
+          if (hasPipe === false) return null
+        } catch {
+          return null
+        }
+        const pipe = new Pipe(fd)
+        pipe.on('end', () => {
+          onteardown(() => pipe.end(), Number.MAX_SAFE_INTEGER)
+        })
+        this.#pipe = pipe
+        pipe.once('close', () => {
+          onteardown(() => program.exit(), Number.MAX_SAFE_INTEGER)
+        })
+        return pipe
       }
 
-      run (...args) {
-        if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.worker.run() is now Pear.run()')
-        return api.run(...args)
+      run (link, args = []) {
+        if (link.startsWith('pear://dev')) link = link.slice(0, 10)
+        else if (link.startsWith('pear:dev')) link = link.slice(0, 8)
+        const { RUNTIME, RUNTIME_ARGV, RTI } = settings
+        const argv = pear(program.argv.slice(1)).rest
+        const parser = command('run', ...rundef)
+        const cmd = parser.parse(argv, { sync: true })
+        const inject = [link]
+        if (!cmd.flags.trusted) inject.unshift('--trusted')
+        if (RTI.startId) inject.unshift('--parent', RTI.startId)
+        argv.length = cmd.indices.args.link
+        argv.push(...inject)
+        argv.unshift('run')
+        let linksIndex = cmd.indices.flags.links
+        const linksElements = linksIndex > 0 ? (cmd.flags.links === argv[linksIndex]) ? 2 : 1 : 0
+        if (cmd.indices.flags.startId > 0) {
+          argv.splice(cmd.indices.flags.startId, 1)
+          if (linksIndex > cmd.indices.flags.startId) linksIndex -= linksElements
+        }
+        if (linksIndex > 0) argv.splice(linksIndex, linksElements)
+        const sp = spawn(RUNTIME, [...RUNTIME_ARGV, ...argv, ...args], {
+          stdio: ['inherit', 'inherit', 'inherit', 'overlapped'],
+          windowsHide: true
+        })
+        ref()
+        sp.once('exit', (exitCode) => {
+          if (exitCode !== 0) pipe.emit('crash', { exitCode })
+          unref()
+        })
+        const pipe = sp.stdio[3]
+        return pipe
       }
     }()
   }
@@ -193,15 +250,15 @@ class API {
   }
 
   checkpoint = (state) => {
-    this.config.checkpoint = state
+    this.app.checkpoint = state
     return this.#reftrack(this.#ipc.checkpoint(state))
   }
 
   versions = () => this.#reftrack(this.#ipc.versions())
 
   updated = () => {
-    if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.updated is deprecated, always resolves to undefined from here on and will be removed')
-    return Promise.resolve() // compat-mode, always resolve to undefined, update comes through Pear.updates
+    if (typeof this.#ipc.updated === 'function') return this.#reftrack(this.#ipc.updated())
+    return Promise.resolve()
   }
 
   get = (key, opts = {}) => this.#reftrack(this.#ipc.get({ key, ...opts }))
@@ -212,7 +269,6 @@ class API {
 
   restart = async (opts = {}) => {
     if (this.#state.ui === null) throw new Error('Pear.restart is not supported for terminal apps')
-
     return this.#reftrack(this.#ipc.restart(opts))
   }
 

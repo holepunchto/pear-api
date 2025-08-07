@@ -277,6 +277,37 @@ test('Pear.run pipe', async function (t) {
   pipe.write('exit')
 })
 
+test('Pear.worker.run Pear.worker.pipe', async function (t) {
+  t.plan(1)
+
+  const dir = path.join(dirname, 'fixtures', 'legacy-worker-pipe')
+
+  const teardown = Helper.rig()
+  t.teardown(teardown)
+
+  const pipe = Pear.worker.run(dir)
+
+  pipe.on('error', (err) => {
+    if (err.code === 'ENOTCONN') return // when the other side destroys the pipe
+    throw err
+  })
+
+  const messages = []
+  const response = new Promise((resolve) => {
+    pipe.on('data', (data) => {
+      messages.push(data.toString())
+      if (messages.length === 4) resolve(messages.join(''))
+    })
+  })
+
+  pipe.write('ping')
+
+  const runResponse = await response
+  t.is(runResponse, '0123', 'pear pipe can send and receive data')
+
+  pipe.write('exit')
+})
+
 test('Pear.run args become Pear.config.args', async function (t) {
   t.plan(1)
 

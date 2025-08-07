@@ -112,7 +112,7 @@
     "brittle": "^3.16.2",
     "hypercore-crypto": "^3.5.0",
     "iambus": "^1.0.3",
-    "pear-ipc": "^6.1.0",
+    "pear-ipc": "^6.5.0",
     "script-linker": "^2.5.4",
     "standard": "^17.1.2"
   }
