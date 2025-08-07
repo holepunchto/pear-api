@@ -55,7 +55,6 @@ class API {
   }
 
   get config () {
-    if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.config is deprecated and will be removed, use Pear.app')
     return this.app
   }
 
