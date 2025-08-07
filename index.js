@@ -95,9 +95,9 @@ class API {
         const { RUNTIME, RUNTIME_ARGV, RTI } = settings
         const parsed = plink.parse(link)
         const { key, fork, length } = parsed.drive
-        const { key: appKey } = (plink.parse(state?.applink)).drive
+        const { key: appKey } = state.applink ? (plink.parse(state.applink)).drive : {}
         if (appKey && key && b4a.equals(key, appKey) && fork === null && length === null) {
-          link = `pear://${state?.version?.fork}.${state?.version?.length}.${hypercoreid.encode(key)}${parsed.pathname || ''}`
+          link = `pear://${state.version?.fork}.${state.version?.length}.${hypercoreid.encode(key)}${parsed.pathname || ''}`
         }
         const argv = pear(program.argv.slice(1)).rest
         const parser = command('run', ...rundef)
@@ -208,9 +208,9 @@ class API {
     const { RUNTIME, RUNTIME_ARGV, RTI } = this.constructor
     const parsed = plink.parse(link)
     const { key, fork, length } = parsed.drive
-    const { key: appKey } = (plink.parse(this.app.applink)).drive
+    const { key: appKey } = this.#state.applink ? (plink.parse(this.#state.applink)).drive : {}
     if (appKey && key && b4a.equals(key, appKey) && fork === null && length === null) {
-      link = `pear://${this.app.fork}.${this.app.length}.${hypercoreid.encode(key)}${parsed.pathname || ''}`
+      link = `pear://${this.#state.version?.fork}.${this.#state.version?.length}.${hypercoreid.encode(key)}${parsed.pathname || ''}`
     }
     const argv = pear(program.argv.slice(1)).rest
     const parser = command('run', ...rundef)
