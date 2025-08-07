@@ -66,7 +66,7 @@ class API {
 
   get worker () {
     if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.worker is deprecated and will be removed (use pear-run & pear-pipe)')
-    const app = this.app
+    const state = this.#state
     const ref = this.#ref.bind(this)
     const unref = this.#unref.bind(this)
     const settings = this.constructor
@@ -95,9 +95,9 @@ class API {
         const { RUNTIME, RUNTIME_ARGV, RTI } = settings
         const parsed = plink.parse(link)
         const { key, fork, length } = parsed.drive
-        const { key: appKey } = (plink.parse(Pear.config.applink)).drive
+        const { key: appKey } = (plink.parse(state?.applink)).drive
         if (appKey && key && b4a.equals(key, appKey) && fork === null && length === null) {
-          link = `pear://${Pear.config.fork}.${Pear.config.length}.${hypercoreid.encode(key)}${parsed.pathname || ''}`
+          link = `pear://${state?.version?.fork}.${state?.version?.length}.${hypercoreid.encode(key)}${parsed.pathname || ''}`
         }
         const argv = pear(program.argv.slice(1)).rest
         const parser = command('run', ...rundef)
