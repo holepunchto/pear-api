@@ -51,8 +51,9 @@ module.exports = class State {
 
   static async build (state, pkg = null) {
     if (state.manifest) return state.manifest
+    const originDir = state.dir
     if (pkg === null && state.key === null) pkg = await this.localPkg(state)
-    if (pkg === null) throw ERR_INVALID_PROJECT_DIR(`"${path.join(this.dir, 'package.json')}" not found. Pear project must have a package.json`)
+    if (pkg === null) throw ERR_INVALID_PROJECT_DIR(`"package.json not found from: ${originDir}. Pear project must have a package.json`)
     state.pkg = pkg
     state.options = state.pkg?.pear ?? {}
 
