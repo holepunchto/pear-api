@@ -76,6 +76,9 @@ exports.SALT = b4a.from('d134aa8b0631f1193b5031b356d82dbea214389208fa4a0bcdf5c2e
 
 exports.KNOWN_NODES_LIMIT = 100
 
+exports.UNCAUGHT_WIND_DOWN_MAX_WAIT = 120_000
+exports.UNCAUGHT_WIND_DOWN_MIN_WAIT = 30_000
+
 function toPath (u) {
   return fileURLToPath(u).replace(/[/\\]$/, '') || '/'
 }
