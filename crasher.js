@@ -30,36 +30,44 @@ function printCrash (errorInfo, stackTrace, err) {
   console.error(errorMsg)
 }
 
-function logAndExit (enableLog, logPath, errorInfo, stack, err) {
+async function logAndExit (enableLog, logPath, errorInfo, stack, err, hook) {
   if (enableLog) {
     logCrash(logPath, errorInfo, stack, err)
   } else {
     printCrash(errorInfo, stack, err)
   }
 
+  if (hook) {
+    try {
+      await hook()
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
   const program = isBare ? global.Bare : (global.process.versions.electron ? require('electron').app : global.process)
   program.exit(1)
 }
 
-function setupCrashHandlers (processName, swap, enableLog) {
+function setupCrashHandlers (processName, swap, enableLog, hook) {
   const crashlogPath = path.join(swap, `${processName}.crash.log`)
   const runContext = isBare ? global.Bare : global.process
 
-  runContext.on('unhandledRejection', (reason) => {
+  runContext.on('unhandledRejection', async (reason) => {
     if (hasLoggedUnhandledRejection) return
     hasLoggedUnhandledRejection = true
 
     const stack = reason?.stack || reason || ''
     const errorInfo = `${processName} exiting due to unhandled rejection`
-    logAndExit(enableLog, crashlogPath, errorInfo, stack, reason)
+    await logAndExit(enableLog, crashlogPath, errorInfo, stack, reason, hook)
   })
 
-  runContext.on('uncaughtException', (err) => {
+  runContext.on('uncaughtException', async (err) => {
     if (hasLoggedUncaughtException) return
     hasLoggedUncaughtException = true
 
     const errorInfo = `${processName} exiting due to uncaught exception`
-    logAndExit(enableLog, crashlogPath, errorInfo, err.stack, err)
+    await logAndExit(enableLog, crashlogPath, errorInfo, err.stack, err, hook)
   })
 }
 
