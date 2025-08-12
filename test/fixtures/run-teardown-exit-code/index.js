@@ -1,6 +1,6 @@
 const process = require('process')
 
-const pipe = Pear.pipe
+const pipe = require('pear-pipe')()
 pipe.on('data', () => pipe.write(`${process.pid}\n`))
 
 Pear.teardown(async () => {

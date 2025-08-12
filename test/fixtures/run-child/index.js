@@ -1,3 +1,3 @@
 const process = require('process')
-const pipe = Pear.pipe
+const pipe = require('pear-pipe')()
 pipe.write(`${process.pid}\n`)

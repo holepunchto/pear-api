@@ -1,5 +1,5 @@
 const main = async () => {
-  const pipe = Pear.pipe
+  const pipe = require('pear-pipe')()
 
   Pear.teardown(() => new Promise((resolve) => { setTimeout(resolve, 1000) }))
 

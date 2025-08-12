@@ -6,7 +6,7 @@ const setupCrashHandlers = require('../../../crasher')
 setupCrashHandlers('testProcess', swap, true)
 
 const main = async () => {
-  const pipe = Pear.pipe
+  const pipe = require('pear-pipe')()
   pipe.write(`${process.pid}\n`)
 
   await new Promise((resolve) => setTimeout(resolve, 1000))

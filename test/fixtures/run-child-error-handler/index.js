@@ -1,6 +1,6 @@
 const process = require('process')
 
-const pipe = Pear.pipe
+const pipe = require('pear-pipe')()
 pipe.on('error', (err) => {
   if (err.code === 'ENOTCONN') return // when the other side destroys the pipe
   throw err

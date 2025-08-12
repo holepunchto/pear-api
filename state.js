@@ -8,8 +8,8 @@ const crypto = require('hypercore-crypto')
 const { PLATFORM_DIR, SWAP, RUNTIME } = require('./constants')
 const CWD = isBare ? os.cwd() : process.cwd()
 const ENV = isBare ? require('bare-env') : process.env
-const plink = require('./link')
-const { ERR_INVALID_PROJECT_DIR, ERR_INVALID_APP_STORAGE, ERR_INVALID_APP_NAME } = require('pear-api/errors')
+const plink = require('pear-link')
+const { ERR_INVALID_PROJECT_DIR, ERR_INVALID_APP_STORAGE, ERR_INVALID_APP_NAME } = require('pear-errors')
 
 module.exports = class State {
   env = null

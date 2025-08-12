@@ -2,7 +2,7 @@
 const { isBare, platform, arch } = require('which-runtime')
 const fs = require('fs')
 const path = require('path')
-const { CHECKOUT } = require('./constants')
+const { CHECKOUT } = require('pear-rti')
 const pid = isBare ? global.Bare.pid : process.pid
 
 let hasLoggedUnhandledRejection = false

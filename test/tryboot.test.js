@@ -2,6 +2,7 @@
 
 const { test } = require('brittle')
 const path = require('path')
+const run = require('pear-run')
 
 const Helper = require('./helper')
 
@@ -46,7 +47,7 @@ test('tryboot with --dht-bootstrap flag', async function (t) {
   t.teardown(teardown)
 
   const args = ['--dht-bootstrap', 'bootstrap-value']
-  const pipe = Pear.run(dir, args)
+  const pipe = run(dir, args)
 
   const res = JSON.parse(await Helper.untilResult(pipe))
 

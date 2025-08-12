@@ -15,7 +15,7 @@ Pear.teardown(restore)
 const tryboot = require('../../../tryboot')
 tryboot()
 
-const pipe = Pear.pipe
+const pipe = require('pear-pipe')()
 pipe.on('data', async () => {
   const res = await spawnCalled
   pipe.write(JSON.stringify(res) + '\n')
