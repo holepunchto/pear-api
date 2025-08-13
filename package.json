@@ -93,6 +93,7 @@
     "pear-aliases": "^1.0.0",
     "pear-constants": "^1.0.0",
     "pear-dump": "^1.0.0",
+    "pear-gunk": "^1.0.0",
     "pear-info": "^1.0.0",
     "pear-link": "^4.1.0",
     "pear-message": "^1.0.0",
