@@ -2,7 +2,8 @@
 
 const { test } = require('brittle')
 const { pathToFileURL } = require('url-file-url')
-
+const plink = require('pear-link')
+const { ALIASES } = require('pear-aliases')
 const dirname = __dirname
 global.Pear = null
 
@@ -25,7 +26,6 @@ test('parse-link ./some/path/to/a/file.js', async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
-  const plink = require('../link')
 
   const res = plink.parse('./some/path/to/a/file.js')
   t.is(res.protocol, 'file:')
@@ -43,7 +43,6 @@ test('parse-link file:///some/path/to/a/file.js', async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
-  const plink = require('../link')
 
   const res = plink.parse('file:///some/path/to/a/file.js')
   t.is(res.protocol, 'file:')
@@ -61,7 +60,6 @@ test('parse-link pear://key', async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
-  const plink = require('../link')
 
   const key = 'd47c1dfecec0f74a067985d2f8d7d9ad15f9ae5ff648f7bc6ca28e41d70ed221'
   const res = plink.parse(`pear://${key}`)
@@ -81,8 +79,6 @@ test('parse-link alias pear://alias', async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
-  const plink = require('../link')
-  const constants = require('../constants')
 
   const aliases = ['keet', 'runtime', 'doctor']
   for (const alias of aliases) {
@@ -90,7 +86,7 @@ test('parse-link alias pear://alias', async function (t) {
     t.is(res.protocol, 'pear:')
     t.is(res.pathname, '')
     t.is(res.hash, '')
-    t.is(res.drive.key, constants.ALIASES[alias])
+    t.is(res.drive.key, ALIASES[alias])
     t.is(res.drive.length, null)
     t.is(res.drive.fork, null)
     t.is(res.drive.hash, null)
@@ -104,7 +100,6 @@ test('parse-link pear://fork.length.key', async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
-  const plink = require('../link')
 
   const key = 'd47c1dfecec0f74a067985d2f8d7d9ad15f9ae5ff648f7bc6ca28e41d70ed221'
   const res = plink.parse(`pear://123.456.${key}`)
@@ -124,8 +119,6 @@ test('parse-link alias pear://fork.length.alias', async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
-  const plink = require('../link')
-  const constants = require('../constants')
 
   const aliases = ['keet', 'runtime', 'doctor']
   for (const alias of aliases) {
@@ -133,7 +126,7 @@ test('parse-link alias pear://fork.length.alias', async function (t) {
     t.is(res.protocol, 'pear:')
     t.is(res.pathname, '')
     t.is(res.hash, '')
-    t.is(res.drive.key, constants.ALIASES[alias])
+    t.is(res.drive.key, ALIASES[alias])
     t.is(res.drive.length, 456)
     t.is(res.drive.fork, 123)
     t.is(res.drive.hash, null)
@@ -147,7 +140,6 @@ test('parse-link pear://fork.length.key.dhash', async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
-  const plink = require('../link')
 
   const key = 'd47c1dfecec0f74a067985d2f8d7d9ad15f9ae5ff648f7bc6ca28e41d70ed221'
   const dhash = '38d8296e972167f4ad37803999fbcac17025271162f44dcdce1188d4bc5bac1d'
@@ -168,7 +160,6 @@ test('parse-link invalid link', async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
-  const plink = require('../link')
 
   t.exception(() => plink.parse())
   t.exception(() => plink.parse(''))

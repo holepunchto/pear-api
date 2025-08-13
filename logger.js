@@ -2,7 +2,7 @@
 const { isBare } = require('which-runtime')
 const { formatWithOptions } = isBare ? require('bare-format') : require('util')
 const hrtime = isBare ? require('bare-hrtime') : process.hrtime
-const pear = require('./cmd')(isBare ? global.Bare.argv.slice(1) : process.argv.slice(1))
+const pear = require('pear-cmd')(isBare ? global.Bare.argv.slice(1) : process.argv.slice(1))
 const max = pear?.flags.logMax ?? false
 const verbose = pear?.flags.logVerbose || max
 const log = pear?.flags.log || !!pear?.flags.logLabels || verbose || max
