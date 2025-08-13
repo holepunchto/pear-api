@@ -32,7 +32,7 @@ test('tryboot default', async function (t) {
 
   const res = await spawnCalled
 
-  const constants = require('../constants')
+  const constants = require('pear-constants')
   t.is(res.cmd, constants.RUNTIME, 'spawn called with RUNTIME')
   t.ok(res.args.includes('--sidecar'), 'spawn called with --sidecar')
   t.is(res.options.cwd, constants.PLATFORM_DIR, 'spawn called with cwd PLATFORM')

@@ -15,7 +15,7 @@ if (!/\/test\/all\.js$/.test(argv?.[1])) {
 }
 
 if (!require.main.url) require.main.url = require('url-file-url').pathToFileURL(__filename)
-
+Error.stackTraceLimit = Infinity
 async function runTests () {
   const test = (await import('brittle')).default
   test.pause()

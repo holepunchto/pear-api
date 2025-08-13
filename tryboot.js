@@ -1,6 +1,6 @@
 'use strict'
 const daemon = require('bare-daemon')
-const { RUNTIME, PLATFORM_DIR } = require('./constants')
+const { RUNTIME, PLATFORM_DIR } = require('pear-constants')
 
 module.exports = function tryboot () {
   const { argv } = global.Bare || global.process
