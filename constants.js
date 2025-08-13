@@ -1,24 +1,14 @@
 'use strict'
-const hypercoreid = require('hypercore-id-encoding')
 const { platform, arch, isWindows, isLinux } = require('which-runtime')
 const { fileURLToPath } = require('url-file-url')
 const sodium = require('sodium-native')
 const b4a = require('b4a')
-const CHECKOUT = global.Pear?.constructor.RTI.checkout
-const MOUNT = global.Pear?.constructor.RTI.mount
+const { CHECKOUT, MOUNT } = require('pear-rti')
+const { ALIASES, EOLS } = require('pear-aliases')
+
 const BIN = 'by-arch/' + platform + '-' + arch + '/bin/'
-
-let mount = MOUNT ? toURL(MOUNT + '/', 'file:') : null
-if (!mount) {
-  let url = require.main?.url
-  if (url?.href.endsWith('/boot.bundle')) url.href += '/'
-  else url = new URL('.', url)
-  if (url && url.protocol === 'pear:') url = toURL(global.Pear.config.swapDir + '/', 'file:')
-  mount = url
-}
-
 const LOCALDEV = CHECKOUT.length === null
-const swapURL = mount.pathname.endsWith('.bundle/') ? new URL('..', mount) : mount
+const swapURL = MOUNT.pathname.endsWith('.bundle/') ? new URL('..', MOUNT) : MOUNT
 const swapPath = toPath(swapURL)
 const IPC_ID = 'pear'
 const PLATFORM_URL = LOCALDEV ? new URL('pear/', swapURL) : new URL('../../../', swapURL)
@@ -36,18 +26,6 @@ const WAKEUP_EXEC = isWindows
     ? 'pear'
     : 'Pear.app/Contents/MacOS/Pear'
 
-const ALIASES = {
-  pear: hypercoreid.decode(LOCALDEV ? 'dhpc5npmqkansx38uh18h3uwpdp6g9ukozrqyc4irbhwriedyeho' : CHECKOUT.key),
-  keet: hypercoreid.decode('ma9zo8zmfat3ih314mne1q47shrfho1odyfm9methgnn7b866w6y'),
-  runtime: hypercoreid.decode('rbw6fbxorqgjgyitworh3f73utc5cu7sczhptn64oonbznuojiao'),
-  doctor: hypercoreid.decode('ouenymy889n4ri9g74jm5bcr46wc6hqnxadqhfmbc4xbskerehby'),
-  electron: hypercoreid.decode('goowesg5dga9j1ryx47rsk9o4zms4541me4zerxsnbu8u99duh4o')
-}
-
-const EOLS = {
-  keet: [hypercoreid.decode('jc38t9nr7fasay4nqfxwfaawywfd3y14krnsitj67ymoubiezqdy'), hypercoreid.decode('oeeoz3w6fjjt7bym3ndpa6hhicm8f8naxyk11z4iypeoupn6jzpo')]
-}
-
 exports.LOCALDEV = LOCALDEV
 exports.CHECKOUT = CHECKOUT
 exports.ALIASES = ALIASES
@@ -61,7 +39,7 @@ exports.GC = toPath(new URL('gc', PLATFORM_URL))
 exports.PLATFORM_CORESTORE = toPath(new URL('corestores/platform', PLATFORM_URL))
 exports.UPGRADE_LOCK = toPath(new URL('lock', PLATFORM_URL))
 exports.APPLINGS_PATH = toPath(new URL('applings', PLATFORM_URL))
-exports.MOUNT = mount.href.slice(0, -1)
+exports.MOUNT = MOUNT.href.slice(0, -1)
 exports.SOCKET_PATH = isWindows ? `\\\\.\\pipe\\${IPC_ID}-${pipeId(PLATFORM_DIR)}` : `${PLATFORM_DIR}/${IPC_ID}.sock`
 exports.BOOT = require.main?.filename
 
@@ -78,12 +56,6 @@ exports.KNOWN_NODES_LIMIT = 100
 
 function toPath (u) {
   return fileURLToPath(u).replace(/[/\\]$/, '') || '/'
-}
-
-function toURL (s) {
-  if (s[1] === ':' && s[0] !== '/') return new URL('file:' + s)
-  if (s.startsWith('file:')) return new URL(s)
-  return new URL(s, 'file:')
 }
 
 function pipeId (s) {

@@ -9,6 +9,7 @@ const dirname = __dirname
 global.Pear = null
 
 const CONSTANTS_URL = isBare ? pathToFileURL(require.resolve('../constants')) : require.resolve('../constants')
+const RTI_URL = isBare ? pathToFileURL(require.resolve('pear-rti')) : require.resolve('pear-rti')
 
 const rig = ({ mount } = {}) => {
   if (global.Pear !== null) throw Error(`Prior Pear global not cleaned up: ${global.Pear}`)
@@ -21,6 +22,7 @@ const rig = ({ mount } = {}) => {
   return {
     teardown: () => {
       delete require.cache[CONSTANTS_URL]
+      delete require.cache[RTI_URL]
       global.Pear = null
     }
   }

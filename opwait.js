@@ -1,6 +1,6 @@
 'use strict'
 const noop = () => {}
-const { ERR_OPERATION_FAILED } = require('./errors')
+const { ERR_OPERATION_FAILED } = require('pear-errors')
 
 module.exports = function opwait (stream, onstatus) {
   if (typeof onstatus !== 'function') onstatus = noop

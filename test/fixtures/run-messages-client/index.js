@@ -7,7 +7,7 @@ const main = async () => {
   runRigTeardown()
   const teardown = Helper.rig({ ipc, state: { config: { args: process.argv.slice(4) } } })
 
-  const pipe = Pear.pipe
+  const pipe = require('pear-pipe')()
 
   const stream = Pear.messages({ hello: 'world' })
   await new Promise((resolve) => {

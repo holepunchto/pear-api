@@ -1,4 +1,4 @@
-const pipe = Pear.pipe
+const pipe = require('pear-pipe')()
 
 let i = 0
 let interval = null

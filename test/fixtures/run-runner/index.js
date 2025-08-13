@@ -1,6 +1,7 @@
 const [entry] = Pear.config.args
-const pipe = Pear.pipe
-const childPipe = Pear.run(entry)
+const pipe = require('pear-pipe')()
+const run = require('pear-run')
+const childPipe = run(entry)
 childPipe.on('data', (data) => {
   pipe.write(data)
   childPipe.end()

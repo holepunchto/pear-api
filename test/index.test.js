@@ -7,6 +7,7 @@ const path = require('path')
 const os = require('os')
 const Iambus = require('iambus')
 const process = require('process')
+const run = require('pear-run')
 
 const Helper = require('./helper')
 
@@ -105,7 +106,7 @@ test('Pear.messages multi clients', async function (t) {
     })
   })
 
-  const pipe = Pear.run(dir)
+  const pipe = run(dir)
 
   await subscribed
   await Pear.message({ hello: 'world', msg: 'pear1' })
@@ -246,7 +247,7 @@ test('Pear.versions returns', async function (t) {
 // run
 //
 
-test('Pear.run pipe', async function (t) {
+test('run pipe', async function (t) {
   t.plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'run')
@@ -254,7 +255,7 @@ test('Pear.run pipe', async function (t) {
   const teardown = Helper.rig()
   t.teardown(teardown)
 
-  const pipe = Pear.run(dir)
+  const pipe = run(dir)
 
   pipe.on('error', (err) => {
     if (err.code === 'ENOTCONN') return // when the other side destroys the pipe
@@ -308,7 +309,7 @@ test('Pear.worker.run Pear.worker.pipe', async function (t) {
   pipe.write('exit')
 })
 
-test('Pear.run args become Pear.config.args', async function (t) {
+test('run args become Pear.config.args', async function (t) {
   t.plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'print-args')
@@ -317,7 +318,7 @@ test('Pear.run args become Pear.config.args', async function (t) {
   t.teardown(teardown)
 
   const args = ['hello', 'world']
-  const pipe = Pear.run(dir, args)
+  const pipe = run(dir, args)
 
   const result = JSON.parse(await Helper.untilResult(pipe))
 
@@ -326,7 +327,7 @@ test('Pear.run args become Pear.config.args', async function (t) {
   await Helper.untilClose(pipe)
 })
 
-test('Pear.run args become Pear.config.args', async function (t) {
+test('run args become Pear.config.args', async function (t) {
   t.plan(1)
 
   const dir = path.join(dirname, 'fixtures', 'print-args')
@@ -335,7 +336,7 @@ test('Pear.run args become Pear.config.args', async function (t) {
   t.teardown(teardown)
 
   const args = ['hello', 'world']
-  const pipe = Pear.run(dir, args)
+  const pipe = run(dir, args)
 
   const result = JSON.parse(await Helper.untilResult(pipe))
 
@@ -344,7 +345,7 @@ test('Pear.run args become Pear.config.args', async function (t) {
   await Helper.untilClose(pipe)
 })
 
-test('Pear.run should run inside Pear.run', async function (t) {
+test('run should run inside run', async function (t) {
   t.plan(1)
 
   const runDir = path.join(dirname, 'fixtures', 'run-runner')
@@ -353,7 +354,7 @@ test('Pear.run should run inside Pear.run', async function (t) {
   const teardown = Helper.rig()
   t.teardown(teardown)
 
-  const pipe = Pear.run(runDir, [helloWorldDir])
+  const pipe = run(runDir, [helloWorldDir])
 
   const response = await Helper.untilResult(pipe)
 
@@ -362,132 +363,60 @@ test('Pear.run should run inside Pear.run', async function (t) {
   await Helper.untilClose(pipe)
 })
 
-test('Pear.run exit when child calls pipe.end()', async function (t) {
+test('run exit when child calls pipe.end()', async function (t) {
   const runParent = path.join(dirname, 'fixtures', 'run-parent')
   const runEndFromChild = path.join(dirname, 'fixtures', 'run-end-from-child')
 
   const teardown = Helper.rig()
   t.teardown(teardown)
 
-  const pipe = Pear.run(runParent, [runEndFromChild])
+  const pipe = run(runParent, [runEndFromChild])
   pipe.on('end', () => pipe.end())
 
   const pid = await Helper.untilResult(pipe)
   await Helper.untilExit(pid)
 })
 
-test('Pear.run exit when child calls pipe.destroy()', async function (t) {
+test('run exit when child calls pipe.destroy()', async function (t) {
   const runParentErrorHandler = path.join(dirname, 'fixtures', 'run-parent-error-handler')
   const runDestroyFromChild = path.join(dirname, 'fixtures', 'run-destroy-from-child')
 
   const teardown = Helper.rig()
   t.teardown(teardown)
 
-  const pipe = Pear.run(runParentErrorHandler, [runDestroyFromChild])
+  const pipe = run(runParentErrorHandler, [runDestroyFromChild])
   pipe.on('end', () => pipe.end())
 
   const pid = await Helper.untilResult(pipe)
   await Helper.untilExit(pid)
 })
 
-test('Pear.run exit when parent calls pipe.end()', async function (t) {
+test('run exit when parent calls pipe.end()', async function (t) {
   const runEndFromParent = path.join(dirname, 'fixtures', 'run-end-from-parent')
   const runChild = path.join(dirname, 'fixtures', 'run-child')
 
   const teardown = Helper.rig()
   t.teardown(teardown)
 
-  const pipe = Pear.run(runEndFromParent, [runChild])
+  const pipe = run(runEndFromParent, [runChild])
   pipe.on('end', () => pipe.end())
 
   const pid = await Helper.untilResult(pipe)
   await Helper.untilExit(pid)
 })
 
-test('Pear.run exit when parent calls pipe.destroy()', async function (t) {
+test('run exit when parent calls pipe.destroy()', async function (t) {
   const runDestroyFromParent = path.join(dirname, 'fixtures', 'run-destroy-from-parent')
   const runChildErrorHandler = path.join(dirname, 'fixtures', 'run-child-error-handler')
 
   const teardown = Helper.rig()
   t.teardown(teardown)
 
-  const pipe = Pear.run(runDestroyFromParent, [runChildErrorHandler])
+  const pipe = run(runDestroyFromParent, [runChildErrorHandler])
   pipe.on('end', () => pipe.end())
 
   const pid = await Helper.untilResult(pipe)
   await Helper.untilExit(pid)
-})
-
-//
-// get
-//
-
-test('Pear.get returns', async function (t) {
-  t.plan(3)
-
-  await Helper.startIpcServer({
-    handlers: {
-      get: ({ key, ...opts }) => ({ key, ...opts, time: Date.now() })
-    },
-    teardown: t.teardown
-  })
-  const ipc = await Helper.startIpcClient()
-
-  const teardown = Helper.rig({ ipc })
-  t.teardown(teardown)
-
-  const res = await Pear.get('hello', { magic: 'trick' })
-  t.is(res.key, 'hello', 'get returned')
-  t.is(res.magic, 'trick', 'get has data')
-  t.ok(typeof res.time === 'number' && res.time <= Date.now(), 'versions has time')
-})
-
-//
-// exists
-//
-
-test('Pear.exists returns', async function (t) {
-  t.plan(2)
-
-  await Helper.startIpcServer({
-    handlers: {
-      exists: ({ key }) => ({ key, time: Date.now() })
-    },
-    teardown: t.teardown
-  })
-  const ipc = await Helper.startIpcClient()
-
-  const teardown = Helper.rig({ ipc })
-  t.teardown(teardown)
-
-  const res = await Pear.exists('hello')
-  t.is(res.key, 'hello', 'exists returned')
-  t.ok(typeof res.time === 'number' && res.time <= Date.now(), 'versions has time')
-})
-
-//
-// compare
-//
-
-test('Pear.compare returns', async function (t) {
-  t.plan(4)
-
-  await Helper.startIpcServer({
-    handlers: {
-      compare: ({ keyA, keyB }) => ({ keyA, keyB, check: keyA === keyB, time: Date.now() })
-    },
-    teardown: t.teardown
-  })
-  const ipc = await Helper.startIpcClient()
-
-  const teardown = Helper.rig({ ipc })
-  t.teardown(teardown)
-
-  const res = await Pear.compare('hello', 'world')
-  t.is(res.keyA, 'hello', 'compare returned keyA')
-  t.is(res.keyB, 'world', 'compare returned keyB')
-  t.is(res.check, false, 'compare returned check')
-  t.ok(typeof res.time === 'number' && res.time <= Date.now(), 'compare has time')
 })
 
 //
@@ -674,7 +603,7 @@ test('Pear.teardown on pipe end', { skip: !isBare || isWindows }, async function
   const teardown = Helper.rig()
   t.teardown(teardown)
 
-  const pipe = Pear.run(dir)
+  const pipe = run(dir)
 
   const td = await Helper.untilResult(pipe, { runFn: () => pipe.end() })
   t.is(td, 'teardown', 'teardown executed')
@@ -688,7 +617,7 @@ test('Pear.teardown on os kill', { skip: !isBare || isWindows }, async function 
   const teardown = Helper.rig()
   t.teardown(teardown)
 
-  const pipe = Pear.run(dir)
+  const pipe = run(dir)
 
   pipe.on('error', (err) => {
     if (err.code === 'ENOTCONN') return // when the other side destroys the pipe
@@ -710,7 +639,7 @@ test('Pear.teardown run wait', { skip: !isBare || isWindows }, async function (t
   const teardown = Helper.rig()
   t.teardown(teardown)
 
-  const pipe = Pear.run(dir)
+  const pipe = run(dir)
 
   const td = await Helper.untilResult(pipe, { runFn: () => pipe.end() })
   t.is(td, 'teardown', 'teardown executed')
@@ -724,7 +653,7 @@ test('Pear.teardown throw error', { skip: !isBare || isWindows }, async function
   const teardown = Helper.rig()
   t.teardown(teardown)
 
-  const pipe = Pear.run(dir)
+  const pipe = run(dir)
 
   const td = await Helper.untilResult(pipe, { runFn: () => pipe.end() })
   t.is(td, 'teardown', 'teardown executed')

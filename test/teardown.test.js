@@ -2,6 +2,7 @@
 
 const { test } = require('brittle')
 const { isWindows, isBare } = require('which-runtime')
+const run = require('pear-run')
 const path = require('path')
 
 const Helper = require('./helper')
@@ -16,7 +17,7 @@ test('teardown default', { skip: !isBare || isWindows }, async function (t) {
   const teardown = Helper.rig({ clearRequireCache: '../teardown' })
   t.teardown(teardown)
 
-  const pipe = Pear.run(dir)
+  const pipe = run(dir)
 
   const td = await Helper.untilResult(pipe, { runFn: () => pipe.end() })
   t.is(td, 'teardown', 'teardown executed')
@@ -30,7 +31,7 @@ test('teardown with position', { skip: !isBare || isWindows }, async function (t
   const teardown = Helper.rig({ clearRequireCache: '../teardown' })
   t.teardown(teardown)
 
-  const pipe = Pear.run(dir)
+  const pipe = run(dir)
   const td = await Helper.untilResult(pipe, { runFn: () => pipe.end() })
   t.is(td, 'teardown', 'teardown executed')
 })

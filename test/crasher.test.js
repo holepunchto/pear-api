@@ -4,7 +4,7 @@ const { test } = require('brittle')
 const path = require('path')
 const fs = require('fs')
 const os = require('os')
-
+const run = require('pear-run')
 const Helper = require('./helper')
 
 const dirname = __dirname
@@ -19,7 +19,7 @@ test('crasher uncaught exception', async function (t) {
 
   const swap = path.join(os.tmpdir(), `${Date.now()}`)
   await fs.promises.mkdir(swap)
-  const pipe = Pear.run(dir, [swap])
+  const pipe = run(dir, [swap])
   pipe.on('error', (err) => {
     if (err.code === 'ENOTCONN') return // when the other side destroys the pipe
     throw err
@@ -50,7 +50,7 @@ test('crasher unhandled rejection', async function (t) {
 
   const swap = path.join(os.tmpdir(), `${Date.now()}`)
   await fs.promises.mkdir(swap)
-  const pipe = Pear.run(dir, [swap])
+  const pipe = run(dir, [swap])
   pipe.on('error', (err) => {
     if (err.code === 'ENOTCONN') return // when the other side destroys the pipe
     throw err
