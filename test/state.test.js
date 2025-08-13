@@ -373,7 +373,7 @@ test('state.applink', async function (t) {
 
   const helloWorld = path.join(dirname, 'fixtures', 'hello-world')
 
-  const State = require('..')
+  const State = require('pear-state')
   const cwd = global.process?.cwd ?? os.cwd
   t.is(new State({ dir: helloWorld, link: helloWorld, flags: {} }).applink, pathToFileURL(helloWorld).href)
   t.is(new State({ dir: helloWorld, link: helloWorld + '/some/route', flags: {} }).applink, pathToFileURL(helloWorld).href)

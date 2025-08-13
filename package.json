@@ -92,6 +92,7 @@
     "paparam": "^1.8.5",
     "pear-aliases": "^1.0.0",
     "pear-constants": "^1.0.0",
+    "pear-crasher": "^1.0.1",
     "pear-dump": "^1.0.0",
     "pear-gunk": "^1.0.0",
     "pear-info": "^1.0.0",
