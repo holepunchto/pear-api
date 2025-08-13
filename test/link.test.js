@@ -26,7 +26,6 @@ test('parse-link ./some/path/to/a/file.js', async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
-
   const res = plink.parse('./some/path/to/a/file.js')
   t.is(res.protocol, 'file:')
   t.is(res.pathname, pathToFileURL('./some/path/to/a/file.js').pathname)
@@ -43,7 +42,6 @@ test('parse-link file:///some/path/to/a/file.js', async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
-
   const res = plink.parse('file:///some/path/to/a/file.js')
   t.is(res.protocol, 'file:')
   t.is(res.pathname, '/some/path/to/a/file.js')
@@ -59,7 +57,6 @@ test('parse-link pear://key', async function (t) {
 
   const { teardown } = rig()
   t.teardown(teardown)
-
 
   const key = 'd47c1dfecec0f74a067985d2f8d7d9ad15f9ae5ff648f7bc6ca28e41d70ed221'
   const res = plink.parse(`pear://${key}`)
@@ -78,7 +75,6 @@ test('parse-link alias pear://alias', async function (t) {
 
   const { teardown } = rig()
   t.teardown(teardown)
-
 
   const aliases = ['keet', 'runtime', 'doctor']
   for (const alias of aliases) {
@@ -100,7 +96,6 @@ test('parse-link pear://fork.length.key', async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
-
   const key = 'd47c1dfecec0f74a067985d2f8d7d9ad15f9ae5ff648f7bc6ca28e41d70ed221'
   const res = plink.parse(`pear://123.456.${key}`)
   t.is(res.protocol, 'pear:')
@@ -118,7 +113,6 @@ test('parse-link alias pear://fork.length.alias', async function (t) {
 
   const { teardown } = rig()
   t.teardown(teardown)
-
 
   const aliases = ['keet', 'runtime', 'doctor']
   for (const alias of aliases) {
@@ -140,7 +134,6 @@ test('parse-link pear://fork.length.key.dhash', async function (t) {
   const { teardown } = rig()
   t.teardown(teardown)
 
-
   const key = 'd47c1dfecec0f74a067985d2f8d7d9ad15f9ae5ff648f7bc6ca28e41d70ed221'
   const dhash = '38d8296e972167f4ad37803999fbcac17025271162f44dcdce1188d4bc5bac1d'
   const res = plink.parse(`pear://123.456.${key}.${dhash}`)
@@ -159,7 +152,6 @@ test('parse-link invalid link', async function (t) {
 
   const { teardown } = rig()
   t.teardown(teardown)
-
 
   t.exception(() => plink.parse())
   t.exception(() => plink.parse(''))
