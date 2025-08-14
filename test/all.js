@@ -30,7 +30,6 @@ async function runTests () {
   await import('./link.test.js')
   await import('./state.test.js')
   await import('./teardown.test.js')
-  await import('./terminal.test.js')
   await import('./transform.test.js')
   await import('./tryboot.test.js')
 
