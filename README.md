@@ -2,15 +2,12 @@
 
 > Pear API Base & Integration Module
 
-**Status: WIP**
-
 ## `pear-api`
 
 Supplies the API base for the Pear API (https://docs.pears.com/pear-runtime/api).
 
 Typically for extending from for user-interface-runtime purposes.
 
-## Integration Libraries
 
 The `pear-api` module also exposes libraries that provide platform core functionality.
 

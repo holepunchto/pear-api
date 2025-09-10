@@ -1,17 +1,14 @@
 'use strict'
-const message = require('pear-message')
-const messages = require('pear-messages')
 const ref = require('pear-ref')
 const run = require('pear-run')
 const pipe = require('pear-pipe')
-const seed = require('pear-seed')
-const stage = require('pear-stage')
-const dump = require('pear-dump')
-const info = require('pear-info')
-const release = require('pear-release')
+const wakeups = require('pear-wakeups')
+const updates = require('pear-updates')
+const message = require('pear-message')
+const messages = require('pear-messages')
 const { ERR_INVALID_INPUT } = require('pear-errors')
 const { RUNTIME } = require('pear-constants')
-const onteardown = global.Bare ? require('./teardown') : noop
+const onteardown = global.Bare ? require('pear-gracedown') : noop
 const program = global.Bare || global.process
 const kIPC = Symbol('ipc')
 
@@ -76,6 +73,38 @@ class API {
     }()
   }
 
+  checkpoint = (state) => {
+    this.app.checkpoint = state
+    return ref.track(this.#ipc.checkpoint(state))
+  }
+
+  restart = async (opts = {}) => {
+    if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.restart is deprecated and will be removed. Use pear-restart')
+    if (this.#state.ui === null) throw new Error('Pear.restart is not supported for terminal apps')
+    return ref.track(this.#ipc.restart(opts))
+  }
+
+  teardown = (fn = () => {}, position = 0) => {
+    if (typeof fn !== 'function') throw ERR_INVALID_INPUT('teardown expects function')
+
+    const isValidPosition = Number.isInteger(position) || position === Infinity || position === -Infinity
+    if (!isValidPosition) throw ERR_INVALID_INPUT('teardown position must be integer')
+
+    this.#teardowns.push({ fn, position })
+  }
+
+  versions = () => ref.track(this.#ipc.versions())
+
+  set exitCode (code) { program.exitCode = code }
+  get exitCode () { return program.exitCode }
+
+  exit = (code) => {
+    program.exitCode = code
+    this.#unload().finally(() => {
+      return program.exit(code)
+    })
+  }
+
   async #unload () {
     this.#unloading()
 
@@ -118,21 +147,10 @@ class API {
     return messages(pattern, listener)
   }
 
-  checkpoint = (state) => {
-    this.app.checkpoint = state
-    return ref.track(this.#ipc.checkpoint(state))
-  }
-
-  versions = () => ref.track(this.#ipc.versions())
-
   updated = () => {
+    if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.updated is deprecated and will be removed. It is now a no-op & can be removed from code.')
     if (typeof this.#ipc.updated === 'function') return ref.track(this.#ipc.updated())
     return Promise.resolve()
-  }
-
-  restart = async (opts = {}) => {
-    if (this.#state.ui === null) throw new Error('Pear.restart is not supported for terminal apps')
-    return ref.track(this.#ipc.restart(opts))
   }
 
   reload = async (opts = {}) => {
@@ -144,56 +162,12 @@ class API {
 
   updates = (listener) => {
     if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.updates is deprecated and will be removed. Use pear-updates')
-    return messages({ type: 'pear/updates' }, listener)
+    return updates(listener)
   }
 
   wakeups = (listener) => {
     if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.wakeups is deprecated and will be removed. Use pear-wakeups')
-    return messages({ type: 'pear/wakeup' }, listener)
-  }
-
-  teardown = (fn = () => {}, position = 0) => {
-    if (typeof fn !== 'function') throw ERR_INVALID_INPUT('teardown expects function')
-
-    const isValidPosition = Number.isInteger(position) || position === Infinity || position === -Infinity
-    if (!isValidPosition) throw ERR_INVALID_INPUT('teardown position must be integer')
-
-    this.#teardowns.push({ fn, position })
-  }
-
-  exit = (code) => {
-    program.exitCode = code
-    this.#unload().finally(() => {
-      return program.exit(code)
-    })
-  }
-
-  set exitCode (code) { program.exitCode = code }
-  get exitCode () { return program.exitCode }
-
-  dump = (link, opts) => {
-    if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.dump is deprecated and will be removed. Use pear-dump')
-    return dump(link, opts)
-  }
-
-  stage = (link, opts) => {
-    if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.stage is deprecated and will be removed. Use pear-stage')
-    return stage(link, opts)
-  }
-
-  release = (link, opts) => {
-    if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.release is deprecated and will be removed. Use pear-release')
-    return release(link, opts)
-  }
-
-  info = (link, opts) => {
-    if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.info is deprecated and will be removed. Use pear-info')
-    return info(link, opts)
-  }
-
-  seed = (link, opts) => {
-    if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.seed is deprecated and will be removed. Use pear-seed')
-    return seed(link, opts)
+    return wakeups(listener)
   }
 }
 
