@@ -6,7 +6,6 @@ const IPC = require('pear-ipc')
 const path = require('path')
 const fs = require('fs')
 const { pathToFileURL } = require('url-file-url')
-const process = require('process')
 
 const dirname = __dirname
 const socketPath = isWindows ? '\\\\.\\pipe\\pear-api-test-ipc' : 'test.sock'
@@ -33,14 +32,15 @@ class Helper {
     }
     global.Pear = new RigAPI()
 
+    const program = global.Bare ?? global.process
+
     const API = require('..')
     class TestAPI extends API {
-      static RUNTIME = process.argv[0]
+      static RUNTIME = program.argv[0]
       static RUNTIME_ARGV = runtimeArgv ?? [path.join(dirname, 'run.js')]
       static RTI = RigAPI.RTI
     }
 
-    const program = global.Bare ?? global.process
     const argv = [...program.argv]
     program.argv.length = 0
     program.argv.push('pear', 'run', ...argv.slice(1))

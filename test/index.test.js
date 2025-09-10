@@ -2,13 +2,12 @@
 
 const { test } = require('brittle')
 const { isWindows, isBare } = require('which-runtime')
-const { Readable } = require('streamx')
 const path = require('path')
 const os = require('os')
 const Iambus = require('iambus')
-const process = require('process')
 const run = require('pear-run')
 
+const program = global.Bare ?? global.process
 const Helper = require('./helper')
 
 const dirname = __dirname
@@ -669,14 +668,12 @@ test('Pear.exit', async function (t) {
   const teardown = Helper.rig()
   t.teardown(teardown)
 
-  const originalExit = isBare ? Bare.exit : process.exit
+  const originalExit = program.exit
   const exited = new Promise((resolve) => {
-    if (isBare) Bare.exit = () => resolve(true)
-    else process.exit = () => resolve(true)
+    program.exit = () => resolve(true)
   })
   t.teardown(() => {
-    if (isBare) Bare.exit = originalExit
-    else process.exit = originalExit
+    program.exit = originalExit
   })
 
   Pear.exit()
