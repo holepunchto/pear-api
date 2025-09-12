@@ -11,6 +11,7 @@ const { RUNTIME } = require('pear-constants')
 const onteardown = global.Bare ? require('pear-gracedown') : noop
 const program = global.Bare || global.process
 const kIPC = Symbol('ipc')
+const kREF = Symbol('ref')
 
 let COMPAT = false
 
@@ -26,6 +27,7 @@ class API {
   pid = program.pid
   static RTI = global.Pear?.constructor.RTI ?? null
   static IPC = kIPC
+  static REF = kREF
   static RUNTIME = RUNTIME
   static RUNTIME_ARGV = []
   static set COMPAT (compat) {
@@ -57,6 +59,7 @@ class API {
   }
 
   get [kIPC] () { return this.#ipc }
+  get [kREF] () { return ref }
 
   get worker () {
     if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.worker is deprecated and will be removed. Use pear-run & pear-pipe')

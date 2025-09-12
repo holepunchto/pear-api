@@ -5,7 +5,6 @@ const { isWindows, isBare } = require('which-runtime')
 const path = require('path')
 const os = require('os')
 const Iambus = require('iambus')
-const run = require('pear-run')
 
 const program = global.Bare ?? global.process
 const Helper = require('./helper')
@@ -105,7 +104,7 @@ test('Pear.messages multi clients', async function (t) {
     })
   })
 
-  const pipe = run(dir)
+  const pipe = Helper.run(dir)
 
   await subscribed
   await Pear.message({ hello: 'world', msg: 'pear1' })
@@ -254,7 +253,7 @@ test('Pear.worker.run -> pipe', async function (t) {
   const teardown = Helper.rig()
   t.teardown(teardown)
 
-  const pipe = run(dir)
+  const pipe = Helper.run(dir)
 
   pipe.on('error', (err) => {
     if (err.code === 'ENOTCONN') return // when the other side destroys the pipe
@@ -317,7 +316,7 @@ test('run args become Pear.config.args', async function (t) {
   t.teardown(teardown)
 
   const args = ['hello', 'world']
-  const pipe = run(dir, args)
+  const pipe = Helper.run(dir, args)
 
   const result = JSON.parse(await Helper.untilResult(pipe))
 
@@ -335,7 +334,7 @@ test('run args become Pear.config.args', async function (t) {
   t.teardown(teardown)
 
   const args = ['hello', 'world']
-  const pipe = run(dir, args)
+  const pipe = Helper.run(dir, args)
 
   const result = JSON.parse(await Helper.untilResult(pipe))
 
@@ -353,7 +352,7 @@ test('run should run inside run', async function (t) {
   const teardown = Helper.rig()
   t.teardown(teardown)
 
-  const pipe = run(runDir, [helloWorldDir])
+  const pipe = Helper.run(runDir, [helloWorldDir])
 
   const response = await Helper.untilResult(pipe)
 
@@ -369,7 +368,7 @@ test('run exit when child calls pipe.end()', async function (t) {
   const teardown = Helper.rig()
   t.teardown(teardown)
 
-  const pipe = run(runParent, [runEndFromChild])
+  const pipe = Helper.run(runParent, [runEndFromChild])
   pipe.on('end', () => pipe.end())
 
   const pid = await Helper.untilResult(pipe)
@@ -383,7 +382,7 @@ test('run exit when child calls pipe.destroy()', async function (t) {
   const teardown = Helper.rig()
   t.teardown(teardown)
 
-  const pipe = run(runParentErrorHandler, [runDestroyFromChild])
+  const pipe = Helper.run(runParentErrorHandler, [runDestroyFromChild])
   pipe.on('end', () => pipe.end())
 
   const pid = await Helper.untilResult(pipe)
@@ -397,7 +396,7 @@ test('run exit when parent calls pipe.end()', async function (t) {
   const teardown = Helper.rig()
   t.teardown(teardown)
 
-  const pipe = run(runEndFromParent, [runChild])
+  const pipe = Helper.run(runEndFromParent, [runChild])
   pipe.on('end', () => pipe.end())
 
   const pid = await Helper.untilResult(pipe)
@@ -411,7 +410,7 @@ test('run exit when parent calls pipe.destroy()', async function (t) {
   const teardown = Helper.rig()
   t.teardown(teardown)
 
-  const pipe = run(runDestroyFromParent, [runChildErrorHandler])
+  const pipe = Helper.run(runDestroyFromParent, [runChildErrorHandler])
   pipe.on('end', () => pipe.end())
 
   const pid = await Helper.untilResult(pipe)
@@ -602,7 +601,7 @@ test('Pear.teardown on pipe end', { skip: !isBare || isWindows }, async function
   const teardown = Helper.rig()
   t.teardown(teardown)
 
-  const pipe = run(dir)
+  const pipe = Helper.run(dir)
 
   const td = await Helper.untilResult(pipe, { runFn: () => pipe.end() })
   t.is(td, 'teardown', 'teardown executed')
@@ -616,7 +615,7 @@ test('Pear.teardown on os kill', { skip: !isBare || isWindows }, async function 
   const teardown = Helper.rig()
   t.teardown(teardown)
 
-  const pipe = run(dir)
+  const pipe = Helper.run(dir)
 
   pipe.on('error', (err) => {
     if (err.code === 'ENOTCONN') return // when the other side destroys the pipe
@@ -638,7 +637,7 @@ test('Pear.teardown run wait', { skip: !isBare || isWindows }, async function (t
   const teardown = Helper.rig()
   t.teardown(teardown)
 
-  const pipe = run(dir)
+  const pipe = Helper.run(dir)
 
   const td = await Helper.untilResult(pipe, { runFn: () => pipe.end() })
   t.is(td, 'teardown', 'teardown executed')
@@ -652,7 +651,7 @@ test('Pear.teardown throw error', { skip: !isBare || isWindows }, async function
   const teardown = Helper.rig()
   t.teardown(teardown)
 
-  const pipe = run(dir)
+  const pipe = Helper.run(dir)
 
   const td = await Helper.untilResult(pipe, { runFn: () => pipe.end() })
   t.is(td, 'teardown', 'teardown executed')

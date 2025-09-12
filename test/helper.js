@@ -158,6 +158,10 @@ class Helper {
     return server
   }
 
+  static run (...args) {
+    return require('pear-run')(...args) // so that pear-run is loaded after global.Pear setup
+  }
+
   static override (moduleName, override) {
     const modulePath = isBare ? pathToFileURL(require.resolve(moduleName)) : require.resolve(moduleName)
     if (BUILTINS.has(moduleName)) {
