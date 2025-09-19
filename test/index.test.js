@@ -65,8 +65,16 @@ test('Pear.messages single client', async function (t) {
 
   const messages = await received
   t.is(messages.length, 4, 'received 4 messages')
-  t.ok(messages.every(msg => msg.hello === 'world'), 'all messages match')
-  t.ok(messages.every(msg => typeof msg.time === 'number' && msg.time <= Date.now()), 'all messages have time')
+  t.ok(
+    messages.every((msg) => msg.hello === 'world'),
+    'all messages match'
+  )
+  t.ok(
+    messages.every(
+      (msg) => typeof msg.time === 'number' && msg.time <= Date.now()
+    ),
+    'all messages have time'
+  )
 
   await Helper.untilClose(stream)
 })
@@ -85,7 +93,9 @@ test('Pear.messages multi clients', async function (t) {
         bus.pub({ type: 'subscribed', pattern })
         return stream
       },
-      message: (pattern) => { bus.pub({ ...pattern, time: Date.now() }) }
+      message: (pattern) => {
+        bus.pub({ ...pattern, time: Date.now() })
+      }
     },
     teardown: t.teardown
   })
@@ -122,8 +132,12 @@ test('Pear.messages with no listener', async function (t) {
   const bus = new Iambus()
   await Helper.startIpcServer({
     handlers: {
-      messages: (pattern) => { return bus.sub(pattern) },
-      message: (pattern) => { bus.pub(pattern) }
+      messages: (pattern) => {
+        return bus.sub(pattern)
+      },
+      message: (pattern) => {
+        bus.pub(pattern)
+      }
     },
     teardown: t.teardown
   })
@@ -152,7 +166,9 @@ test('Pear.messages with no pattern', async function (t) {
         stream.push({ type: 'subscribed', pattern })
         return stream
       },
-      message: (pattern) => { bus.pub({ ...pattern, time: Date.now() }) }
+      message: (pattern) => {
+        bus.pub({ ...pattern, time: Date.now() })
+      }
     },
     teardown: t.teardown
   })
@@ -182,7 +198,10 @@ test('Pear.messages with no pattern', async function (t) {
 
   const msg = await received
   t.is(msg.hello, 'world', 'message received')
-  t.ok(typeof msg.time === 'number' && msg.time <= Date.now(), 'message has time')
+  t.ok(
+    typeof msg.time === 'number' && msg.time <= Date.now(),
+    'message has time'
+  )
 
   await Helper.untilClose(stream)
 })
@@ -212,7 +231,10 @@ test('Pear.checkpoint returns', async function (t) {
 
   const cp = await Pear.checkpoint({ magic: 'trick' })
   t.is(cp.magic, 'trick', 'checkpoint returned')
-  t.ok(typeof cp.time === 'number' && cp.time <= Date.now(), 'checkpoint has time')
+  t.ok(
+    typeof cp.time === 'number' && cp.time <= Date.now(),
+    'checkpoint has time'
+  )
 
   t.is(Pear.config.hello, 'world', 'Pear.config is still set')
   t.is(Pear.config.checkpoint.magic, 'trick', 'Pear.config is updated')
@@ -238,7 +260,10 @@ test('Pear.versions returns', async function (t) {
 
   const ver = await Pear.versions()
   t.is(ver.hello, 'world', 'versions returned')
-  t.ok(typeof ver.time === 'number' && ver.time <= Date.now(), 'versions has time')
+  t.ok(
+    typeof ver.time === 'number' && ver.time <= Date.now(),
+    'versions has time'
+  )
 })
 
 //
@@ -376,8 +401,16 @@ test('run exit when child calls pipe.end()', async function (t) {
 })
 
 test('run exit when child calls pipe.destroy()', async function (t) {
-  const runParentErrorHandler = path.join(dirname, 'fixtures', 'run-parent-error-handler')
-  const runDestroyFromChild = path.join(dirname, 'fixtures', 'run-destroy-from-child')
+  const runParentErrorHandler = path.join(
+    dirname,
+    'fixtures',
+    'run-parent-error-handler'
+  )
+  const runDestroyFromChild = path.join(
+    dirname,
+    'fixtures',
+    'run-destroy-from-child'
+  )
 
   const teardown = Helper.rig()
   t.teardown(teardown)
@@ -404,8 +437,16 @@ test('run exit when parent calls pipe.end()', async function (t) {
 })
 
 test('run exit when parent calls pipe.destroy()', async function (t) {
-  const runDestroyFromParent = path.join(dirname, 'fixtures', 'run-destroy-from-parent')
-  const runChildErrorHandler = path.join(dirname, 'fixtures', 'run-child-error-handler')
+  const runDestroyFromParent = path.join(
+    dirname,
+    'fixtures',
+    'run-destroy-from-parent'
+  )
+  const runChildErrorHandler = path.join(
+    dirname,
+    'fixtures',
+    'run-child-error-handler'
+  )
 
   const teardown = Helper.rig()
   t.teardown(teardown)
@@ -427,7 +468,10 @@ test('Pear.restart terminal app throw error', async function (t) {
   const teardown = Helper.rig({ state: { ui: null } })
   t.teardown(teardown)
 
-  t.exception(() => Pear.restart(), 'Pear.restart threw an error for terminal app')
+  t.exception(
+    () => Pear.restart(),
+    'Pear.restart threw an error for terminal app'
+  )
 })
 
 test('Pear.restart ok', async function (t) {
@@ -446,7 +490,10 @@ test('Pear.restart ok', async function (t) {
 
   const res = await Pear.restart({ hello: 'world' })
   t.is(res.hello, 'world', 'restart returned')
-  t.ok(typeof res.time === 'number' && res.time <= Date.now(), 'restart has time')
+  t.ok(
+    typeof res.time === 'number' && res.time <= Date.now(),
+    'restart has time'
+  )
 })
 
 //
@@ -459,7 +506,10 @@ test('Pear.reload terminal app throw error', async function (t) {
   const teardown = Helper.rig({ state: { ui: null } })
   t.teardown(teardown)
 
-  t.exception(() => Pear.reload(), 'Pear.reload threw an error for terminal app')
+  t.exception(
+    () => Pear.reload(),
+    'Pear.reload threw an error for terminal app'
+  )
 })
 
 test('Pear.reload desktop app throw error', async function (t) {
@@ -468,7 +518,10 @@ test('Pear.reload desktop app throw error', async function (t) {
   const teardown = Helper.rig()
   t.teardown(teardown)
 
-  t.exception(() => Pear.reload({ platform: 'darwin' }), 'Pear.reload threw an error for desktop app')
+  t.exception(
+    () => Pear.reload({ platform: 'darwin' }),
+    'Pear.reload threw an error for desktop app'
+  )
 })
 
 test('Pear.reload ok', async function (t) {
@@ -502,7 +555,9 @@ test('Pear.updates trigger', async function (t) {
         stream.push({ type: 'subscribed', pattern })
         return stream
       },
-      message: (pattern) => { bus.pub({ ...pattern, time: Date.now() }) }
+      message: (pattern) => {
+        bus.pub({ ...pattern, time: Date.now() })
+      }
     },
     teardown: t.teardown
   })
@@ -533,7 +588,10 @@ test('Pear.updates trigger', async function (t) {
   const msg = await received
   t.is(msg.type, 'pear/updates', 'updates triggered')
   t.is(msg.hello, 'world', 'message received')
-  t.ok(typeof msg.time === 'number' && msg.time <= Date.now(), 'message has time')
+  t.ok(
+    typeof msg.time === 'number' && msg.time <= Date.now(),
+    'message has time'
+  )
 
   await Helper.untilClose(stream)
 })
@@ -553,7 +611,9 @@ test('Pear.wakeups trigger', async function (t) {
         stream.push({ type: 'subscribed', pattern })
         return stream
       },
-      message: (pattern) => { bus.pub({ ...pattern, time: Date.now() }) }
+      message: (pattern) => {
+        bus.pub({ ...pattern, time: Date.now() })
+      }
     },
     teardown: t.teardown
   })
@@ -584,7 +644,10 @@ test('Pear.wakeups trigger', async function (t) {
   const msg = await received
   t.is(msg.type, 'pear/wakeup', 'wakeups triggered')
   t.is(msg.hello, 'world', 'message received')
-  t.ok(typeof msg.time === 'number' && msg.time <= Date.now(), 'message has time')
+  t.ok(
+    typeof msg.time === 'number' && msg.time <= Date.now(),
+    'message has time'
+  )
 
   await Helper.untilClose(stream)
 })
@@ -593,69 +656,85 @@ test('Pear.wakeups trigger', async function (t) {
 // teardown
 //
 
-test('Pear.teardown on pipe end', { skip: !isBare || isWindows }, async function (t) {
-  t.plan(1)
+test(
+  'Pear.teardown on pipe end',
+  { skip: !isBare || isWindows },
+  async function (t) {
+    t.plan(1)
 
-  const dir = path.join(dirname, 'fixtures', 'run-teardown')
+    const dir = path.join(dirname, 'fixtures', 'run-teardown')
 
-  const teardown = Helper.rig()
-  t.teardown(teardown)
+    const teardown = Helper.rig()
+    t.teardown(teardown)
 
-  const pipe = Helper.run(dir)
+    const pipe = Helper.run(dir)
 
-  const td = await Helper.untilResult(pipe, { runFn: () => pipe.end() })
-  t.is(td, 'teardown', 'teardown executed')
-})
+    const td = await Helper.untilResult(pipe, { runFn: () => pipe.end() })
+    t.is(td, 'teardown', 'teardown executed')
+  }
+)
 
-test('Pear.teardown on os kill', { skip: !isBare || isWindows }, async function (t) {
-  t.plan(2)
+test(
+  'Pear.teardown on os kill',
+  { skip: !isBare || isWindows },
+  async function (t) {
+    t.plan(2)
 
-  const dir = path.join(dirname, 'fixtures', 'run-teardown-os-kill')
+    const dir = path.join(dirname, 'fixtures', 'run-teardown-os-kill')
 
-  const teardown = Helper.rig()
-  t.teardown(teardown)
+    const teardown = Helper.rig()
+    t.teardown(teardown)
 
-  const pipe = Helper.run(dir)
+    const pipe = Helper.run(dir)
 
-  pipe.on('error', (err) => {
-    if (err.code === 'ENOTCONN') return // when the other side destroys the pipe
-    throw err
-  })
+    pipe.on('error', (err) => {
+      if (err.code === 'ENOTCONN') return // when the other side destroys the pipe
+      throw err
+    })
 
-  const pid = +(await Helper.untilResult(pipe))
-  t.ok(pid > 0, 'pid is valid')
+    const pid = +(await Helper.untilResult(pipe))
+    t.ok(pid > 0, 'pid is valid')
 
-  const td = await Helper.untilResult(pipe, { runFn: () => os.kill(pid) })
-  t.is(td, 'teardown', 'teardown executed')
-})
+    const td = await Helper.untilResult(pipe, { runFn: () => os.kill(pid) })
+    t.is(td, 'teardown', 'teardown executed')
+  }
+)
 
-test('Pear.teardown run wait', { skip: !isBare || isWindows }, async function (t) {
-  t.plan(1)
+test(
+  'Pear.teardown run wait',
+  { skip: !isBare || isWindows },
+  async function (t) {
+    t.plan(1)
 
-  const dir = path.join(dirname, 'fixtures', 'run-teardown-wait')
+    const dir = path.join(dirname, 'fixtures', 'run-teardown-wait')
 
-  const teardown = Helper.rig()
-  t.teardown(teardown)
+    const teardown = Helper.rig()
+    t.teardown(teardown)
 
-  const pipe = Helper.run(dir)
+    const pipe = Helper.run(dir)
 
-  const td = await Helper.untilResult(pipe, { runFn: () => pipe.end() })
-  t.is(td, 'teardown', 'teardown executed')
-})
+    const td = await Helper.untilResult(pipe, { runFn: () => pipe.end() })
+    t.is(td, 'teardown', 'teardown executed')
+  }
+)
 
-test('Pear.teardown throw error', { skip: !isBare || isWindows }, async function (t) {
-  t.plan(1)
+test(
+  'Pear.teardown throw error',
+  { skip: !isBare || isWindows },
+  async function (t) {
+    t.plan(1)
 
-  const dir = path.join(dirname, 'fixtures', 'run-teardown-error')
+    const dir = path.join(dirname, 'fixtures', 'run-teardown-error')
 
-  const teardown = Helper.rig()
-  t.teardown(teardown)
+    const teardown = Helper.rig()
+    t.teardown(teardown)
 
-  const pipe = Helper.run(dir)
+    const pipe = Helper.run(dir)
 
-  const td = await Helper.untilResult(pipe, { runFn: () => pipe.end() })
-  t.is(td, 'teardown', 'teardown executed')
-})
+    const td = await Helper.untilResult(pipe, { runFn: () => pipe.end() })
+    t.is(td, 'teardown', 'teardown executed')
+  }
+)
 
 //
 // exit
