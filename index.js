@@ -30,50 +30,75 @@ class API {
   static REF = kREF
   static RUNTIME = RUNTIME
   static RUNTIME_ARGV = []
-  static set COMPAT (compat) {
+  static set COMPAT(compat) {
     if (compat) Pear.app.tier = Pear.app.key ? 'production' : 'dev'
     return (COMPAT = compat)
   }
 
-  static get COMPAT () { return COMPAT }
+  static get COMPAT() {
+    return COMPAT
+  }
   static CUTOVER = true
-  constructor (ipc, state, { teardown = onteardown } = {}) {
+  constructor(ipc, state, { teardown = onteardown } = {}) {
     this.#ipc = ipc
     this.#state = state
-    this.#teardown = new Promise((resolve) => { this.#unloading = resolve })
+    this.#teardown = new Promise((resolve) => {
+      this.#unloading = resolve
+    })
     this.#onteardown = teardown
-    this.key = this.#state.key ? (this.#state.key.type === 'Buffer' ? Buffer.from(this.#state.key.data) : this.#state.key) : null
+    this.key = this.#state.key
+      ? this.#state.key.type === 'Buffer'
+        ? Buffer.from(this.#state.key.data)
+        : this.#state.key
+      : null
     this.app = state.config
     this.#onteardown(() => this.#unload())
     this.#ipc.unref()
-    ref.on('ref', (refs) => { if (refs === 1) this.#ipc.ref() })
-    ref.on('unref', (refs) => { if (refs === 0) this.#ipc.unref() })
+    ref.on('ref', (refs) => {
+      if (refs === 1) this.#ipc.ref()
+    })
+    ref.on('unref', (refs) => {
+      if (refs === 0) this.#ipc.unref()
+    })
   }
 
-  get config () {
+  get config() {
     return this.app
   }
 
-  set config (v) {
+  set config(v) {
     return (this.app = v)
   }
 
-  get [kIPC] () { return this.#ipc }
-  get [kREF] () { return ref }
+  get [kIPC]() {
+    return this.#ipc
+  }
+  get [kREF]() {
+    return ref
+  }
 
-  get worker () {
-    if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.worker is deprecated and will be removed. Use pear-run & pear-pipe')
-    return new class DeprecatedWorker {
-      pipe () {
-        if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.worker.pipe() is deprecated. Use pear-pipe')
+  get worker() {
+    if (!this.constructor.COMPAT)
+      console.error(
+        '[ DEPRECATED ] Pear.worker is deprecated and will be removed. Use pear-run & pear-pipe'
+      )
+    return new (class DeprecatedWorker {
+      pipe() {
+        if (!this.constructor.COMPAT)
+          console.error(
+            '[ DEPRECATED ] Pear.worker.pipe() is deprecated. Use pear-pipe'
+          )
         return pipe()
       }
 
-      run (link, args = []) {
-        if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.worker.run() is deprecated. Use pear-run')
+      run(link, args = []) {
+        if (!this.constructor.COMPAT)
+          console.error(
+            '[ DEPRECATED ] Pear.worker.run() is deprecated. Use pear-run'
+          )
         return run(link, args)
       }
-    }()
+    })()
   }
 
   checkpoint = (state) => {
@@ -82,24 +107,37 @@ class API {
   }
 
   restart = async (opts = {}) => {
-    if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.restart is deprecated and will be removed. Use pear-restart')
-    if (this.#state.ui === null) throw new Error('Pear.restart is not supported for terminal apps')
+    if (!this.constructor.COMPAT)
+      console.error(
+        '[ DEPRECATED ] Pear.restart is deprecated and will be removed. Use pear-restart'
+      )
+    if (this.#state.ui === null)
+      throw new Error('Pear.restart is not supported for terminal apps')
     return ref.track(this.#ipc.restart(opts))
   }
 
   teardown = (fn = () => {}, position = 0) => {
-    if (typeof fn !== 'function') throw ERR_INVALID_INPUT('teardown expects function')
+    if (typeof fn !== 'function')
+      throw ERR_INVALID_INPUT('teardown expects function')
 
-    const isValidPosition = Number.isInteger(position) || position === Infinity || position === -Infinity
-    if (!isValidPosition) throw ERR_INVALID_INPUT('teardown position must be integer')
+    const isValidPosition =
+      Number.isInteger(position) ||
+      position === Infinity ||
+      position === -Infinity
+    if (!isValidPosition)
+      throw ERR_INVALID_INPUT('teardown position must be integer')
 
     this.#teardowns.push({ fn, position })
   }
 
   versions = () => ref.track(this.#ipc.versions())
 
-  set exitCode (code) { program.exitCode = code }
-  get exitCode () { return program.exitCode }
+  set exitCode(code) {
+    program.exitCode = code
+  }
+  get exitCode() {
+    return program.exitCode
+  }
 
   exit = (code) => {
     program.exitCode = code
@@ -108,11 +146,12 @@ class API {
     })
   }
 
-  async #unload () {
+  async #unload() {
     this.#unloading()
 
     this.#teardowns.sort((a, b) => a.position - b.position)
-    for (const teardown of this.#teardowns) this.#teardown = this.#teardown.then(teardown.fn)
+    for (const teardown of this.#teardowns)
+      this.#teardown = this.#teardown.then(teardown.fn)
 
     const MAX_TEARDOWN_WAIT = 15000
     let timeout = null
@@ -124,13 +163,19 @@ class API {
         resolve()
       }, MAX_TEARDOWN_WAIT)
     })
-    this.#teardown.finally(() => { clearTimeout(timeout) })
+    this.#teardown.finally(() => {
+      clearTimeout(timeout)
+    })
     await Promise.race([this.#teardown, countdown]).catch((err) => {
       rejected = err
     })
     if (timedout || rejected) {
-      if (timedout) console.error(`Max teardown wait reached after ${MAX_TEARDOWN_WAIT} ms. Exiting...`)
-      if (rejected) console.error(`${rejected}. User teardown threw. Exiting...`)
+      if (timedout)
+        console.error(
+          `Max teardown wait reached after ${MAX_TEARDOWN_WAIT} ms. Exiting...`
+        )
+      if (rejected)
+        console.error(`${rejected}. User teardown threw. Exiting...`)
       if (global.Bare) {
         global.Bare.exit()
       } else {
@@ -141,39 +186,60 @@ class API {
   }
 
   message = (msg) => {
-    if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.message is deprecated and will be removed. Use pear-message')
+    if (!this.constructor.COMPAT)
+      console.error(
+        '[ DEPRECATED ] Pear.message is deprecated and will be removed. Use pear-message'
+      )
     return message(msg)
   }
 
   messages = (pattern, listener) => {
-    if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.messages is deprecated and will be removed. Use pear-messages')
+    if (!this.constructor.COMPAT)
+      console.error(
+        '[ DEPRECATED ] Pear.messages is deprecated and will be removed. Use pear-messages'
+      )
     return messages(pattern, listener)
   }
 
   updated = () => {
-    if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.updated is deprecated and will be removed. It is now a no-op & can be removed from code.')
-    if (typeof this.#ipc.updated === 'function') return ref.track(this.#ipc.updated())
+    if (!this.constructor.COMPAT)
+      console.error(
+        '[ DEPRECATED ] Pear.updated is deprecated and will be removed. It is now a no-op & can be removed from code.'
+      )
+    if (typeof this.#ipc.updated === 'function')
+      return ref.track(this.#ipc.updated())
     return Promise.resolve()
   }
 
   reload = async (opts = {}) => {
-    if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.reload is deprecated and will be removed. Use location.reload.')
-    if (this.#state.ui === null) throw new Error('Pear.reload is not supported for terminal apps')
-    if (opts.platform) throw new Error('Platform Pear.reload is not supported for desktop apps')
+    if (!this.constructor.COMPAT)
+      console.error(
+        '[ DEPRECATED ] Pear.reload is deprecated and will be removed. Use location.reload.'
+      )
+    if (this.#state.ui === null)
+      throw new Error('Pear.reload is not supported for terminal apps')
+    if (opts.platform)
+      throw new Error('Platform Pear.reload is not supported for desktop apps')
     global.location.reload()
   }
 
   updates = (listener) => {
-    if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.updates is deprecated and will be removed. Use pear-updates')
+    if (!this.constructor.COMPAT)
+      console.error(
+        '[ DEPRECATED ] Pear.updates is deprecated and will be removed. Use pear-updates'
+      )
     return updates(listener)
   }
 
   wakeups = (listener) => {
-    if (!this.constructor.COMPAT) console.error('[ DEPRECATED ] Pear.wakeups is deprecated and will be removed. Use pear-wakeups')
+    if (!this.constructor.COMPAT)
+      console.error(
+        '[ DEPRECATED ] Pear.wakeups is deprecated and will be removed. Use pear-wakeups'
+      )
     return wakeups(listener)
   }
 }
 
-function noop () {}
+function noop() {}
 
 module.exports = API
