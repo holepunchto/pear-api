@@ -76,7 +76,7 @@
     "bare-path": "^3.0.0",
     "bare-process": "^4.2.1",
     "brittle": "^3.16.2",
-    "iambus": "^1.0.3",
+    "iambus": "^2.0.0",
     "paparam": "^1.8.5",
     "pear-ipc": "^6.5.0",
     "prettier": "^3.6.2",
