@@ -30,6 +30,7 @@ class API {
   static REF = kREF
   static RUNTIME = RUNTIME
   static RUNTIME_ARGV = []
+  static RUNTIME_FLAGS = []
   static set COMPAT(compat) {
     if (compat) Pear.app.tier = Pear.app.key ? 'production' : 'dev'
     return (COMPAT = compat)
