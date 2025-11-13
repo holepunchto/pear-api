@@ -82,7 +82,7 @@ test('Pear.messages single client', async function (t) {
 test('Pear.messages multi clients', async function (t) {
   t.plan(1)
 
-  const dir = path.join(dirname, 'fixtures', 'run-messages-client')
+  const dir = path.join(dirname, 'fixtures', 'run-messages-client', 'index.js')
 
   const bus = new Iambus()
   await Helper.startIpcServer({
@@ -273,7 +273,7 @@ test('Pear.versions returns', async function (t) {
 test('Pear.worker.run -> pipe', async function (t) {
   t.plan(1)
 
-  const dir = path.join(dirname, 'fixtures', 'run')
+  const dir = path.join(dirname, 'fixtures', 'run', 'index.js')
 
   const teardown = Helper.rig()
   t.teardown(teardown)
@@ -304,7 +304,7 @@ test('Pear.worker.run -> pipe', async function (t) {
 test('Pear.worker.run Pear.worker.pipe', async function (t) {
   t.plan(1)
 
-  const dir = path.join(dirname, 'fixtures', 'legacy-worker-pipe')
+  const dir = path.join(dirname, 'fixtures', 'legacy-worker-pipe', 'index.js')
 
   const teardown = Helper.rig()
   t.teardown(teardown)
@@ -335,7 +335,7 @@ test('Pear.worker.run Pear.worker.pipe', async function (t) {
 test('run args become Pear.config.args', async function (t) {
   t.plan(1)
 
-  const dir = path.join(dirname, 'fixtures', 'print-args')
+  const dir = path.join(dirname, 'fixtures', 'print-args', 'index.js')
 
   const teardown = Helper.rig()
   t.teardown(teardown)
@@ -353,7 +353,7 @@ test('run args become Pear.config.args', async function (t) {
 test('run args become Pear.config.args', async function (t) {
   t.plan(1)
 
-  const dir = path.join(dirname, 'fixtures', 'print-args')
+  const dir = path.join(dirname, 'fixtures', 'print-args', 'index.js')
 
   const teardown = Helper.rig()
   t.teardown(teardown)
@@ -371,8 +371,13 @@ test('run args become Pear.config.args', async function (t) {
 test('run should run inside run', async function (t) {
   t.plan(1)
 
-  const runDir = path.join(dirname, 'fixtures', 'run-runner')
-  const helloWorldDir = path.join(dirname, 'fixtures', 'hello-world')
+  const runDir = path.join(dirname, 'fixtures', 'run-runner', 'index.js')
+  const helloWorldDir = path.join(
+    dirname,
+    'fixtures',
+    'hello-world',
+    'index.js'
+  )
 
   const teardown = Helper.rig()
   t.teardown(teardown)
@@ -387,8 +392,13 @@ test('run should run inside run', async function (t) {
 })
 
 test('run exit when child calls pipe.end()', async function (t) {
-  const runParent = path.join(dirname, 'fixtures', 'run-parent')
-  const runEndFromChild = path.join(dirname, 'fixtures', 'run-end-from-child')
+  const runParent = path.join(dirname, 'fixtures', 'run-parent', 'index.js')
+  const runEndFromChild = path.join(
+    dirname,
+    'fixtures',
+    'run-end-from-child',
+    'index.js'
+  )
 
   const teardown = Helper.rig()
   t.teardown(teardown)
@@ -404,12 +414,14 @@ test('run exit when child calls pipe.destroy()', async function (t) {
   const runParentErrorHandler = path.join(
     dirname,
     'fixtures',
-    'run-parent-error-handler'
+    'run-parent-error-handler',
+    'index.js'
   )
   const runDestroyFromChild = path.join(
     dirname,
     'fixtures',
-    'run-destroy-from-child'
+    'run-destroy-from-child',
+    'index.js'
   )
 
   const teardown = Helper.rig()
@@ -423,8 +435,13 @@ test('run exit when child calls pipe.destroy()', async function (t) {
 })
 
 test('run exit when parent calls pipe.end()', async function (t) {
-  const runEndFromParent = path.join(dirname, 'fixtures', 'run-end-from-parent')
-  const runChild = path.join(dirname, 'fixtures', 'run-child')
+  const runEndFromParent = path.join(
+    dirname,
+    'fixtures',
+    'run-end-from-parent',
+    'index.js'
+  )
+  const runChild = path.join(dirname, 'fixtures', 'run-child', 'index.js')
 
   const teardown = Helper.rig()
   t.teardown(teardown)
@@ -440,12 +457,14 @@ test('run exit when parent calls pipe.destroy()', async function (t) {
   const runDestroyFromParent = path.join(
     dirname,
     'fixtures',
-    'run-destroy-from-parent'
+    'run-destroy-from-parent',
+    'index.js'
   )
   const runChildErrorHandler = path.join(
     dirname,
     'fixtures',
-    'run-child-error-handler'
+    'run-child-error-handler',
+    'index.js'
   )
 
   const teardown = Helper.rig()
@@ -662,7 +681,7 @@ test(
   async function (t) {
     t.plan(1)
 
-    const dir = path.join(dirname, 'fixtures', 'run-teardown')
+    const dir = path.join(dirname, 'fixtures', 'run-teardown', 'index.js')
 
     const teardown = Helper.rig()
     t.teardown(teardown)
@@ -680,7 +699,12 @@ test(
   async function (t) {
     t.plan(2)
 
-    const dir = path.join(dirname, 'fixtures', 'run-teardown-os-kill')
+    const dir = path.join(
+      dirname,
+      'fixtures',
+      'run-teardown-os-kill',
+      'index.js'
+    )
 
     const teardown = Helper.rig()
     t.teardown(teardown)
@@ -706,7 +730,7 @@ test(
   async function (t) {
     t.plan(1)
 
-    const dir = path.join(dirname, 'fixtures', 'run-teardown-wait')
+    const dir = path.join(dirname, 'fixtures', 'run-teardown-wait', 'index.js')
 
     const teardown = Helper.rig()
     t.teardown(teardown)
@@ -724,7 +748,7 @@ test(
   async function (t) {
     t.plan(1)
 
-    const dir = path.join(dirname, 'fixtures', 'run-teardown-error')
+    const dir = path.join(dirname, 'fixtures', 'run-teardown-error', 'index.js')
 
     const teardown = Helper.rig()
     t.teardown(teardown)
