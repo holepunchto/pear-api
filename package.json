@@ -65,7 +65,7 @@
     "pear-messages": "^1.0.0",
     "pear-pipe": "^1.0.1",
     "pear-ref": "^1.0.2",
-    "pear-run": "^1.0.0",
+    "pear-run": "^1.0.8",
     "pear-updates": "^1.0.1",
     "pear-wakeups": "^1.0.0"
   },

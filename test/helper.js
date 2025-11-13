@@ -19,6 +19,7 @@ class Helper {
     ipc = { ref: noop, unref: noop },
     state = { config: { applink: 'pear://keet' }, applink: 'pear://keet' },
     runtimeArgv,
+    runtimeFlags = [],
     clearRequireCache
   } = {}) {
     if (!require.main.url) require.main.url = pathToFileURL(__filename)
@@ -38,6 +39,7 @@ class Helper {
     class TestAPI extends API {
       static RUNTIME = program.argv[0]
       static RUNTIME_ARGV = runtimeArgv ?? [path.join(dirname, 'run.js')]
+      static RUNTIME_FLAGS = runtimeFlags
       static RTI = RigAPI.RTI
     }
 
