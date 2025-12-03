@@ -4,7 +4,7 @@
 
 ## `pear-api`
 
-Supplies the API base for the Pear API (https://docs.pears.com/api).
+Supplies the API base for the Pear API (https://docs.pears.com/reference/api).
 
 For extending from for User Interface integrations.
 
