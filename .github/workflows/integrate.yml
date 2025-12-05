@@ -27,4 +27,3 @@ jobs:
     steps:
       - uses: holepunchto/actions/bare-base@v1
       - run: npm test
-        continue-on-error: true
