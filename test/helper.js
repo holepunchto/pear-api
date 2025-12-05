@@ -195,8 +195,9 @@ class Helper {
     require.cache[modulePath].exports =
       typeof override === 'function' ? override : { ...original, ...override }
     return () => {
-      if (require.cache[modulePath])
+      if (require.cache[modulePath]) {
         require.cache[modulePath].exports = original
+      }
     }
   }
 

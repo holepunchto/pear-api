@@ -5,10 +5,11 @@
   "main": "index.js",
   "scripts": {
     "format": "prettier --write .",
-    "lint": "prettier --check .",
+    "lint": "prettier --check . && lunte",
     "test:gen": "brittle -r test/all.js test/*.test.js",
-    "test": "brittle-bare test/all.js",
-    "test:node": "brittle-node test/all.js"
+    "test": "npm run test:node && npm run test:bare",
+    "test:node": "brittle-node test/all.js",
+    "test:bare": "brittle-bare test/all.js"
   },
   "files": [
     "CHANGELOG.md",
@@ -77,6 +78,7 @@
     "bare-process": "^4.2.1",
     "brittle": "^3.16.2",
     "iambus": "^2.0.0",
+    "lunte": "^1.3.0",
     "paparam": "^1.8.5",
     "pear-ipc": "^6.5.0",
     "prettier": "^3.6.2",

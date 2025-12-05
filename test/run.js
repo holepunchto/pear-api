@@ -2,10 +2,14 @@ const Helper = require('./helper')
 const { command } = require('paparam')
 const pear = require('pear-cmd')
 const rundef = require('pear-cmd/run')
+const path = require('path')
 const program = global.Bare ?? global.process
+const { fileURLToPath } = require('url-file-url')
 const cmd = pear(program.argv.slice(2))
-if (cmd.args.cmd !== 'run')
+if (cmd.args.cmd !== 'run') {
   throw Error('NOT A RUN COMMAND, MUST BE A RUN COMMAND')
+}
+
 const parser = command('run', ...rundef)
 const run = parser.parse(cmd.rest)
 global.runRigTeardown = Helper.rig({
@@ -14,4 +18,5 @@ global.runRigTeardown = Helper.rig({
     config: { args: run.rest, applink: 'pear://keet' }
   }
 })
-require(run.args.link)
+const link = path.relative(__dirname, fileURLToPath(run.args.link))
+require(`./${link}`)
