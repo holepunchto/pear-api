@@ -1,1 +1,1 @@
-global.Pear = {isMobile: true}
+global.Pear = { isMobile: true }
