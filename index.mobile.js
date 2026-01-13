@@ -1,0 +1,1 @@
+global.Pear = {isMobile: true}
