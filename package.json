@@ -59,7 +59,10 @@
     }
   },
   "exports": {
-    "./mobile": "./index.mobile.js"
+    ".": {
+      "pear-mobile": "./index.mobile.js",
+      "default": "./index.js"
+    }
   },
   "dependencies": {
     "pear-constants": "^1.0.0",
