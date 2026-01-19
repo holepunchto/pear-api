@@ -65,6 +65,8 @@
     }
   },
   "dependencies": {
+    "bare-console": "^6.1.0",
+    "bare-system-logger": "^1.0.2",
     "pear-constants": "^1.0.0",
     "pear-errors": "^1.0.0",
     "pear-gracedown": "^1.0.0",
