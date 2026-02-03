@@ -7,12 +7,81 @@ const path = require('bare-path')
 const fs = require('bare-fs')
 const crypto = require('bare-crypto')
 const { fileURLToPath, pathToFileURL } = require('bare-url')
+const os = require('bare-os')
+const goodbye = require('graceful-goodbye')
 
 let bundle = Bare.argv.pop()
 const filename = Bare.argv.pop()
 const assets = null // TODO: support assets
 
+class API {
+  constructor (){
+    this.isMobile = true
+    this.argv = Bare.argv
+    this.pid = Bare.pid
+    this.exitCode = Bare.exitCode
+    this.app = {} // need to adjust
+
+    this.app.startId = crypto.randomBytes(16).toString('hex') // ID for the thread
+    this.app.id = null // `${client.id}@${startId}`
+    
+  }
+
+  checkpoint (state) {
+    global.Pear.app.checkpoint = state
+    // return ref.track(this.#ipc.checkpoint(state)) // TODO: find equivalent
+  }
+
+  versions () {
+    return { runtimes: { bare: Bare.versions.bare }, engines: {}}
+  }
+
+  exit () {
+    return os.kill(Bare.pid, 'SIGTERM')
+  }
+
+  teardown (callback, position){
+    return goodbye(callback, position)
+  }
+}
+
+// eg:
+//       id,
+//       startId,
+//       key,
+//       links,
+//       alias,
+//       env,
+//       gui,
+//       assets,
+//       options,
+//       checkpoint,
+//       checkout,
+//       flags,
+//       dev,
+//       stage,
+//       storage,
+//       name,
+//       main,
+//       args,
+//       channel,
+//       release,
+//       applink,
+//       query,
+//       fragment,
+//       link,
+//       linkData,
+//       entrypoint,
+//       route,
+//       routes,
+//       dir,
+//       dht,
+//       prerunning,
+//       version
+
+global.Pear = new API()
 load()
+
 async function load() {
   if (assets !== null) {
     let url
@@ -75,54 +144,3 @@ async function load() {
 
   Module.load(url, bundle, {cache})
 }
-
-
-const goodbye = require('graceful-goodbye')
-
-global.Pear = {}
-global.Pear.test = "test"
-global.Pear.isMobile = true
-
-console.log('logging bare api', Bare)
-global.Pear.versions = () => { return { runtimes: { bare: Bare.versions.bare }, engines: {}}}
-global.Pear.exit = (code) => Bare.exit(code)
-global.Pear.argv = Bare.argv
-global.Pear.pid = Bare.pid
-global.Pear.exitCode = Bare.exitCode
-global.Pear.teardown = goodbye
-global.Pear.checkpoint = null // 
-global.Pear.app = null // need stage create config from im pear-state
-
-// eg:
-//       id,
-//       startId,
-//       key,
-//       links,
-//       alias,
-//       env,
-//       gui,
-//       assets,
-//       options,
-//       checkpoint,
-//       checkout,
-//       flags,
-//       dev,
-//       stage,
-//       storage,
-//       name,
-//       main,
-//       args,
-//       channel,
-//       release,
-//       applink,
-//       query,
-//       fragment,
-//       link,
-//       linkData,
-//       entrypoint,
-//       route,
-//       routes,
-//       dir,
-//       dht,
-//       prerunning,
-//       version
