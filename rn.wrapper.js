@@ -16,8 +16,8 @@ const info = Bare.argv.pop()
 const { filename, link, pkgContent } = JSON.parse(info)
 const pkg = pkgContent ?? JSON.parse(pkgContent)
 const { main, pear: options, name } = pkg
-const assets = null // TODO: support assets
 
+// TODO: support assets
 class API {
   constructor(opts = {}) {
     this.isMobile = true
@@ -90,20 +90,6 @@ global.Pear = new API({ main, options, name })
 load()
 
 async function load() {
-  if (assets !== null) {
-    let url
-
-    if (startsWithWindowsDriveLetter(assets)) {
-      url = null
-    } else {
-      url = URL.parse(assets)
-    }
-
-    if (url === null) url = pathToFileURL(assets)
-
-    assets = fileURLToPath(url)
-  }
-
   let url
 
   if (startsWithWindowsDriveLetter(filename)) {
@@ -116,36 +102,6 @@ async function load() {
 
   if (bundle === null) bundle = Module.protocol.read(url)
   else bundle = Buffer.from(bundle)
-
-  if (assets !== null && path.extname(url.href) === '.bundle') {
-    const bundle = Bundle.from(bundle)
-
-    if (bundle.id !== null && bundle.assets.length > 0) {
-      const id = crypto.createHash('blake2b256').update(bundle.id).digest('hex')
-
-      const root = path.join(assets, id)
-
-      const tmp = fs.existsSync(root) ? null : path.join(assets, 'tmp')
-
-      if (tmp !== null) {
-        fs.rmSync(tmp, { recursive: true, force: true })
-        fs.mkdirSync(tmp, { recursive: true })
-      }
-
-      bundle = await unpack(bundle, { files: false, assets: true }, (key) => {
-        if (tmp !== null) {
-          const target = path.join(tmp, key)
-
-          fs.mkdirSync(path.dirname(target), { recursive: true })
-          fs.writeFileSync(target, bundle.read(key))
-        }
-
-        return pathToFileURL(path.join(root, key)).href
-      })
-
-      if (tmp !== null) fs.renameSync(tmp, root)
-    }
-  }
 
   // local cache doesnt work with ESM (as of now)
   // const cache = Object.create(null) // use clean cache to avoid id collisions

@@ -17,9 +17,9 @@ const main = pkg.main ?? link.lastIndexOf('/') + 1
 const options = pkg.pear ?? null
 const name = pkg.name ?? link.lastIndexOf('/') + 1
 
-const assets = null // TODO: support assets
 Bare.Thread.self.data = data
 
+// TODO: support assets
 class API {
   constructor(opts = {}) {
     this.isMobile = true
@@ -89,35 +89,6 @@ class API {
     return goodbye(callback, position)
   }
 }
-
-// eg:
-//       env,
-//       gui,
-//       assets,
-//       options,
-//       checkpoint,
-//       checkout,
-//       flags,
-//       dev,
-//       stage,
-//       storage,
-//       name,
-//       main,
-//       args,
-//       channel,
-//       release,
-//       applink,
-//       query,
-//       fragment,
-//       link,
-//       linkData,
-//       entrypoint,
-//       route,
-//       routes,
-//       dir,
-//       dht,
-//       prerunning,
-//       version
 
 global.Pear = new API({ main, options, name, args })
 
