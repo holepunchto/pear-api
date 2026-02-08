@@ -63,7 +63,7 @@
       "pear-mobile": "./index.mobile.js",
       "default": "./index.js"
     },
-    "./wrapper": "./index.mobile.js"
+    "./wrapper": "./rn.wrapper.js"
   },
   "dependencies": {
     "bare-console": "^6.1.0",

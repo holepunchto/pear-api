@@ -1,24 +1,22 @@
 const SystemLog = require('bare-system-logger')
 const Console = require('bare-console')
 global.console = new Console(new SystemLog())
+const Module = require('bare-module')
+const { startsWithWindowsDriveLetter } = require('bare-module-resolve')
+const path = require('bare-path')
+const fs = require('bare-fs')
 const crypto = require('bare-crypto')
+const { fileURLToPath, pathToFileURL } = require('bare-url')
 const plink = require('pear-link')
 const os = require('bare-os')
 const goodbye = require('graceful-goodbye')
 
-const { data, info, args } = Bare.Thread.self.data
-const { link, pkgContent } = info
-
-let pkg = {}
-if (pkgContent) pkg = pkgContent ?? JSON.parse(pkgContent)
-console.log('logging pkg:', pkg)
-
-const main = pkg.main ?? link.lastIndexOf('/') + 1
-const options = pkg.pear ?? null
-const name = pkg.name ?? link.lastIndexOf('/') + 1
-
+let bundle = Bare.argv.pop()
+const info = Bare.argv.pop()
+const { filename, link, pkgContent } = JSON.parse(info)
+const pkg = pkgContent ?? JSON.parse(pkgContent)
+const { main, pear: options, name } = pkg
 const assets = null // TODO: support assets
-Bare.Thread.self.data = data
 
 class API {
   constructor (opts = {}){
@@ -35,14 +33,12 @@ class API {
     this.app.fork = null
     this.app.release = null
     try{
-      console.log('parsing link:', link)
       const { hash, drive, query } = plink.parse(link)
       const { key, fork, release, length } = drive
       const linkInfo = { key, fork, release, length, fragement:hash, query}
       this.app = { ...this.app, ...linkInfo } // same as on desktop (its the key of the current thread (on desktop process))
-      console.log('logging app:', this.app)
     } catch (err) {
-      console.log('error with pear-link:', err)
+      console.warn('error with pear-link:', err)
     }
     this.app = {
         ...this.app,
@@ -90,35 +86,69 @@ class API {
   }
 }
 
-// eg:
-//       env,
-//       gui,
-//       assets,
-//       options,
-//       checkpoint,
-//       checkout,
-//       flags,
-//       dev,
-//       stage,
-//       storage,
-//       name,
-//       main,
-//       args,
-//       channel,
-//       release,
-//       applink,
-//       query,
-//       fragment,
-//       link,
-//       linkData,
-//       entrypoint,
-//       route,
-//       routes,
-//       dir,
-//       dht,
-//       prerunning,
-//       version
+global.Pear = new API({main, options, name})
+load()
 
-global.Pear = new API({main, options, name, args})
+async function load() {
+  if (assets !== null) {
+    let url
 
-module.exports = API
+    if (startsWithWindowsDriveLetter(assets)) {
+      url = null
+    } else {
+      url = URL.parse(assets)
+    }
+
+    if (url === null) url = pathToFileURL(assets)
+
+    assets = fileURLToPath(url)
+  }
+
+  let url
+
+  if (startsWithWindowsDriveLetter(filename)) {
+    url = null
+  } else {
+    url = URL.parse(filename)
+  }
+
+  if (url === null) url = pathToFileURL(filename)
+
+  if (bundle === null) bundle = Module.protocol.read(url)
+  else bundle = Buffer.from(bundle)
+
+  if (assets !== null && path.extname(url.href) === '.bundle') {
+    const bundle = Bundle.from(bundle)
+
+    if (bundle.id !== null && bundle.assets.length > 0) {
+      const id = crypto.createHash('blake2b256').update(bundle.id).digest('hex')
+
+      const root = path.join(assets, id)
+
+      const tmp = fs.existsSync(root) ? null : path.join(assets, 'tmp')
+
+      if (tmp !== null) {
+        fs.rmSync(tmp, { recursive: true, force: true })
+        fs.mkdirSync(tmp, { recursive: true })
+      }
+
+      bundle = await unpack(bundle, { files: false, assets: true }, (key) => {
+        if (tmp !== null) {
+          const target = path.join(tmp, key)
+
+          fs.mkdirSync(path.dirname(target), { recursive: true })
+          fs.writeFileSync(target, bundle.read(key))
+        }
+
+        return pathToFileURL(path.join(root, key)).href
+      })
+
+      if (tmp !== null) fs.renameSync(tmp, root)
+    }
+  }
+
+  // local cache doesnt work with ESM (as of now)
+  // const cache = Object.create(null) // use clean cache to avoid id collisions
+
+  Module.load(url, bundle)
+}
