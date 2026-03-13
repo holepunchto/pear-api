@@ -19,6 +19,7 @@ class API {
   #ipc = null
   #state = null
   #unloading = null
+  #unloadPromise = null
   #teardown = null
   #teardowns = []
   #onteardown = null
@@ -155,45 +156,53 @@ class API {
   }
 
   async #unload() {
-    this.#unloading()
-
-    this.#teardowns.sort((a, b) => a.position - b.position)
-    for (const teardown of this.#teardowns) {
-      this.#teardown = this.#teardown.then(teardown.fn)
+    if (this.#unloadPromise) {
+      return this.#unloadPromise
     }
 
-    const MAX_TEARDOWN_WAIT = 15000
-    let timeout = null
-    let timedout = false
-    let rejected = null
-    const countdown = new Promise((resolve) => {
-      timeout = setTimeout(() => {
-        timedout = true
-        resolve()
-      }, MAX_TEARDOWN_WAIT)
-    })
-    this.#teardown.finally(() => {
-      clearTimeout(timeout)
-    })
-    await Promise.race([this.#teardown, countdown]).catch((err) => {
-      rejected = err
-    })
-    if (timedout || rejected) {
-      if (timedout) {
-        console.error(
-          `Max teardown wait reached after ${MAX_TEARDOWN_WAIT} ms. Exiting...`
-        )
+    this.#unloadPromise = (async () => {
+      this.#unloading()
+
+      this.#teardowns.sort((a, b) => a.position - b.position)
+      for (const teardown of this.#teardowns) {
+        this.#teardown = this.#teardown.then(teardown.fn)
       }
-      if (rejected) {
-        console.error(`${rejected}. User teardown threw. Exiting...`)
+
+      const MAX_TEARDOWN_WAIT = 15000
+      let timeout = null
+      let timedout = false
+      let rejected = null
+      const countdown = new Promise((resolve) => {
+        timeout = setTimeout(() => {
+          timedout = true
+          resolve()
+        }, MAX_TEARDOWN_WAIT)
+      })
+      this.#teardown.finally(() => {
+        clearTimeout(timeout)
+      })
+      await Promise.race([this.#teardown, countdown]).catch((err) => {
+        rejected = err
+      })
+      if (timedout || rejected) {
+        if (timedout) {
+          console.error(
+            `Max teardown wait reached after ${MAX_TEARDOWN_WAIT} ms. Exiting...`
+          )
+        }
+        if (rejected) {
+          console.error(`${rejected}. User teardown threw. Exiting...`)
+        }
+        if (global.Bare) {
+          global.Bare.exit()
+        } else {
+          const electron = require('electron')
+          electron.ipcRenderer.send('app-exit') // graceful electron shutdown
+        }
       }
-      if (global.Bare) {
-        global.Bare.exit()
-      } else {
-        const electron = require('electron')
-        electron.ipcRenderer.send('app-exit') // graceful electron shutdown
-      }
-    }
+    })()
+
+    return this.#unloadPromise
   }
 
   message = (msg) => {
