@@ -19,7 +19,7 @@ class API {
   #ipc = null
   #state = null
   #unloading = null
-  #unloadPromise = null
+  #unloadingPromise = null
   #teardown = null
   #teardowns = []
   #onteardown = null
@@ -156,11 +156,11 @@ class API {
   }
 
   async #unload() {
-    if (this.#unloadPromise) {
-      return this.#unloadPromise
+    if (this.#unloadingPromise) {
+      return this.#unloadingPromise
     }
 
-    this.#unloadPromise = (async () => {
+    this.#unloadingPromise = (async () => {
       this.#unloading()
 
       this.#teardowns.sort((a, b) => a.position - b.position)
@@ -202,7 +202,7 @@ class API {
       }
     })()
 
-    return this.#unloadPromise
+    return this.#unloadingPromise
   }
 
   message = (msg) => {
