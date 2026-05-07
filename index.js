@@ -187,12 +187,8 @@ class API {
       if (rejected) {
         console.error(`${rejected}. User teardown threw. Exiting...`)
       }
-      if (global.Bare) {
-        global.Bare.exit()
-      } else {
-        const electron = require('electron')
-        electron.ipcRenderer.send('app-exit') // graceful electron shutdown
-      }
+
+      program.exit()
     }
   }
 
